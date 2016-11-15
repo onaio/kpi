@@ -41,8 +41,7 @@ ecdsa==0.13               # via paramiko
 enum34==1.1.6             # via cryptography
 Fabric==1.11.1
 funcsigs==1.0.2           # via begins
-# functools32==3.2.3.post2  # via jsonschema
-functools32==3.2.3-2
+functools32==3.2.3-2      # via jsonschema
 gunicorn==19.4.5
 idna==2.1                 # via cryptography
 ipaddress==1.0.17         # via cryptography
