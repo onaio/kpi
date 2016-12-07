@@ -462,7 +462,7 @@ export default assign({
                   ref='form-name'
                   value={name}
                   onChange={this.nameChange}
-                  placeholder={t('form name')}
+                  placeholder={t('Enter form name')}
                 />
             </bem.FormBuilderHeader__cell>
             <bem.FormBuilderHeader__cell m={'buttonsTopRight'} >
