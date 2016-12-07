@@ -4,13 +4,15 @@ import copy
 import json
 import datetime
 
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Q, Count
 from django.forms import model_to_dict
-from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
+from django.http import (
+    Http404, HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
+)
 from django.utils.http import is_safe_url
 from django.shortcuts import get_object_or_404, resolve_url
 from django.template.response import TemplateResponse
@@ -28,7 +30,7 @@ from rest_framework import (
 )
 from rest_framework.decorators import api_view
 from rest_framework.decorators import renderer_classes
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import authentication_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
@@ -85,13 +87,30 @@ from .utils.kobo_to_xlsform import to_xlsform_structure
 from .utils.ss_structure_to_mdtable import ss_structure_to_mdtable
 from .tasks import import_in_background
 from deployment_backends.backends import DEPLOYMENT_BACKENDS
+from ona.authentication import (
+    JWTAuthentication, encode_payload, decode_payload
+)
+
 
 CLONE_ARG_NAME = 'clone_from'
 COLLECTION_CLONE_FIELDS = {'name'}
 
 
-@login_required
 def home(request):
+    if request.user.is_anonymous():
+        cookie_jwt = request.COOKIES.get('__enketo')
+        if cookie_jwt:
+            auth_class = JWTAuthentication()
+            user, token = auth_class.authenticate(request)
+            user.backend = settings.AUTHENTICATION_BACKENDS[0]
+            login(request, user)
+
+            return TemplateResponse(request, "index.html")
+        else:
+            return HttpResponse(
+                ("Login to http://ona.io/login on a different browser tab"
+                 " then refresh this page"))
+
     return TemplateResponse(request, "index.html")
 
 
