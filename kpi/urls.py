@@ -53,6 +53,7 @@ urlpatterns = [
     url(r'^me/$', CurrentUserViewSet.as_view({
         'get': 'retrieve',
         'patch': 'partial_update',
+        'post': 'logout',
     }), name='currentuser-detail'),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls',
