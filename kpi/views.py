@@ -328,6 +328,15 @@ class CurrentUserViewSet(viewsets.ModelViewSet):
     def get_object(self):
         return self.request.user
 
+    @list_route(methods=['POST'], renderer_classes=[renderers.JSONRenderer])
+    def logout(self, request, *args, **kwargs):
+        logout(request)
+
+        return Response(
+            data={"message": "user successfully logged out"},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
 
 class AuthorizedApplicationUserViewSet(mixins.CreateModelMixin,
                                        viewsets.GenericViewSet):
