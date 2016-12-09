@@ -1,5 +1,6 @@
 import React from 'react/addons';
 import $ from 'jquery';
+import alertify from 'alertifyjs';
 import mdl from '../libs/rest_framework/material';
 import Select from 'react-select';
 import _ from 'underscore';
@@ -362,6 +363,9 @@ export default assign({
     };
     if (this.state.name) {
       params.name = this.state.name;
+    } else {
+      alertify.error(t('Please enter a title for your form'));
+      return
     }
     if (this.editorState === 'new') {
       var library = isLibrary(this.context.router);
@@ -462,7 +466,7 @@ export default assign({
                   ref='form-name'
                   value={name}
                   onChange={this.nameChange}
-                  placeholder={t('form name')}
+                  placeholder={t('Enter form name')}
                 />
             </bem.FormBuilderHeader__cell>
             <bem.FormBuilderHeader__cell m={'buttonsTopRight'} >

@@ -265,7 +265,9 @@ $cardIndicatorIconWidth: 21px;
         // background: none;
         // color: white;
     }
-
+    &.js-add-to-question-library {
+        display: none;
+    }
 }
 
 .bleeding-edge .card__buttons__button {

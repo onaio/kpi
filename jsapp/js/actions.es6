@@ -347,6 +347,20 @@ actions.resources.updateAsset.listen(function(uid, values){
       .fail(function(...args){
         reject(args)
       });
+  }).then(function(asset) {
+    var has_deployment = asset.has_deployment;
+    dataInterface.deployAsset(asset, has_deployment)
+      .done((data) => {
+        if (has_deployment) {
+          notify(t('successfully updated published form'));
+        } else {
+          notify(t('successfully published form'));
+        }
+      })
+      .fail((data) => {
+        alertify.error(t('please add at least one question'));
+      });
+    return asset
   })
 });
 

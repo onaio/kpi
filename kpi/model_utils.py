@@ -172,7 +172,8 @@ def grant_all_model_level_perms(
         else:
             content_types.append(ContentType.objects.get_for_model(item))
     permissions_to_assign = permissions_manager.filter(
-        content_type__in=content_types)
+        content_type__pk__in=[c.pk for c in content_types]
+    )
     if content_types and not permissions_to_assign.exists():
         raise Exception('No permissions found! You may need to migrate your '
             'database. Searched for content types {}.'.format(content_types))

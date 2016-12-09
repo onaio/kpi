@@ -6,6 +6,8 @@
 #
 -e git+https://github.com/kobotoolbox/formpack.git@1.4#egg=formpack
 -e git+https://github.com/kobotoolbox/pyxform.git@6dfff060fc2ad6c575c6a7d953c381d2180e6833#egg=pyxform
+# cors
+-e git+https://github.com/onaio/django-cors-headers.git@allow-all-for-url#egg=cors-headers
 amqp==1.4.9
 anyjson==0.3.3
 begins==0.9
@@ -41,7 +43,7 @@ ecdsa==0.13               # via paramiko
 enum34==1.1.6             # via cryptography
 Fabric==1.11.1
 funcsigs==1.0.2           # via begins
-functools32==3.2.3.post2  # via jsonschema
+functools32==3.2.3-2  # via jsonschema
 gunicorn==19.4.5
 idna==2.1                 # via cryptography
 ipaddress==1.0.17         # via cryptography
@@ -59,6 +61,7 @@ paramiko==1.17.0          # via fabric
 path.py==8.1.2
 psycopg2==2.6.1
 py==1.4.31                # via pytest
+PyJWT==1.4.0
 pyasn1==0.1.9
 pycparser==2.14           # via cffi
 pycrypto==2.6.1           # via paramiko
