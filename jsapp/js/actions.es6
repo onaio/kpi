@@ -358,7 +358,7 @@ actions.resources.updateAsset.listen(function(uid, values){
         }
       })
       .fail((data) => {
-        actions.resources.deployAsset.failed(data, dialog_or_alert);
+        alertify.error(t('please add at least one question'));
       });
     return asset
   })
