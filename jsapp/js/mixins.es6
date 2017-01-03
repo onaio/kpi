@@ -136,7 +136,7 @@ var dmix = {
       innerRender: function () {
         var docTitle = this.state.name || t('Untitled');
         return (
-          <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+          <DocumentTitle title={`${docTitle} | Ona`}>
             <bem.FormView m='scrollable'>
                 <bem.FormView__wrapper m='form'>
                   <bem.FormView__row>

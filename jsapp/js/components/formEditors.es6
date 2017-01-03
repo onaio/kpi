@@ -346,7 +346,7 @@ export var ProjectDownloads = React.createClass({
     var docTitle = this.props.asset.name || t('Untitled');
 
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | Ona`}>
       <bem.FormView>
         <bem.FormView__cell>
           <bem.FormModal__form onSubmit={this.handleSubmit}>

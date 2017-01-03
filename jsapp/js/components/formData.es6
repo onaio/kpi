@@ -85,7 +85,7 @@ var FormData = React.createClass({
     var docTitle = this.state.name || t('Untitled');
 
     return (
-        <DocumentTitle title={`${docTitle} | KoboToolbox`}>      
+        <DocumentTitle title={`${docTitle} | Ona`}>
           <bem.FormView>
             <bem.FormView__wrapper>
               <bem.FormView__cell m='iframe'>

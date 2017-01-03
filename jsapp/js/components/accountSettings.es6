@@ -143,7 +143,7 @@ export var AccountSettings = React.createClass({
     var accountName = stores.session.currentAccount.username;
 
     return (
-      <DocumentTitle title={`${accountName} | KoboToolbox`}>
+      <DocumentTitle title={`${accountName} | Ona`}>
       <ui.Panel>
         <bem.AccountSettings>
           <bem.AccountSettings__left>

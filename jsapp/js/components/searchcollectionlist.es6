@@ -205,7 +205,7 @@ var SearchCollectionList = React.createClass({
       docTitle = t('Library');
     }
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | Ona`}>
         <bem.List m={display} onScroll={this.handleScroll}>
           {
             (()=>{

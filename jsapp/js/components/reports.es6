@@ -558,7 +558,7 @@ var Reports = React.createClass({
     }
 
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | Ona`}>
         <bem.ReportView>
           {this.renderReportButtons()}
           {this.state.asset ?
