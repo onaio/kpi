@@ -19,6 +19,7 @@ import {
   assign,
   t,
   log,
+  ONA_TITLE,
 } from '../utils';
 
 function labelVal(label, value) {
@@ -558,7 +559,7 @@ var Reports = React.createClass({
     }
 
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
         <bem.ReportView>
           {this.renderReportButtons()}
           {this.state.asset ?

@@ -1,5 +1,6 @@
 import alertify from 'alertifyjs';
 import {dataInterface} from './dataInterface';
+import {redirectForAuthentication, checkCookieExists} from './utils';
 import {
   log,
   t,
@@ -337,31 +338,35 @@ actions.resources.listTags.completed.listen(function(results){
 });
 
 actions.resources.updateAsset.listen(function(uid, values){
-  return new Promise(function(resolve, reject){
-    dataInterface.patchAsset(uid, values)
-      .done(function(asset){
-        actions.resources.updateAsset.completed(asset);
-        notify(t('successfully updated'));
-        resolve(asset);
-      })
-      .fail(function(...args){
-        reject(args)
-      });
-  }).then(function(asset) {
-    var has_deployment = asset.has_deployment;
-    dataInterface.deployAsset(asset, has_deployment)
-      .done((data) => {
-        if (has_deployment) {
-          notify(t('successfully updated published form'));
-        } else {
-          notify(t('successfully published form'));
-        }
-      })
-      .fail((data) => {
-        alertify.error(t('please add at least one question'));
-      });
-    return asset
-  })
+  if (checkCookieExists("__kpi_formbuilder")) {
+      redirectForAuthentication();
+  } else {
+    return new Promise(function(resolve, reject){
+      dataInterface.patchAsset(uid, values)
+        .done(function(asset){
+          actions.resources.updateAsset.completed(asset);
+          notify(t('successfully updated'));
+          resolve(asset);
+        })
+        .fail(function(...args){
+          reject(args)
+        });
+    }).then(function(asset) {
+      var has_deployment = asset.has_deployment;
+      dataInterface.deployAsset(asset, has_deployment)
+        .done((data) => {
+          if (has_deployment) {
+            notify(t('successfully updated published form'));
+          } else {
+            notify(t('successfully published form'));
+          }
+        })
+        .fail((data) => {
+          alertify.error(t('please add at least one question'));
+        });
+      return asset
+    })
+  }
 });
 
 actions.resources.deployAsset.listen(

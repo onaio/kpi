@@ -14,6 +14,7 @@ import {
   assign,
   t,
   log,
+  ONA_TITLE,
 } from '../utils';
 
 
@@ -143,7 +144,7 @@ export var AccountSettings = React.createClass({
     var accountName = stores.session.currentAccount.username;
 
     return (
-      <DocumentTitle title={`${accountName} | KoboToolbox`}>
+      <DocumentTitle title={`${accountName} | ${ONA_TITLE}`}>
       <ui.Panel>
         <bem.AccountSettings>
           <bem.AccountSettings__left>

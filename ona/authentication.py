@@ -52,33 +52,17 @@ class JWTAuthentication(TokenAuthentication):
     model = Token
 
     def authenticate(self, request):
-        try:
-            cookie_jwt = request.get_signed_cookie(
-                '__enketo', salt=getattr(settings, 'ENKETO_API_SALT')
-            )
+        cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
+        if cookie_jwt:
             api_token = get_api_token(cookie_jwt)
-
             if getattr(api_token, 'user'):
                 return api_token.user, api_token
-        except self.model.DoesNotExist:
-            raise exceptions.AuthenticationFailed(_(u'Invalid token'))
-        except KeyError:
-            pass
-        except BadSignature:
-            # if the cookie wasn't signed it means zebra might have
-            # generated it
-            cookie_jwt = request.COOKIES.get('__enketo')
-            if cookie_jwt:
-                api_token = get_api_token(cookie_jwt)
-                if getattr(api_token, 'user'):
-                    return api_token.user, api_token
 
-                raise exceptions.ParseError(
-                    _('Malformed cookie. Clear your cookies then try again'))
+            raise exceptions.ParseError(
+                _('Malformed cookie. Clear your cookies then try again'))
 
-            raise exceptions.ParseError(_('Expected cookie not found'))
+        raise exceptions.ParseError(_('Expected cookie not found'))
 
-        return None
 
     def get_user(self, user_id):
         try:

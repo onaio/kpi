@@ -26,6 +26,7 @@ import {
   t,
   redirectTo,
   assign,
+  ONA_TITLE,
 } from '../utils';
 
 var ProjectSettings = React.createClass({
@@ -346,7 +347,7 @@ export var ProjectDownloads = React.createClass({
     var docTitle = this.props.asset.name || t('Untitled');
 
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
       <bem.FormView>
         <bem.FormView__cell>
           <bem.FormModal__form onSubmit={this.handleSubmit}>

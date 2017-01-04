@@ -97,19 +97,12 @@ COLLECTION_CLONE_FIELDS = {'name'}
 
 
 def home(request):
-    if request.user.is_anonymous():
-        cookie_jwt = request.COOKIES.get('__enketo')
-        if cookie_jwt:
-            auth_class = JWTAuthentication()
-            user, token = auth_class.authenticate(request)
-            user.backend = settings.AUTHENTICATION_BACKENDS[0]
-            login(request, user)
-
-            return TemplateResponse(request, "index.html")
-        else:
-            return HttpResponse(
-                ("Login to http://ona.io/login on a different browser tab"
-                 " then refresh this page"))
+    cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
+    if request.user.is_anonymous() and cookie_jwt:
+        auth_class = JWTAuthentication()
+        user, token = auth_class.authenticate(request)
+        user.backend = settings.AUTHENTICATION_BACKENDS[0]
+        login(request, user)
 
     return TemplateResponse(request, "index.html")
 
