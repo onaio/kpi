@@ -25,6 +25,7 @@ import {
   assign,
   notify,
   isLibrary,
+  ONA_TITLE,
 } from './utils';
 import {
   ProjectSettingsEditor,
@@ -136,7 +137,7 @@ var dmix = {
       innerRender: function () {
         var docTitle = this.state.name || t('Untitled');
         return (
-          <DocumentTitle title={`${docTitle} | Ona`}>
+          <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
             <bem.FormView m='scrollable'>
                 <bem.FormView__wrapper m='form'>
                   <bem.FormView__row>

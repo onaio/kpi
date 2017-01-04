@@ -16,6 +16,7 @@ import {
   parsePermissions,
   t,
   isLibrary,
+  ONA_TITLE,
 } from '../utils';
 
 var SearchCollectionList = React.createClass({
@@ -205,7 +206,7 @@ var SearchCollectionList = React.createClass({
       docTitle = t('Library');
     }
     return (
-      <DocumentTitle title={`${docTitle} | Ona`}>
+      <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
         <bem.List m={display} onScroll={this.handleScroll}>
           {
             (()=>{

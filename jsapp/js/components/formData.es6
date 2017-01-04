@@ -23,6 +23,7 @@ import {
   assign,
   t,
   log,
+  ONA_TITLE,
 } from '../utils';
 
 var FormData = React.createClass({
@@ -85,7 +86,7 @@ var FormData = React.createClass({
     var docTitle = this.state.name || t('Untitled');
 
     return (
-        <DocumentTitle title={`${docTitle} | Ona`}>
+        <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
           <bem.FormView>
             <bem.FormView__wrapper>
               <bem.FormView__cell m='iframe'>

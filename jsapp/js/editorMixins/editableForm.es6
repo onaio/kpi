@@ -14,6 +14,7 @@ import {
   assign,
   t,
   isLibrary,
+  ONA_TITLE,
 } from '../utils';
 
 import {
@@ -694,7 +695,7 @@ export default assign({
     var isSurvey = this.app && !isLibrary(this.context.router);
     var docTitle = this.state.name || t('Untitled');
     return (
-        <DocumentTitle title={`${docTitle} | Ona`}>
+        <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
           <ui.Panel m={'transparent'}>
             <bem.FormBuilder m={this.state.formStylePanelDisplayed ? 'formStyleDisplayed': null }>
               {this.renderSaveAndPreviewButtons()}
