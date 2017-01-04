@@ -7,7 +7,19 @@ import Promise from 'es6-promise';
 
 export const LANGUAGE_COOKIE_NAME = 'django_language';
 
+export const ONA_TITLE = 'Ona';
+
 export var assign = require('react/lib/Object.assign');
+
+export function checkCookieExists(cookieName) {
+  return document.cookie.indexOf(cookieName) < 0;
+}
+
+export function redirectForAuthentication() {
+  var current_url = encodeURIComponent(window.location.href);
+  var zebra_login_url = "http://localhost:3005/login"
+  window.location = zebra_login_url + "?return_url=" + current_url;
+}
 
 export function notify(msg, atype='success') {
   alertify.notify(msg, atype);
