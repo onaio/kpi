@@ -97,7 +97,7 @@ COLLECTION_CLONE_FIELDS = {'name'}
 
 
 def home(request):
-    cookie_jwt = request.COOKIES.get('__enketo')
+    cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
     if request.user.is_anonymous() and cookie_jwt:
         auth_class = JWTAuthentication()
         user, token = auth_class.authenticate(request)
