@@ -4,6 +4,7 @@ import alertify from 'alertifyjs';
 import $ from 'jquery';
 import cookie from 'react-cookie';
 import Promise from 'es6-promise';
+import {getAuthUrl} from './config';
 
 export const LANGUAGE_COOKIE_NAME = 'django_language';
 
@@ -17,8 +18,7 @@ export function checkCookieExists(cookieName) {
 
 export function redirectForAuthentication() {
   var current_url = encodeURIComponent(window.location.href);
-  var zebra_login_url = "http://localhost:3005/login"
-  window.location = zebra_login_url + "?return_url=" + current_url;
+  window.location = getAuthUrl(current_url);
 }
 
 export function notify(msg, atype='success') {
