@@ -271,6 +271,7 @@ var assetStore = Reflux.createStore({
     this.data = {};
     this.relatedUsers = {};
     this.listenTo(actions.resources.loadAsset.completed, this.onLoadAssetCompleted);
+    this.listenTo(actions.resources.loadAsset.failed, this.onLoadAssetFailed);
     this.listenTo(actions.resources.updateAsset.completed, this.onUpdateAssetCompleted);
   },
 
@@ -303,6 +304,9 @@ var assetStore = Reflux.createStore({
     this.data[resp.uid] = assetParserUtils.parsed(resp);
     this.noteRelatedUsers(resp);
     this.trigger(this.data, resp.uid);
+  },
+  onLoadAssetFailed: function (jqxhr, textStatus, error) {
+    window.location = '/permissions-error-page/';
   }
 });
 
