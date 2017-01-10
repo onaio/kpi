@@ -696,55 +696,56 @@ export default assign({
   render () {
     if (checkCookieExists("__kpi_formbuilder")) {
         redirectForAuthentication();
+    } else {
+      var isSurvey = this.app && !isLibrary(this.context.router);
+      var docTitle = this.state.name || t('Untitled');
+      return (
+          <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
+            <ui.Panel m={'transparent'}>
+              <bem.FormBuilder m={this.state.formStylePanelDisplayed ? 'formStyleDisplayed': null }>
+                {this.renderSaveAndPreviewButtons()}
+
+                <bem.FormBuilder__contents>
+                  { isSurvey ?
+                    <FormSettingsBox survey={this.app.survey} {...this.state} />
+                  : null }
+                    <div ref="form-wrap" className='form-wrap'>
+                      { (!this.state.surveyAppRendered) ?
+                          this.renderNotLoadedMessage()
+                      : null }
+                    </div>
+                </bem.FormBuilder__contents>
+              </bem.FormBuilder>
+              { this.state.enketopreviewOverlay ?
+                <ui.Modal open large
+                    onClose={this.hidePreview} title={t('Form Preview')}>
+                  <ui.Modal.Body>
+                    <iframe src={this.state.enketopreviewOverlay} />
+                  </ui.Modal.Body>
+                </ui.Modal>
+
+              : (
+                  this.state.enketopreviewError ?
+                    <ui.Modal open error
+                        onClose={this.clearPreviewError} title={t('Error generating preview')}>
+                      <ui.Modal.Body>
+                        {this.state.enketopreviewError}
+                      </ui.Modal.Body>
+                    </ui.Modal>
+                  : null
+                ) }
+              {this.state.showCascadePopup ?
+                <ui.Modal open onClose={this.hideCascade} title={t('Import Cascading Select Questions')}>
+                  <ui.Modal.Body>
+                    {this.renderCascadePopup()}
+                  </ui.Modal.Body>
+                </ui.Modal>
+
+              : null}
+
+            </ui.Panel>
+          </DocumentTitle>
+        );
     }
-    var isSurvey = this.app && !isLibrary(this.context.router);
-    var docTitle = this.state.name || t('Untitled');
-    return (
-        <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
-          <ui.Panel m={'transparent'}>
-            <bem.FormBuilder m={this.state.formStylePanelDisplayed ? 'formStyleDisplayed': null }>
-              {this.renderSaveAndPreviewButtons()}
-
-              <bem.FormBuilder__contents>
-                { isSurvey ?
-                  <FormSettingsBox survey={this.app.survey} {...this.state} />
-                : null }
-                  <div ref="form-wrap" className='form-wrap'>
-                    { (!this.state.surveyAppRendered) ?
-                        this.renderNotLoadedMessage()
-                    : null }
-                  </div>
-              </bem.FormBuilder__contents>
-            </bem.FormBuilder>
-            { this.state.enketopreviewOverlay ?
-              <ui.Modal open large
-                  onClose={this.hidePreview} title={t('Form Preview')}>
-                <ui.Modal.Body>
-                  <iframe src={this.state.enketopreviewOverlay} />
-                </ui.Modal.Body>
-              </ui.Modal>
-
-            : (
-                this.state.enketopreviewError ?
-                  <ui.Modal open error
-                      onClose={this.clearPreviewError} title={t('Error generating preview')}>
-                    <ui.Modal.Body>
-                      {this.state.enketopreviewError}
-                    </ui.Modal.Body>
-                  </ui.Modal>
-                : null
-              ) }
-            {this.state.showCascadePopup ?
-              <ui.Modal open onClose={this.hideCascade} title={t('Import Cascading Select Questions')}>
-                <ui.Modal.Body>
-                  {this.renderCascadePopup()}
-                </ui.Modal.Body>
-              </ui.Modal>
-
-            : null}
-
-          </ui.Panel>
-        </DocumentTitle>
-      );
   },
 }, cascadeMixin);
