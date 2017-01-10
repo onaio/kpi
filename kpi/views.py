@@ -107,6 +107,15 @@ def home(request):
     return TemplateResponse(request, "index.html")
 
 
+def permissions_error_page(request):
+    return TemplateResponse(
+        request,
+        template="permissions_error_page.html",
+        context={'zebra_login_url': settings.ZEBRA_LOGIN_URL},
+        status=403
+    )
+
+
 def browser_tests(request):
     return TemplateResponse(request, "browser_tests.html")
 

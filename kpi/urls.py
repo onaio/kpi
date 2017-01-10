@@ -18,7 +18,9 @@ from kpi.views import (
     UserCollectionSubscriptionViewSet,
 )
 
-from kpi.views import home, one_time_login, browser_tests
+from kpi.views import (
+    home, one_time_login, browser_tests, permissions_error_page
+)
 from kobo.apps.reports.views import ReportsViewSet
 from kpi.views import authorized_application_authenticate_user
 from kpi.forms import RegistrationForm
@@ -69,6 +71,7 @@ urlpatterns = [
         authorized_application_authenticate_user
     ),
     url(r'^browser_tests/$', browser_tests),
+    url(r'^permissions-error-page/$', permissions_error_page),
     url(r'^authorized_application/one_time_login/$', one_time_login),
     url(r'^hub/switch_builder$', switch_builder, name='toggle-preferred-builder'),
     # Translation catalog for client code.
