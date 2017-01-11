@@ -59,6 +59,8 @@ import {
   currentLang,
 } from './utils';
 
+import {getZebraLoginUrl} from './config';
+
 mixins.permissions = {
   removePerm (permName, permObject, content_object_uid) {
     actions.permissions.removePerm({
@@ -1568,6 +1570,10 @@ var formRouteChildren = (baseName) => {
   ];
 }
 
+var RedirectToOna = function() {
+  window.location = getZebraLoginUrl()
+}
+
 var routes = (
   <Route name="home" path="/" handler={App}>
     <Route name="library">
@@ -1599,7 +1605,8 @@ var routes = (
         <DefaultRoute handler={FormLanding} />
       </Route>
 
-      <DefaultRoute handler={FormsSearchableList} />
+      {/* <DefaultRoute handler={FormsSearchableList} /> */}
+      <DefaultRoute handler={RedirectToOna} />
       <NotFoundRoute handler={FormNotFound} />
     </Route>
     <Route name="demo" handler={Demo} />

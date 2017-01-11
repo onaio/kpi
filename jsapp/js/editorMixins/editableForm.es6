@@ -44,7 +44,7 @@ var ErrorMessage = bem.create('error-message'),
     ErrorMessage__strong = bem.create('error-message__header', '<strong>'),
     ErrorMessage__link = bem.create('error-message__link', '<a>');
 
-var webformStylesSupportUrl = "http://support.kobotoolbox.org/customer/en/portal/articles/2108533";
+var webformStylesSupportUrl = "https://help.ona.io/guides/formbuilder/#form-layout";
 
 var FormSettingsEditor = React.createClass({
   render () {

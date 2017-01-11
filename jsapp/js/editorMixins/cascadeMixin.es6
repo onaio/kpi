@@ -9,7 +9,7 @@ var CascadePopup = bem.create('cascade-popup'),
     CascadePopup__buttonWrapper = bem.create('cascade-popup__buttonWrapper'),
     CascadePopup__button = bem.create('cascade-popup__button', '<button>');
 
-var choiceListHelpUrl = 'http://support.kobotoolbox.org/customer/en/portal/articles/1682856';
+var choiceListHelpUrl = 'https://help.ona.io/guides/formbuilder/#cascading-select-questions';
 
 import {
   surveyToValidJson,
