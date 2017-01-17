@@ -258,7 +258,8 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         valid_xlsform_csv_repr = csv_io.getvalue()
         payload = {
             u'text_xls_form': valid_xlsform_csv_repr,
-            u'downloadable': active
+            u'downloadable': active,
+            u'published_by_formbuilder': True
         }
         json_response = self._kobocat_request('POST', url, payload)
         self.store_data({
