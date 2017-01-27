@@ -56,7 +56,9 @@ from .models import (
     )
 from .models.object_permission import get_anonymous_user, get_objects_for_user
 from .models.authorized_application import ApplicationTokenAuthentication
-from .model_utils import disable_auto_field_update
+from .model_utils import (
+    disable_auto_field_update, grant_default_model_level_perms
+)
 from .permissions import (
     IsOwnerOrReadOnly,
     PostMappedToChangePermission,
@@ -337,6 +339,19 @@ class CurrentUserViewSet(viewsets.ModelViewSet):
         return Response(
             data={"message": "user successfully logged out"},
             status=status.HTTP_204_NO_CONTENT
+        )
+
+    @detail_route(methods=['POST'], renderer_classes=[renderers.JSONRenderer])
+    def grant_default_model_level_perms(self, request, *args, **kwargs):
+        user = self.get_object()
+        grant_default_model_level_perms(user)
+
+        return Response(
+            data={
+                "detail": ("Successfully granted default model level "
+                           "perms to user %s." % user.username)
+            },
+            status=status.HTTP_201_CREATED
         )
 
 
