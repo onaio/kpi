@@ -345,7 +345,6 @@ actions.resources.updateAsset.listen(function(uid, values){
       dataInterface.patchAsset(uid, values)
         .done(function(asset){
           actions.resources.updateAsset.completed(asset);
-          notify(t('successfully updated'));
           resolve(asset);
         })
         .fail(function(...args){
@@ -356,13 +355,17 @@ actions.resources.updateAsset.listen(function(uid, values){
       dataInterface.deployAsset(asset, has_deployment)
         .done((data) => {
           if (has_deployment) {
-            notify(t('successfully updated published form'));
+            notify(t('Successfully updated published form.'));
           } else {
-            notify(t('successfully published form'));
+            notify(t('Successfully published form.'));
           }
         })
         .fail((data) => {
-          alertify.error(t('please add at least one question'));
+          if (data.status === 500) {
+            alertify.error(t('Please add at least one question.'));
+          } else {
+            alertify.error(t(data.responseText));
+          }
         });
       return asset
     })
