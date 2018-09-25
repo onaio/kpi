@@ -961,6 +961,25 @@ export class DataTable extends React.Component {
             }
           </ui.PopoverMenu>
         }
+
+        {Object.keys(selected).length > 0 &&
+          <ui.PopoverMenu type='bulkUpdate-menu' triggerLabel={selectedLabel} >
+            {VALIDATION_STATUSES.map((item, n) => {
+              return (
+                <bem.PopoverMenu__link
+                  onClick={this.bulkUpdateStatus}
+                  data-value={item.value}
+                  key={n}
+                >
+                  {t('Set status: ##status##').replace('##status##', item.label)}
+                </bem.PopoverMenu__link>
+              );
+            })}
+            <bem.PopoverMenu__link onClick={this.bulkDelete}>
+              {t('Delete selected')}
+            </bem.PopoverMenu__link>
+          </ui.PopoverMenu>
+        }
       </bem.FormView__item>
     );
   }
