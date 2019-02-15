@@ -13,8 +13,14 @@ from django.db import (
 )
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+<<<<<<< HEAD
 from django_digest.models import PartialDigest
 from jsonfield import JSONField
+=======
+from django.contrib.auth.models import User, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
+>>>>>>> Used signals to sync 'kc' DB with 'kpi' DB
 
 from kpi.constants import SHADOW_MODEL_APP_LABEL
 from kpi.utils.strings import hashable_str
@@ -204,6 +210,7 @@ class KobocatUser(ShadowModel):
     class Meta(ShadowModel.Meta):
         db_table = "auth_user"
 
+<<<<<<< HEAD
     @classmethod
     def sync(cls, auth_user):
         # NB: `KobocatUserObjectPermission` (and probably other things) depend
@@ -236,6 +243,9 @@ class KobocatUser(ShadowModel):
 
 
 class KobocatUserObjectPermission(ShadowModel):
+=======
+class UserObjectPermission(ShadowModel):
+>>>>>>> Used signals to sync 'kc' DB with 'kpi' DB
     """
     For the _sole purpose_ of letting us manipulate KoBoCAT
     permissions, this comprises the following django-guardian classes
@@ -249,8 +259,13 @@ class KobocatUserObjectPermission(ShadowModel):
     CAVEAT LECTOR: The django-guardian custom manager,
     UserObjectPermissionManager, is NOT included!
     """
+<<<<<<< HEAD
     permission = models.ForeignKey(KobocatPermission, on_delete=models.CASCADE)
     content_type = models.ForeignKey(KobocatContentType, on_delete=models.CASCADE)
+=======
+    permission = models.ForeignKey(Permission)
+    content_type = models.ForeignKey(ContentType)
+>>>>>>> Used signals to sync 'kc' DB with 'kpi' DB
     object_pk = models.CharField(_('object ID'), max_length=255)
     content_object = GenericForeignKey(fk_field='object_pk')
     # It's okay not to use `KobocatUser` as long as PKs are synchronized
@@ -387,6 +402,67 @@ class KobocatDigestPartial(ShadowModel):
                 confirmed=partial_digest.confirmed,
                 partial_digest=partial_digest.partial_digest,
             )
+
+
+class KCUser(ShadowModel):
+
+    username = models.CharField(_("username"), max_length=30)
+    password = models.CharField(_("password"), max_length=128)
+    last_login = models.DateTimeField(_("last login"), blank=True, null=True)
+    is_superuser = models.BooleanField(_('superuser status'), default=False)
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=150, blank=True)
+    email = models.EmailField(_('email address'), blank=True)
+    is_staff = models.BooleanField(_('staff status'), default=False)
+    is_active = models.BooleanField(_('active'), default=True)
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
+    class Meta(ShadowModel.Meta):
+        db_table = "auth_user"
+
+    @classmethod
+    def sync(cls, auth_user):
+        try:
+            kc_auth_user = cls.objects.get(pk=auth_user.pk)
+            assert kc_auth_user.username == auth_user.username
+        except KCUser.DoesNotExist:
+            kc_auth_user = cls(pk=auth_user.pk, username=auth_user.username)
+
+        kc_auth_user.password = auth_user.password
+        kc_auth_user.last_login = auth_user.last_login
+        kc_auth_user.is_superuser = auth_user.is_superuser
+        kc_auth_user.first_name = auth_user.first_name
+        kc_auth_user.last_name = auth_user.last_name
+        kc_auth_user.email = auth_user.email
+        kc_auth_user.is_staff = auth_user.is_staff
+        kc_auth_user.is_active = auth_user.is_active
+        kc_auth_user.date_joined = auth_user.date_joined
+
+        kc_auth_user.save()
+
+
+class KCToken(ShadowModel):
+
+    key = models.CharField(_("Key"), max_length=40, primary_key=True)
+    user = models.OneToOneField(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
+                                related_name='auth_token',
+                                on_delete=models.CASCADE, verbose_name=_("User"))
+    created = models.DateTimeField(_("Created"), auto_now_add=True)
+
+    class Meta(ShadowModel.Meta):
+        db_table = "authtoken_token"
+
+    @classmethod
+    def sync(cls, auth_token):
+        try:
+            kc_auth_token = cls.objects.get(pk=auth_token.pk)
+            assert kc_auth_user.user_id == auth_token.user_id
+        except KCToken.DoesNotExist:
+            kc_auth_token = cls(pk=auth_token.pk, user=auth_token.user)
+
+        print("####")
+        print("ON SAVE LE KCTOKEN")
+        kc_auth_token.save()
 
 
 def safe_kc_read(func):

@@ -227,14 +227,10 @@ kobocat_database_url = os.getenv('KC_DATABASE_URL')
 if kobocat_database_url:
     DATABASES['kobocat'] = dj_database_url.parse(kobocat_database_url)
 
-<<<<<<< HEAD
-DATABASE_ROUTERS = ['kpi.db_routers.DefaultDatabaseRouter']
-=======
 # Tmp hack to point DB to kc_kobo @to-Do remove when kobo-docker supports it
 DATABASES['kobocat']['NAME'] = "kc_kobo"
 
 DATABASE_ROUTERS = ["kpi.db_routers.DefaultDatabaseRouter"]
->>>>>>> Use Redis as session storage
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
