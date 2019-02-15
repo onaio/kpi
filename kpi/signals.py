@@ -1,9 +1,9 @@
+
 # coding: utf-8
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from django_digest.models import PartialDigest
 from rest_framework.authtoken.models import Token
 from taggit.models import Tag
 
@@ -11,11 +11,11 @@ from kobo.apps.hook.models.hook import Hook
 from kpi.deployment_backends.kc_access.shadow_models import (
     KobocatToken,
     KobocatUser,
-    KobocatDigestPartial
 )
 from kpi.deployment_backends.kc_access.utils import grant_kc_model_level_perms
-from kpi.models import Asset, Collection, ObjectPermission, TagUid
+from kpi.models import Asset, TagUid
 from kpi.utils.permissions import grant_default_model_level_perms
+
 
 
 @receiver(post_save, sender=User)
