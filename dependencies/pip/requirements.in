@@ -45,7 +45,10 @@ django-private-storage
 djangorestframework
 djangorestframework-xml
 django-redis-sessions
+<<<<<<< HEAD
 django-request-cache
+=======
+>>>>>>> Use Redis as session storage
 drf-extensions
 future
 geojson-rewind

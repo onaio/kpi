@@ -21,6 +21,7 @@ celery[redis]==4.3.0      # via -r dependencies/pip/requirements.in
 certifi==2019.9.11        # via requests
 cffi==1.13.2              # via cryptography
 chardet==3.0.4            # via requests
+<<<<<<< HEAD
 cryptography==2.8         # via pyopenssl
 cssselect==1.1.0          # via pyquery
 defusedxml==0.6.0         # via djangorestframework-xml
@@ -56,6 +57,44 @@ djangorestframework-xml==1.4.0  # via -r dependencies/pip/requirements.in
 djangorestframework==3.10.3  # via -r dependencies/pip/requirements.in, drf-extensions
 docutils==0.15.2          # via botocore, statistics
 drf-extensions==0.5.0     # via -r dependencies/pip/requirements.in
+=======
+configparser==3.7.1       # via importlib-metadata
+contextlib2==0.5.5        # via importlib-metadata
+cookies==2.2.1            # via responses
+cryptography==2.2.2       # via pyopenssl
+cssselect==1.0.3          # via pyquery
+cyordereddict==1.0.0
+defusedxml==0.5.0         # via djangorestframework-xml
+dj-database-url==0.4.1
+dj-static==0.0.6
+django-braces==1.13.0
+django-celery-beat==1.1.1
+django-constance[database]==2.2.0
+django-debug-toolbar==1.4
+django-extensions==1.6.7
+django-haystack==2.6.0
+django-jsonbfield==0.1.0
+django-loginas==0.2.3
+django-markitup==3.0.0
+django-mptt==0.8.7
+django-oauth-toolkit==0.10.0
+django-picklefield==1.0.0  # via django-constance
+django-private-storage==2.1.2
+django-redis-sessions==0.6.1
+django-registration-redux==1.3
+django-reversion==2.0.8
+django-ses==0.8.9
+django-storages==1.6.5
+django-taggit==0.22.0
+django-toolbelt==0.0.1
+django-webpack-loader==0.3.0
+django==1.8.19
+djangorestframework-xml==1.4.0
+djangorestframework==3.6.4
+docutils==0.14            # via botocore, statistics
+drf-extensions==0.3.1
+enum34==1.1.6             # via cryptography
+>>>>>>> Use Redis as session storage
 formencode==1.3.1         # via pyxform
 future==0.18.2            # via -r dependencies/pip/requirements.in
 geojson-rewind==0.2.0     # via -r dependencies/pip/requirements.in, formpack
@@ -66,6 +105,7 @@ jsonfield==2.0.2          # via -r dependencies/pip/requirements.in
 jsonschema==3.1.1         # via formpack
 kombu==4.6.6              # via -r dependencies/pip/requirements.in, celery
 linecache2==1.0.0         # via traceback2
+<<<<<<< HEAD
 lxml==4.4.1               # via -r dependencies/pip/requirements.in, formpack, pyquery
 markdown==3.1.1           # via -r dependencies/pip/requirements.in, django-markdownx
 more-itertools==7.2.0     # via zipp
@@ -95,6 +135,38 @@ sqlparse==0.3.0           # via -r dependencies/pip/requirements.in, django, dja
 static3==0.7.0            # via -r dependencies/pip/requirements.in, dj-static
 statistics==1.0.3.5       # via formpack
 tabulate==0.8.5           # via -r dependencies/pip/requirements.in
+=======
+lxml==4.3.0
+markdown==3.0.1
+mock==2.0.0
+ndg-httpsclient==0.4.2
+oauthlib==1.0.3
+path.py==11.5.0
+pathlib2==2.3.3           # via importlib-metadata
+pbr==4.0.2                # via mock
+psycopg2==2.7.7           # via django-jsonbfield, django-toolbelt
+pyasn1==0.1.9
+pycparser==2.14           # via cffi
+pygments==2.1.3
+pymongo==3.7.2
+pyopenssl==18.0.0
+pyquery==1.4.0
+python-dateutil==2.7.5
+python-digest==1.7
+pytz==2018.9
+pyxform==0.12.0
+redis==3.1.0              # via django-redis-sessions
+requests==2.21.0
+responses==0.9.0
+s3transfer==0.1.13        # via boto3
+scandir==1.9.0            # via pathlib2
+shortuuid==0.4.3
+six==1.12.0
+sqlparse==0.1.19
+static3==0.7.0
+statistics==1.0.3.5
+tabulate==0.8.2
+>>>>>>> Use Redis as session storage
 traceback2==1.4.0         # via unittest2
 unicodecsv==0.14.1        # via -r dependencies/pip/requirements.in, pyxform
 unittest2==1.1.0          # via pyxform
