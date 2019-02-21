@@ -4,9 +4,10 @@
 #
 #    make pip_compile
 #
--e git+https://github.com/dimagi/django-digest@0eb1c921329dd187c343b61acfbec4e98450136e#egg=django_digest
--e git+https://github.com/kobotoolbox/formpack.git@eb7d723eb2b54dbfd56a1c32d72e0008bbb29149#egg=formpack
-amqp==1.4.9
+-e git+https://github.com/dimagi/django-digest@52ba7edeb326efd97d5670273bb6fa8b0539e501#egg=django_digest
+-e git+https://github.com/jnm/django-haystack@3a3b04564e189c11fdc20a4be43e360b5396708c#egg=django_haystack
+-e git+https://github.com/kobotoolbox/formpack.git@45a49bbcc794c6ac3756afe04a4f851c3da9219d#egg=formpack
+amqp==2.4.0
 anyjson==0.3.3
 argparse==1.4.0           # via unittest2
 asn1crypto==0.24.0        # via cryptography
@@ -56,16 +57,16 @@ django-storages==1.6.5
 django-taggit==0.22.0
 django-toolbelt==0.0.1
 django-webpack-loader==0.3.0
-django==1.8.19
+django==1.11.20
 djangorestframework-xml==1.4.0
-djangorestframework==3.6.4
+djangorestframework==3.9.1
 docutils==0.14            # via botocore, statistics
-drf-extensions==0.3.1
-enum34==1.1.6             # via cryptography, traitlets
+drf-extensions==0.4.0
+enum34==1.1.6             # via cryptography
 fabric==2.4.0
 formencode==1.3.1         # via pyxform
 funcsigs==1.0.2           # via begins, mock, pytest
-functools32==3.2.3.post2  # via jsonschema, pyxform
+functools32==3.2.3.post2  # via jsonschema
 future==0.17.1            # via backports.os, django-ses
 futures==3.2.0            # via s3transfer
 gunicorn==19.4.5
@@ -121,12 +122,12 @@ scandir==1.9.0            # via pathlib2
 shortuuid==0.4.3
 simplegeneric==0.8.1      # via ipython
 six==1.12.0
-sqlparse==0.1.19
+sqlparse==0.2.4
 static3==0.7.0
 statistics==1.0.3.5
 tabulate==0.8.2
 traceback2==1.4.0         # via unittest2
-traitlets==4.3.2          # via ipython
+typing==3.6.6             # via django-extensions
 unicodecsv==0.14.1
 unittest2==1.1.0          # via pyxform
 urllib3==1.24.1           # via botocore, requests
