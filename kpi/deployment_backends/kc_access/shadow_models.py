@@ -4,7 +4,7 @@ from hashlib import md5
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import JSONField as JSONBField
 from django.db import (
     ProgrammingError,
     connections,
@@ -13,16 +13,10 @@ from django.db import (
 )
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-<<<<<<< HEAD
 from django_digest.models import PartialDigest
-from jsonfield import JSONField
-=======
-from django.contrib.auth.models import User, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.utils import timezone
->>>>>>> Used signals to sync 'kc' DB with 'kpi' DB
 
 from kpi.constants import SHADOW_MODEL_APP_LABEL
+from kpi.exceptions import BadContentTypeException
 from kpi.utils.strings import hashable_str
 
 
@@ -210,7 +204,6 @@ class KobocatUser(ShadowModel):
     class Meta(ShadowModel.Meta):
         db_table = "auth_user"
 
-<<<<<<< HEAD
     @classmethod
     def sync(cls, auth_user):
         # NB: `KobocatUserObjectPermission` (and probably other things) depend
@@ -243,9 +236,6 @@ class KobocatUser(ShadowModel):
 
 
 class KobocatUserObjectPermission(ShadowModel):
-=======
-class UserObjectPermission(ShadowModel):
->>>>>>> Used signals to sync 'kc' DB with 'kpi' DB
     """
     For the _sole purpose_ of letting us manipulate KoBoCAT
     permissions, this comprises the following django-guardian classes
@@ -259,13 +249,8 @@ class UserObjectPermission(ShadowModel):
     CAVEAT LECTOR: The django-guardian custom manager,
     UserObjectPermissionManager, is NOT included!
     """
-<<<<<<< HEAD
     permission = models.ForeignKey(KobocatPermission, on_delete=models.CASCADE)
     content_type = models.ForeignKey(KobocatContentType, on_delete=models.CASCADE)
-=======
-    permission = models.ForeignKey(Permission)
-    content_type = models.ForeignKey(ContentType)
->>>>>>> Used signals to sync 'kc' DB with 'kpi' DB
     object_pk = models.CharField(_('object ID'), max_length=255)
     content_object = GenericForeignKey(fk_field='object_pk')
     # It's okay not to use `KobocatUser` as long as PKs are synchronized
@@ -460,8 +445,6 @@ class KCToken(ShadowModel):
         except KCToken.DoesNotExist:
             kc_auth_token = cls(pk=auth_token.pk, user=auth_token.user)
 
-        print("####")
-        print("ON SAVE LE KCTOKEN")
         kc_auth_token.save()
 
 
