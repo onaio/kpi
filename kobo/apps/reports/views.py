@@ -9,8 +9,12 @@ from kpi.constants import (
 )
 from kpi.models import Asset
 from kpi.models.object_permission import get_objects_for_user, get_anonymous_user
+<<<<<<< HEAD
 from .serializers import ReportsListSerializer, ReportsDetailSerializer
 from kpi.constants import PERM_VIEW_SUBMISSIONS, PERM_PARTIAL_SUBMISSIONS
+=======
+from kpi.constants import PERM_VIEW_SUBMISSIONS
+>>>>>>> Refactored permissions variables, use variables from 'constant.py' instead of hardcoded string
 
 
 class ReportsViewSet(mixins.ListModelMixin,
@@ -46,6 +50,7 @@ class ReportsViewSet(mixins.ListModelMixin,
 
 
     def get_queryset(self):
+<<<<<<< HEAD
         queryset = Asset.objects.filter(asset_type=ASSET_TYPE_SURVEY)
         if self.action == 'retrieve':
             # `get_object()` will do the checking; no need to manipulate the
@@ -79,3 +84,13 @@ class ReportsViewSet(mixins.ListModelMixin,
         ) & Asset.objects.deployed()
 
         return deployed_assets
+=======
+        
+        # Retrieve all deployed assets first.
+        deployed_assets = Asset.objects.filter(asset_versions__deployed=True).distinct()
+        # Then retrieve all assets user is allowed to view (user must have `PERM_VIEW_SUBMISSIONS` on Asset objects)
+        user_assets = get_objects_for_user(self.request.user, PERM_VIEW_SUBMISSIONS, deployed_assets)
+        publicly_shared_assets = get_objects_for_user(get_anonymous_user(), PERM_VIEW_SUBMISSIONS, deployed_assets)
+
+        return user_assets | publicly_shared_assets
+>>>>>>> Refactored permissions variables, use variables from 'constant.py' instead of hardcoded string

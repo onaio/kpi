@@ -11,6 +11,11 @@ from kpi.exceptions import BadPermissionsException
 from ..models.asset import Asset
 from ..models.collection import Collection
 from ..models.object_permission import get_all_objects_for_user
+from kpi.constants import PERM_VIEW_ASSET, PERM_CHANGE_ASSET, PERM_ADD_SUBMISSIONS, \
+    PERM_VIEW_SUBMISSIONS, PERM_SUPERVISOR_VIEW_SUBMISSION, \
+    PERM_CHANGE_SUBMISSIONS, PERM_VALIDATE_SUBMISSIONS, PERM_SHARE_ASSET, \
+    PERM_DELETE_ASSET, PERM_SHARE_SUBMISSIONS, PERM_DELETE_SUBMISSIONS, \
+    PERM_VIEW_COLLECTION, PERM_CHANGE_COLLECTION
 
 
 class BasePermissionsTestCase(TestCase):
@@ -68,11 +73,7 @@ class BasePermissionsTestCase(TestCase):
         :type perm_name_prefix: str
         :param user: The user for whom permissions on `obj` will be manipulated.
         :type user: :py:class:`User`
-<<<<<<< HEAD
         """
-=======
-        '''
->>>>>>> PEP-8 fixes
         perm_name = self._get_perm_name(perm_name_prefix, obj)
         self.assertTrue(user.has_perm(perm_name, obj))
         obj.remove_perm(user, perm_name)

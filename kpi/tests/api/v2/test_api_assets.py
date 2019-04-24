@@ -15,6 +15,7 @@ from kpi.constants import (
     PERM_PARTIAL_SUBMISSIONS,
 )
 
+from kpi.constants import PERM_CHANGE_ASSET, PERM_VIEW_ASSET
 from kpi.models import Asset
 from kpi.models import AssetFile
 from kpi.models import AssetVersion

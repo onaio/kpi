@@ -411,8 +411,8 @@ def _sync_permissions(asset, xform):
             # This user's KPI access came only from this script, and now all KC
             # permissions have been removed. Purge all KPI grant permissions,
             # even the non-mapped ones, in order to clean up prerequisite
-            # permissions (e.g. 'view_asset' is a prerequisite of
-            # 'view_submissions')
+            # permissions (e.g. `PERM_VIEW_ASSET` is a prerequisite of
+            # `PERM_VIEW_SUBMISSIONS`)
             ObjectPermission.objects.filter(
                 user_id=user,
                 deny=False,
