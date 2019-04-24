@@ -68,7 +68,11 @@ class BasePermissionsTestCase(TestCase):
         :type perm_name_prefix: str
         :param user: The user for whom permissions on `obj` will be manipulated.
         :type user: :py:class:`User`
+<<<<<<< HEAD
         """
+=======
+        '''
+>>>>>>> PEP-8 fixes
         perm_name = self._get_perm_name(perm_name_prefix, obj)
         self.assertTrue(user.has_perm(perm_name, obj))
         obj.remove_perm(user, perm_name)
