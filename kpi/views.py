@@ -85,7 +85,7 @@ from .permissions import (
     IsOwnerOrReadOnly,
     PostMappedToChangePermission,
     get_perm_name,
-    SubmissionsPermissions
+    SubmissionPermission
 )
 from .renderers import (
     AssetJsonRenderer,
@@ -943,7 +943,7 @@ class SubmissionViewSet(NestedViewSetMixin, viewsets.ViewSet):
                         renderers.JSONRenderer,
                         SubmissionXMLRenderer
                         )
-    permission_classes = (SubmissionsPermissions,)
+    permission_classes = (SubmissionPermission,)
 
     def _get_asset(self):
 
