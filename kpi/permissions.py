@@ -224,8 +224,18 @@ class CollectionNestedObjectPermission(BaseCollectionNestedObjectPermission,
     """
 
     perms_map = {
+<<<<<<< HEAD
         'GET': ['%(app_label)s.view_collection'],
         'POST': ['%(app_label)s.change_collection'],
+=======
+        'GET': ['%(app_label)s.view_%(model_name)s',
+                '%(app_label)s.supervisor_view_%(model_name)s'],
+        'OPTIONS': ['%(app_label)s.view_%(model_name)s'],
+        'HEAD': ['%(app_label)s.view_%(model_name)s'],
+        'POST': ['%(app_label)s.add_%(model_name)s'],
+        'PATCH': ['%(app_label)s.change_%(model_name)s'],
+        'DELETE': ['%(app_label)s.change_%(model_name)s'],
+>>>>>>> Handle multiple permissions for each method in SubmissionsPermissions class
     }
 
     perms_map['OPTIONS'] = perms_map['GET']
@@ -245,11 +255,34 @@ class IsOwnerOrReadOnly(permissions.DjangoObjectPermissions):
     # With the default of True, anonymous requests are categorically rejected.
     authenticated_users_only = False
 
+<<<<<<< HEAD
     perms_map = permissions.DjangoObjectPermissions.perms_map
     perms_map['GET'] = ['%(app_label)s.view_%(model_name)s']
     perms_map['OPTIONS'] = perms_map['GET']
     perms_map['HEAD'] = perms_map['GET']
 
+=======
+        asset_uid = self._get_parents_query_dict(request).get("asset")
+        asset = get_object_or_404(Asset, uid=asset_uid)
+        required_permissions = self.get_required_permissions(request.method, view.action)
+
+        has_perm = False
+        for permission in required_permissions:
+            if asset.has_perm(request.user, permission):
+                has_perm = True
+                break
+
+        # We don't want to make a difference between non-existing assets vs non permitted assets
+        # to avoid users to be able guess asset existence
+        if not has_perm:
+            # Except if users are allowed to view submissions, we want to show them Access Denied
+            # @ TODO handle supervisor permissions
+            if request.method not in permissions.SAFE_METHODS:
+                view_permissions = self.get_required_permissions("GET")
+                can_view = asset.has_perm(request.user, view_permissions[0])
+                if can_view:
+                    return False
+>>>>>>> Handle multiple permissions for each method in SubmissionsPermissions class
 
 class PostMappedToChangePermission(IsOwnerOrReadOnly):
     """
@@ -260,6 +293,7 @@ class PostMappedToChangePermission(IsOwnerOrReadOnly):
     perms_map['POST'] = ['%(app_label)s.change_%(model_name)s']
 
 
+<<<<<<< HEAD
 class SubmissionPermission(AssetNestedObjectPermission):
     """
     Permissions for submissions.
@@ -277,6 +311,9 @@ class SubmissionPermission(AssetNestedObjectPermission):
     }
 
     def _get_user_permissions(self, asset, user):
+=======
+    def get_required_permissions(self, method, action=None):
+>>>>>>> Handle multiple permissions for each method in SubmissionsPermissions class
         """
         Overrides parent method to include partial permissions (which are
         specific to submissions)
@@ -300,6 +337,7 @@ class SubmissionPermission(AssetNestedObjectPermission):
 
         return user_permissions
 
+<<<<<<< HEAD
 
 class EditSubmissionPermission(SubmissionPermission):
     perms_map = {
@@ -313,3 +351,15 @@ class SubmissionValidationStatusPermission(SubmissionPermission):
         'PATCH': ['%(app_label)s.validate_%(model_name)s'],
         'DELETE': ['%(app_label)s.validate_%(model_name)s'],
     }
+=======
+        # Handle
+        if action in self.action_map and self.action_map.get(action).get(method):
+            perms = [perm % kwargs for perm in self.action_map.get(action).get(method)]
+        else:
+            if method not in self.perms_map:
+                raise exceptions.MethodNotAllowed(method)
+
+            perms = [perm % kwargs for perm in self.perms_map[method]]
+
+        return [perm.replace("{}.".format(app_label), "") for perm in perms]
+>>>>>>> Handle multiple permissions for each method in SubmissionsPermissions class
