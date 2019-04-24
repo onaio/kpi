@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 
 # coding: utf-8
 from django.conf import settings
 from django.contrib.auth.models import User
+=======
+# -*- coding: utf-8 -*-
+from django.conf import settings
+>>>>>>> Removed KC db connection when running tests
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
@@ -44,6 +49,7 @@ def save_kobocat_user(sender, instance, created, raw, **kwargs):
     `settings.KOBOCAT_DEFAULT_PERMISSION_CONTENT_TYPES`
     """
     if not settings.TESTING:
+<<<<<<< HEAD
         KobocatUser.sync(instance)
 
         if created:
@@ -54,6 +60,9 @@ def save_kobocat_user(sender, instance, created, raw, **kwargs):
             # seem to help. We should roll back the KC user creation if
             # assigning model-level permissions fails
             grant_kc_model_level_perms(instance)
+=======
+        KCUser.sync(instance)
+>>>>>>> Removed KC db connection when running tests
 
 
 @receiver(post_save, sender=Token)

@@ -5,22 +5,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
-<<<<<<< HEAD:kobo/apps/hook/views/v2/hook_log.py
 from kobo.apps.hook.constants import KOBO_INTERNAL_ERROR_STATUS_CODE
 from kobo.apps.hook.models.hook_log import HookLog
 from kobo.apps.hook.serializers.v2.hook_log import HookLogSerializer
 from kpi.paginators import TinyPaginated
 from kpi.permissions import AssetEditorSubmissionViewerPermission
 from kpi.utils.viewset_mixins import AssetNestedObjectViewsetMixin
-=======
-from ..constants import KOBO_INTERNAL_ERROR_STATUS_CODE
-from ..models.hook_log import HookLog
-from ..serializers.hook_log import HookLogSerializer
-from kpi.models import Asset
-from kpi.permissions import AssetOwnerNestedObjectPermission
-from kpi.serializers import TinyPaginated
-from kpi.views import AssetOwnerFilterBackend, SubmissionViewSet
->>>>>>> Refactor Permissions classes - Use singular instead of plural:kobo/apps/hook/views/hook_log.py
 
 
 class HookLogViewSet(AssetNestedObjectViewsetMixin,
