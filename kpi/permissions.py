@@ -39,9 +39,32 @@ class AbstractParentObjectNestedObjectPermission(permissions.BasePermission):
     Common methods are property are defined within this class.
     """
 
+<<<<<<< HEAD
     @property
     def perms_map(self):
         raise NotImplementedError
+=======
+    # Setting this to False allows real permission checking on AnonymousUser.
+    # With the default of True, anonymous requests are categorically rejected.
+    authenticated_users_only = False
+
+    perms_map = permissions.DjangoObjectPermissions.perms_map
+    perms_map['GET'] = ['%(app_label)s.view_%(model_name)s']
+    perms_map['OPTIONS'] = perms_map['GET']
+    perms_map['HEAD'] = perms_map['GET']
+
+
+class PostMappedToChangePermission(IsOwnerOrReadOnly):
+    '''
+    Maps POST requests to the change_model permission instead of DRF's default
+    of add_model
+    '''
+    perms_map = IsOwnerOrReadOnly.perms_map
+    perms_map['POST'] = ['%(app_label)s.change_%(model_name)s']
+
+
+class AssetNestedObjectPermission(permissions.BasePermission):
+>>>>>>> Refactor Permissions classes - Use singular instead of plural
 
     def has_permission(self, request, view):
         raise NotImplementedError
@@ -82,6 +105,7 @@ class AbstractParentObjectNestedObjectPermission(permissions.BasePermission):
         :param method: str. e.g. Mostly keys of `perms_map`
         :return:
         """
+<<<<<<< HEAD
         app_label = self.APP_LABEL
 
         kwargs = {
@@ -121,6 +145,26 @@ class BaseAssetNestedObjectPermission(AbstractParentObjectNestedObjectPermission
 
 
 class BaseCollectionNestedObjectPermission(AbstractParentObjectNestedObjectPermission):
+=======
+        result = {}
+        for kwarg_name, kwarg_value in request.parser_context.get("kwargs").items():
+            if kwarg_name.startswith(extensions_api_settings.DEFAULT_PARENT_LOOKUP_KWARG_NAME_PREFIX):
+                query_lookup = kwarg_name.replace(
+                    extensions_api_settings.DEFAULT_PARENT_LOOKUP_KWARG_NAME_PREFIX,
+                    '',
+                    1
+                )
+                query_value = kwarg_value
+                result[query_lookup] = query_value
+        return result
+
+
+class AssetOwnerNestedObjectPermission(AssetNestedObjectPermission):
+    """
+    Permissions for objects that are nested under Asset which only owner should access.
+    Others should receive a 404 response (instead of 403) to avoid revealing existence
+    of objects.
+>>>>>>> Refactor Permissions classes - Use singular instead of plural
     """
     Base class for Collection and related objects permissions
     """
@@ -216,8 +260,12 @@ class AssetEditorSubmissionViewerPermission(AssetNestedObjectPermission):
     }
 
 
+<<<<<<< HEAD
 class CollectionNestedObjectPermission(BaseCollectionNestedObjectPermission,
                                        AssetNestedObjectPermission):
+=======
+class SubmissionPermission(AssetNestedObjectPermission):
+>>>>>>> Refactor Permissions classes - Use singular instead of plural
     """
     Permissions for nested objects of Collection.
     Users need `*_collection` permissions to operate on these objects
