@@ -545,22 +545,8 @@ class Asset(ObjectPermissionMixin,
         PERM_VIEW_SUBMISSIONS: {'shared': True, 'shared_data': True}
     }
 
-    # todo: test and implement this method
-    # def restore_version(self, uid):
-    #     _version_to_restore = self.asset_versions.get(uid=uid)
-    #     self.content = _version_to_restore.version_content
-    #     self.name = _version_to_restore.name
-
-    def to_ss_structure(self):
-        return flatten_content(self.content, in_place=False)
-
-    def _populate_summary(self):
-        if self.content is None:
-            self.content = {}
-            self.summary = {}
-            return
-        analyzer = AssetContentAnalyzer(**self.content)
-        self.summary = analyzer.summary
+    def __unicode__(self):
+        return u'{} ({})'.format(self.name, self.uid)
 
     def adjust_content_on_save(self):
         '''
@@ -596,6 +582,102 @@ class Asset(ObjectPermissionMixin,
         if _title is not None:
             self.name = _title
 
+    def clone(self, version_uid=None):
+        # not currently used, but this is how "to_clone_dict" should work
+        return Asset.objects.create(**self.to_clone_dict(version_uid))
+
+    @property
+    def deployed_versions(self):
+        return self.asset_versions.filter(deployed=True).order_by(
+            '-date_modified')
+
+    @property
+    def latest_deployed_version(self):
+        return self.deployed_versions.first()
+
+    @property
+    def latest_version(self):
+        versions = None
+        try:
+            versions = self.prefetched_latest_versions
+        except AttributeError:
+            versions = self.asset_versions.order_by('-date_modified')
+        try:
+            return versions[0]
+        except IndexError:
+            return None
+
+    def get_supervised_users(self):
+        pass
+
+    def get_ancestors_or_none(self):
+        # ancestors are ordered from farthest to nearest
+        if self.parent is not None:
+            return self.parent.get_ancestors(include_self=True)
+        else:
+            return None
+
+    @property
+    def has_active_hooks(self):
+        """
+        Returns if asset has active hooks.
+        Useful to update `kc.XForm.has_kpi_hooks` field.
+        :return: {boolean}
+        """
+        return self.hooks.filter(active=True).exists()
+
+    @staticmethod
+    def optimize_queryset_for_list(queryset):
+        ''' Used by serializers to improve performance when listing assets '''
+        queryset = queryset.defer(
+            # Avoid pulling these `JSONField`s from the database because:
+            #   * they are stored as plain text, and just deserializing them
+            #     to Python objects is CPU-intensive;
+            #   * they are often huge;
+            #   * we don't need them for list views.
+            'content', 'report_styles'
+        ).select_related(
+            'owner__username',
+        ).prefetch_related(
+            # We previously prefetched `permissions__content_object`, but that
+            # actually pulled the entirety of each permission's linked asset
+            # from the database! For now, the solution is to remove
+            # `content_object` here *and* from
+            # `ObjectPermissionNestedSerializer`.
+            'permissions__permission',
+            'permissions__user',
+            # `Prefetch(..., to_attr='prefetched_list')` stores the prefetched
+            # related objects in a list (`prefetched_list`) that we can use in
+            # other methods to avoid additional queries; see:
+            # https://docs.djangoproject.com/en/1.8/ref/models/querysets/#prefetch-objects
+            Prefetch('tags', to_attr='prefetched_tags'),
+            Prefetch(
+                'asset_versions',
+                queryset=AssetVersion.objects.order_by(
+                    '-date_modified'
+                ).only('uid', 'asset', 'date_modified', 'deployed'),
+                to_attr='prefetched_latest_versions',
+            ),
+        )
+        return queryset
+
+    def rename_translation(self, _from, _to):
+        if not self._has_translations(self.content, 2):
+            raise ValueError('no translations available')
+        self._rename_translation(self.content, _from, _to)
+
+    # todo: test and implement this method
+    # todo 2019-04-25: Still needed, `revert_to_version` does the same?
+    # def restore_version(self, uid):
+    #     _version_to_restore = self.asset_versions.get(uid=uid)
+    #     self.content = _version_to_restore.version_content
+    #     self.name = _version_to_restore.name
+
+    def revert_to_version(self, version_uid):
+        av = self.asset_versions.get(uid=version_uid)
+        self.content = av.version_content
+        self.save()
+
     def save(self, *args, **kwargs):
         if self.content is None:
             self.content = {}
@@ -630,10 +712,9 @@ class Asset(ObjectPermissionMixin,
                                        deployed=False,
                                        )
 
-    def rename_translation(self, _from, _to):
-        if not self._has_translations(self.content, 2):
-            raise ValueError('no translations available')
-        self._rename_translation(self.content, _from, _to)
+    @property
+    def snapshot(self):
+        return self._snapshot(regenerate=False)
 
     def to_clone_dict(self, version_uid=None, version=None):
         """
@@ -657,14 +738,24 @@ class Asset(ObjectPermissionMixin,
             'tag_string': self.tag_string,
         }
 
-    def clone(self, version_uid=None):
-        # not currently used, but this is how "to_clone_dict" should work
-        return Asset.objects.create(**self.to_clone_dict(version_uid))
+    def to_ss_structure(self):
+        return flatten_content(self.content, in_place=False)
 
-    def revert_to_version(self, version_uid):
-        av = self.asset_versions.get(uid=version_uid)
-        self.content = av.version_content
-        self.save()
+    @property
+    def version_id(self):
+        # Avoid reading the propery `self.latest_version` more than once, since
+        # it may execute a database query each time it's read
+        latest_version = self.latest_version
+        if latest_version:
+            return latest_version.uid
+
+    @property
+    def version__content_hash(self):
+        # Avoid reading the propery `self.latest_version` more than once, since
+        # it may execute a database query each time it's read
+        latest_version = self.latest_version
+        if latest_version:
+            return latest_version.content_hash
 
     def _populate_report_styles(self):
         default = self.report_styles.get(DEFAULT_REPORTS_KEY, {})
@@ -686,53 +777,13 @@ class Asset(ObjectPermissionMixin,
             'kuid_names': kuids_to_variable_names,
         }
 
-    def get_ancestors_or_none(self):
-        # ancestors are ordered from farthest to nearest
-        if self.parent is not None:
-            return self.parent.get_ancestors(include_self=True)
-        else:
-            return None
-
-    @property
-    def latest_version(self):
-        versions = None
-        try:
-            versions = self.prefetched_latest_versions
-        except AttributeError:
-            versions = self.asset_versions.order_by('-date_modified')
-        try:
-            return versions[0]
-        except IndexError:
-            return None
-
-    @property
-    def deployed_versions(self):
-        return self.asset_versions.filter(deployed=True).order_by(
-                                          '-date_modified')
-
-    @property
-    def latest_deployed_version(self):
-        return self.deployed_versions.first()
-
-    @property
-    def version_id(self):
-        # Avoid reading the propery `self.latest_version` more than once, since
-        # it may execute a database query each time it's read
-        latest_version = self.latest_version
-        if latest_version:
-            return latest_version.uid
-
-    @property
-    def version__content_hash(self):
-        # Avoid reading the propery `self.latest_version` more than once, since
-        # it may execute a database query each time it's read
-        latest_version = self.latest_version
-        if latest_version:
-            return latest_version.content_hash
-
-    @property
-    def snapshot(self):
-        return self._snapshot(regenerate=False)
+    def _populate_summary(self):
+        if self.content is None:
+            self.content = {}
+            self.summary = {}
+            return
+        analyzer = AssetContentAnalyzer(**self.content)
+        self.summary = analyzer.summary
 
     @transaction.atomic
     def _snapshot(self, regenerate=True):
@@ -767,57 +818,6 @@ class Asset(ObjectPermissionMixin,
                                                     asset_version=asset_version,
                                                     source=self.content)
         return snapshot
-
-    def __unicode__(self):
-        return u'{} ({})'.format(self.name, self.uid)
-
-    @property
-    def has_active_hooks(self):
-        """
-        Returns if asset has active hooks.
-        Useful to update `kc.XForm.has_kpi_hooks` field.
-        :return: {boolean}
-        """
-        return self.hooks.filter(active=True).exists()
-
-    @staticmethod
-    def optimize_queryset_for_list(queryset):
-        ''' Used by serializers to improve performance when listing assets '''
-        queryset = queryset.defer(
-            # Avoid pulling these `JSONField`s from the database because:
-            #   * they are stored as plain text, and just deserializing them
-            #     to Python objects is CPU-intensive;
-            #   * they are often huge;
-            #   * we don't need them for list views.
-            'content', 'report_styles'
-        ).select_related(
-            # We only need `username`, but `select_related('owner__username')`
-            # actually pulled in the entire `auth_user` table under Django 1.8.
-            # In Django 1.9+, "select_related() prohibits non-relational fields
-            # for nested relations."
-            'owner',
-        ).prefetch_related(
-            # We previously prefetched `permissions__content_object`, but that
-            # actually pulled the entirety of each permission's linked asset
-            # from the database! For now, the solution is to remove
-            # `content_object` here *and* from
-            # `ObjectPermissionNestedSerializer`.
-            'permissions__permission',
-            'permissions__user',
-            # `Prefetch(..., to_attr='prefetched_list')` stores the prefetched
-            # related objects in a list (`prefetched_list`) that we can use in
-            # other methods to avoid additional queries; see:
-            # https://docs.djangoproject.com/en/1.8/ref/models/querysets/#prefetch-objects
-            Prefetch('tags', to_attr='prefetched_tags'),
-            Prefetch(
-                'asset_versions',
-                queryset=AssetVersion.objects.order_by(
-                    '-date_modified'
-                ).only('uid', 'asset', 'date_modified', 'deployed'),
-                to_attr='prefetched_latest_versions',
-            ),
-        )
-        return queryset
 
 
 class AssetSnapshot(models.Model, XlsExportable, FormpackXLSFormUtils):
