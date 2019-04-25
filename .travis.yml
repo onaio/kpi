@@ -45,7 +45,11 @@ env:
        DJANGO_SETTINGS_MODULE=kobo.settings.testing
        DJANGO_LANGUAGE_CODES="en ar es fr hi ku pl pt zh-hans"
        DATABASE_URL="postgres://postgres@localhost:5432/travis_ci_test"
+<<<<<<< HEAD
        REDIS_SESSION_URL="redis://localhost:6379"
+=======
+       REDIS_SESSION_URL="redis://localhost:6389"
+>>>>>>> Added redis to travisCI (for session)
        TRAVIS_NODE_VERSION="8"
        PATH=$PATH:$HOME/build/kobotoolbox/kpi/node_modules/.bin/
 install:
