@@ -674,6 +674,12 @@ class Asset(ObjectPermissionMixin,
     def __str__(self):
         return '{} ({})'.format(self.name, self.uid)
 
+    def assign_perm(
+            self, user_obj, perm, deny=False, defer_recalc=False,
+            skip_kc=False
+    ):
+        return super(Asset, self).assign_perm(user_obj, perm, deny, defer_recalc, skip_kc)
+
     def adjust_content_on_save(self):
         """
         This is called on save by default if content exists.

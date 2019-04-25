@@ -3,7 +3,6 @@ import copy
 import re
 from collections import defaultdict
 
-
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser, Permission
