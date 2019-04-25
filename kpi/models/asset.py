@@ -139,6 +139,7 @@ class KpiTaggableManager(_TaggableManager):
         super().add(*tags_out, **kwargs)
 
 
+
 FLATTEN_OPTS = {
     'remove_columns': {
         'survey': [
