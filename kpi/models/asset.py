@@ -674,12 +674,6 @@ class Asset(ObjectPermissionMixin,
     def __str__(self):
         return '{} ({})'.format(self.name, self.uid)
 
-    def assign_perm(
-            self, user_obj, perm, deny=False, defer_recalc=False,
-            skip_kc=False
-    ):
-        return super(Asset, self).assign_perm(user_obj, perm, deny, defer_recalc, skip_kc)
-
     def adjust_content_on_save(self):
         """
         This is called on save by default if content exists.
@@ -847,6 +841,22 @@ class Asset(ObjectPermissionMixin,
             else:
                 return list(perms)
 
+    def get_usernames_for_restricted_perm(self, user_obj, perm=PERM_VIEW_SUBMISSIONS):
+        """
+        Returns the list of usernames for a specfic permission `perm`
+        and this specific asset.
+        :param user_obj: auth.User
+        :param perm: see `constants.*_SUBMISSIONS`
+        :return:
+        """
+        if not (perm.endswith(SUFFIX_SUBMISSIONS_PERMS) and
+                not perm == PERM_RESTRICTED_SUBMISSIONS):
+            raise BadPermissionsException("Only global permissions for "
+                                          "submissions are supported.")
+
+        perms = self.get_restricted_perms(user_obj, True)
+        if perms:
+            return perms.get(perm)
         return None
 
     @property
