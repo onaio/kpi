@@ -673,7 +673,6 @@ class ProjectSettings extends React.Component {
             type='submit'
             onClick={this.applyTemplate}
             disabled={!this.state.chosenTemplateUid || this.state.isApplyTemplatePending}
-            className='mdl-js-button'
           >
             {this.state.applyTemplateButton}
           </bem.Modal__footerButton>
@@ -743,7 +742,6 @@ class ProjectSettings extends React.Component {
             type='submit'
             onClick={this.importFromURL}
             disabled={!this.state.importUrlButtonEnabled}
-            className='mdl-js-button'
           >
             {this.state.importUrlButton}
           </bem.Modal__footerButton>
@@ -772,7 +770,6 @@ class ProjectSettings extends React.Component {
               type='submit'
               m='primary'
               onClick={this.handleSubmit}
-              className='mdl-js-button'
             >
               {t('Save Changes')}
             </bem.Modal__footerButton>
@@ -864,7 +861,6 @@ class ProjectSettings extends React.Component {
                 m='primary'
                 type='submit'
                 onClick={this.handleSubmit}
-                className='mdl-js-button'
                 disabled={this.state.isSubmitPending}
               >
                 {this.state.isSubmitPending && t('Please wait…')}
