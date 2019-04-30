@@ -199,6 +199,14 @@ class MockDeploymentBackend(BaseDeploymentBackend):
         if 'limit' in params:
             submissions = submissions[:params['limit']]
 
+        if submitted_by:
+            if format_type == INSTANCE_FORMAT_TYPE_XML:
+                # TODO handle `submitted_by` too.
+                pass
+            else:
+                submissions = [submission for submission in submissions
+                               if submission.get('submitted_by') in submitted_by]
+
         return submissions
 
     def get_validation_status(self, submission_pk, params, user):
