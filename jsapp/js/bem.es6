@@ -9,6 +9,8 @@ export const bem = BEM.init();
 
 bem.Button = BEM('mdl-button', '<button>');
 
+bem.Button = BEM('mdl-button', '<button>');
+
 bem.PageWrapper = BEM('page-wrapper');
 bem.PageWrapper__content = bem.PageWrapper.__('content');
 

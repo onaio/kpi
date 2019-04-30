@@ -137,9 +137,10 @@ export const ASSET_TYPES = {
     id: 'survey',
     label: t('project')
   }
-}
+};
 
 export default {
+  AVAILABLE_PERMISSIONS: AVAILABLE_PERMISSIONS,
   AVAILABLE_FORM_STYLES: AVAILABLE_FORM_STYLES,
   update_states: update_states,
   VALIDATION_STATUSES: VALIDATION_STATUSES,
