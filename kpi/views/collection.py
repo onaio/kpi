@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-# coding: utf-8
-from django.contrib.auth.models import User
-from django.db import transaction
-from django.shortcuts import get_object_or_404
-from rest_framework import exceptions, status
-from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
-from rest_framework.views import APIView
-=======
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
@@ -1578,24 +1568,15 @@ class UserCollectionSubscriptionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
->>>>>>> WIP - splitted views.py in several files
 
 
 class TokenView(APIView):
     def _which_user(self, request):
-<<<<<<< HEAD
-        """
-        Determine the user from `request`, allowing superusers to specify
-        another user by passing the `username` query parameter
-        """
-        if request.user.is_anonymous:
-=======
         '''
         Determine the user from `request`, allowing superusers to specify
         another user by passing the `username` query parameter
         '''
         if request.user.is_anonymous():
->>>>>>> WIP - splitted views.py in several files
             raise exceptions.NotAuthenticated()
 
         if 'username' in request.query_params:
@@ -1612,21 +1593,13 @@ class TokenView(APIView):
         return user
 
     def get(self, request, *args, **kwargs):
-<<<<<<< HEAD
-        """ Retrieve an existing token only """
-=======
         ''' Retrieve an existing token only '''
->>>>>>> WIP - splitted views.py in several files
         user = self._which_user(request)
         token = get_object_or_404(Token, user=user)
         return Response({'token': token.key})
 
     def post(self, request, *args, **kwargs):
-<<<<<<< HEAD
-        """ Return a token, creating a new one if none exists """
-=======
         ''' Return a token, creating a new one if none exists '''
->>>>>>> WIP - splitted views.py in several files
         user = self._which_user(request)
         token, created = Token.objects.get_or_create(user=user)
         return Response(
@@ -1635,18 +1608,12 @@ class TokenView(APIView):
         )
 
     def delete(self, request, *args, **kwargs):
-<<<<<<< HEAD
-        """ Delete an existing token and do not generate a new one """
-=======
         ''' Delete an existing token and do not generate a new one '''
->>>>>>> WIP - splitted views.py in several files
         user = self._which_user(request)
         with transaction.atomic():
             token = get_object_or_404(Token, user=user)
             token.delete()
         return Response({}, status=status.HTTP_204_NO_CONTENT)
-<<<<<<< HEAD
-=======
 
 
 class EnvironmentView(APIView):
@@ -1669,4 +1636,3 @@ class EnvironmentView(APIView):
             key.lower(): getattr(constance.config, key)
                 for key in self.CONFIGS_TO_EXPOSE
         })
->>>>>>> WIP - splitted views.py in several files
