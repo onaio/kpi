@@ -1,86 +1,73 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
-import base64
-import copy
-import datetime
-import json
-from hashlib import md5
+from distutils.util import strtobool
 from itertools import chain
+import copy
+from hashlib import md5
+import json
+import base64
+import datetime
 
-import constance
-
-from django.conf import settings
-from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.forms import model_to_dict
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
+from django.utils.http import is_safe_url
 from django.shortcuts import get_object_or_404, resolve_url
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url
-from django.utils.translation import ugettext_lazy as _
-from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from django.views.decorators.http import require_POST
-from private_storage.views import PrivateStorageDetailView
-from rest_framework import exceptions, mixins, renderers, status, viewsets
-from rest_framework.authtoken.models import Token
-from rest_framework.decorators import (
-    api_view,
-    authentication_classes,
-    detail_route,
-    list_route
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import (
+    viewsets,
+    mixins,
+    renderers,
+    status,
+    exceptions,
 )
+from rest_framework.decorators import api_view
+from rest_framework.decorators import renderer_classes
+from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import authentication_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework_extensions.mixins import NestedViewSetMixin
-from taggit.models import Tag
 
-from hub.models import SitewideMessage
-from kobo.apps.hook.utils import HookUtils
-from kobo.static_lists import COUNTRIES, LANGUAGES, SECTORS
-from kpi.exceptions import BadAssetTypeException
-from kpi.utils.log import logging
-from .constants import (
-    ASSET_TYPES,
-    ASSET_TYPE_ARG_NAME,
-    ASSET_TYPE_SURVEY,
-    ASSET_TYPE_TEMPLATE,
-    CLONE_ARG_NAME,
-    CLONE_COMPATIBLE_TYPES,
-    CLONE_FROM_VERSION_ID_ARG_NAME,
-    COLLECTION_CLONE_FIELDS,
-)
-from .deployment_backends.backends import DEPLOYMENT_BACKENDS
-from .filters import (
-    AssetOwnerFilterBackend,
-    KpiAssignedObjectPermissionsFilter,
-    KpiObjectPermissionsFilter,
-    RelatedAssetPermissionsFilter,
-    SearchFilter
-)
+import constance
+from taggit.models import Tag
+from private_storage.views import PrivateStorageDetailView
+
+from .filters import KpiAssignedObjectPermissionsFilter
+from .filters import AssetOwnerFilterBackend
+from .filters import KpiObjectPermissionsFilter, RelatedAssetPermissionsFilter
+from .filters import SearchFilter
 from .highlighters import highlight_xform
-from .model_utils import disable_auto_field_update, remove_string_prefix
+from hub.models import SitewideMessage
 from .models import (
-    Asset,
-    AssetFile,
-    AssetSnapshot,
-    AssetVersion,
-    AuthorizedApplication,
     Collection,
-    ExportTask,
+    Asset,
+    AssetVersion,
+    AssetSnapshot,
+    AssetFile,
     ImportTask,
+    ExportTask,
     ObjectPermission,
+    AuthorizedApplication,
     OneTimeAuthenticationKey,
-    UserCollectionSubscription
-)
+    UserCollectionSubscription,
+    )
+from .models.object_permission import get_anonymous_user, get_objects_for_user
 from .models.authorized_application import ApplicationTokenAuthentication
 from .models.import_export_task import _resolve_url_to_asset_or_collection
-from .models.object_permission import get_anonymous_user, get_objects_for_user
+from .model_utils import disable_auto_field_update, remove_string_prefix
 from .permissions import (
     IsOwnerOrReadOnly,
     PostMappedToChangePermission,
@@ -93,33 +80,26 @@ from .renderers import (
     XFormRenderer,
     XMLRenderer,
     SubmissionXMLRenderer,
-    XlsRenderer,
-)
+    XlsRenderer,)
 from .serializers import (
-    AssetFileSerializer,
-    AssetListSerializer,
-    AssetSerializer,
-    AssetSnapshotSerializer,
+    AssetSerializer, AssetListSerializer,
     AssetVersionListSerializer,
     AssetVersionSerializer,
-    AuthorizedApplicationUserSerializer,
-    CollectionListSerializer,
-    CollectionSerializer,
-    CreateUserSerializer,
-    CurrentUserSerializer,
-    DeploymentSerializer,
-    ExportTaskSerializer,
-    ImportTaskListSerializer,
-    ImportTaskSerializer,
-    ObjectPermissionSerializer,
-    OneTimeAuthenticationKeySerializer,
+    AssetFileSerializer,
+    AssetSnapshotSerializer,
     SitewideMessageSerializer,
-    TagListSerializer,
-    TagSerializer,
-    UserCollectionSubscriptionSerializer,
-    UserSerializer
-)
-from .tasks import import_in_background, export_in_background
+    CollectionSerializer, CollectionListSerializer,
+    UserSerializer,
+    CurrentUserSerializer, CreateUserSerializer,
+    TagSerializer, TagListSerializer,
+    ImportTaskSerializer, ImportTaskListSerializer,
+    ExportTaskSerializer,
+    ObjectPermissionSerializer,
+    AuthorizedApplicationUserSerializer,
+    OneTimeAuthenticationKeySerializer,
+    DeploymentSerializer,
+    UserCollectionSubscriptionSerializer,)
+from .utils.gravatar_url import gravatar_url
 from .utils.kobo_to_xlsform import to_xlsform_structure
 from .utils.ss_structure_to_mdtable import ss_structure_to_mdtable
 from .tasks import import_in_background, export_in_background
@@ -130,19 +110,13 @@ from .constants import CLONE_ARG_NAME, CLONE_FROM_VERSION_ID_ARG_NAME, \
     PERM_VIEW_COLLECTION, PERM_SHARE_SUBMISSIONS
 from .deployment_backends.backends import DEPLOYMENT_BACKENDS
 
-from ona.authentication import (
-    JWTAuthentication, encode_payload, decode_payload
-)
-from .model_utils import grant_default_model_level_perms
+from kobo.apps.hook.utils import HookUtils
+from kpi.exceptions import BadAssetTypeException
+from kpi.utils.log import logging
 
 
+@login_required
 def home(request):
-    cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
-    if request.user.is_anonymous() and cookie_jwt:
-        auth_class = JWTAuthentication()
-        user, token = auth_class.authenticate(request)
-        user.backend = settings.AUTHENTICATION_BACKENDS[0]
-        login(request, user)
     return TemplateResponse(request, "index.html")
 
 
@@ -378,19 +352,6 @@ class CurrentUserViewSet(viewsets.ModelViewSet):
     def get_object(self):
         return self.request.user
 
-    @detail_route(methods=['POST'], renderer_classes=[renderers.JSONRenderer])
-    def grant_default_model_level_perms(self, request, *args, **kwargs):
-        user = self.get_object()
-        grant_default_model_level_perms(user)
-
-        return Response(
-            data={
-                "detail": ("Successfully granted default model level "
-                           "perms to user %s." % user.username)
-            },
-            status=status.HTTP_201_CREATED
-        )
-
 
 class AuthorizedApplicationUserViewSet(mixins.CreateModelMixin,
                                        viewsets.GenericViewSet):
@@ -451,6 +412,7 @@ class OneTimeAuthenticationKeyViewSet(
     authentication_classes = [ApplicationTokenAuthentication]
     queryset = OneTimeAuthenticationKey.objects.none()
     serializer_class = OneTimeAuthenticationKeySerializer
+
     def create(self, request, *args, **kwargs):
         if type(request.auth) is not AuthorizedApplication:
             # Only specially-authorized applications are allowed to create
@@ -776,40 +738,38 @@ class HookSignalViewSet(NestedViewSetMixin, viewsets.ViewSet):
         :param request:
         :return:
         """
-        asset_uid = self.get_parents_query_dict().get("asset")
-        asset = get_object_or_404(self.parent_model, uid=asset_uid)
-
-        instance_id = request.data.get("instance_id")
-        if instance_id is None:
-            raise exceptions.ValidationError(
-                {'instance_id': _('This field is required.')})
-
-        instance = None
+        # Follow Open Rosa responses by default
+        response_status_code = status.HTTP_202_ACCEPTED
+        response = {
+            "detail": _(
+                "We got and saved your data, but may not have fully processed it. You should not try to resubmit.")
+        }
         try:
+            asset_uid = self.get_parents_query_dict().get("asset")
+            asset = get_object_or_404(self.parent_model, uid=asset_uid)
+            instance_id = request.data.get("instance_id")
             instance = asset.deployment.get_submission(instance_id)
-        except ValueError:
-            raise Http404
 
-        # Check if instance really belongs to Asset.
-        if not (instance and
-                instance.get(asset.deployment.INSTANCE_ID_FIELDNAME) == instance_id):
-            raise Http404
+            # Check if instance really belongs to Asset.
+            if not (instance and instance.get(asset.deployment.INSTANCE_ID_FIELDNAME) == instance_id):
+                response_status_code = status.HTTP_404_NOT_FOUND
+                response = {
+                    "detail": _("Resource not found")
+                }
 
-        if HookUtils.call_services(asset, instance_id):
-            # Follow Open Rosa responses by default
-            response_status_code = status.HTTP_202_ACCEPTED
+            elif not HookUtils.call_services(asset, instance_id):
+                response_status_code = status.HTTP_409_CONFLICT
+                response = {
+                    "detail": _(
+                        "Your data for instance {} has been already submitted.".format(instance_id))
+                }
+
+        except Exception as e:
+            logging.error("HookSignalViewSet.create - {}".format(str(e)))
             response = {
-                "detail": _(
-                    "We got and saved your data, but may not have fully processed it. You should not try to resubmit.")
+                "detail": _("An error has occurred when calling the external service. Please retry later.")
             }
-        else:
-            # call_services() refused to launch any task because this
-            # instance already has a `HookLog`
-            response_status_code = status.HTTP_409_CONFLICT
-            response = {
-                "detail": _(
-                    "Your data for instance {} has been already submitted.".format(instance_id))
-            }
+            response_status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         return Response(response, status=response_status_code)
 
@@ -883,7 +843,7 @@ class SubmissionViewSet(NestedViewSetMixin, viewsets.ViewSet):
     Update current submission
 
     _It's not possible to update a submission directly with `kpi`'s API.
-    Instead, it returns the link where the instance can be opened for editing._
+    Instead, it returns the link where the instance can be opened for edition._
 
     <pre class="prettyprint">
     <b>GET</b> /assets/<code>{uid}</code>/submissions/<code>{id}</code>/edit/
@@ -985,14 +945,14 @@ class SubmissionViewSet(NestedViewSetMixin, viewsets.ViewSet):
         return Response(**json_response)
 
     def list(self, request, *args, **kwargs):
-        format_type = kwargs.get('format', request.GET.get('format', 'json'))
+        format_type = kwargs.get("format", request.GET.get("format", "json"))
         deployment = self._get_deployment()
         filters = self._filter_mongo_query(request)
         submissions = deployment.get_submissions(format_type=format_type, **filters)
         return Response(list(submissions))
 
     def retrieve(self, request, pk, *args, **kwargs):
-        format_type = kwargs.get('format', request.GET.get('format', 'json'))
+        format_type = kwargs.get("format", request.GET.get("format", "json"))
         deployment = self._get_deployment()
         filters = self._filter_mongo_query(request)
         submission = deployment.get_submission(pk, format_type=format_type, **filters)
@@ -1004,16 +964,16 @@ class SubmissionViewSet(NestedViewSetMixin, viewsets.ViewSet):
     def validation_status(self, request, pk, *args, **kwargs):
         deployment = self._get_deployment()
         if request.method == "PATCH":
-            json_response = deployment.set_validation_status(pk, request.data, request.user)
+            json_response = deployment.set_validate_status(pk, request.data, request.user)
         else:
-            json_response = deployment.get_validation_status(pk, request.GET, request.user)
+            json_response = deployment.get_validate_status(pk, request.GET, request.user)
 
         return Response(**json_response)
 
     @list_route(methods=["PATCH"], renderer_classes=[renderers.JSONRenderer])
     def validation_statuses(self, request, *args, **kwargs):
         deployment = self._get_deployment()
-        json_response = deployment.set_validation_statuses(request.data, request.user)
+        json_response = deployment.set_validate_statuses(request.data, request.user)
 
         return Response(**json_response)
 
@@ -1063,12 +1023,8 @@ class AssetVersionViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
             # serializer will use
             _queryset = _queryset.only(
                 'uid', 'deployed', 'date_modified', 'asset_id')
-        # `AssetVersionListSerializer.get_url()` asks for the asset UID.
-        # Even though we only need 'uid', `select_related('asset__uid')`
-        # actually pulled in the entire `kpi_asset` table under Django 1.8. In
-        # Django 1.9+, "select_related() prohibits non-relational fields for
-        # nested relations."
-        _queryset = _queryset.select_related('asset')
+        # `AssetVersionListSerializer.get_url()` asks for the asset UID
+        _queryset = _queryset.select_related('asset__uid')
         return _queryset
 
 
@@ -1661,9 +1617,7 @@ class TokenView(APIView):
 
 
 class EnvironmentView(APIView):
-    """
-    GET-only view for certain server-provided configuration data
-    """
+    ''' GET-only view for certain server-provided configuration data '''
 
     CONFIGS_TO_EXPOSE = [
         'TERMS_OF_SERVICE_URL',
@@ -1674,18 +1628,11 @@ class EnvironmentView(APIView):
     ]
 
     def get(self, request, *args, **kwargs):
-        """
+        '''
         Return the lowercased key and value of each setting in
-        `CONFIGS_TO_EXPOSE`, along with the static lists of sectors, countries,
-        all known languages, and languages for which the interface has
-        translations.
-        """
-        data = {
+        `CONFIGS_TO_EXPOSE`
+        '''
+        return Response({
             key.lower(): getattr(constance.config, key)
                 for key in self.CONFIGS_TO_EXPOSE
-        }
-        data['available_sectors'] = SECTORS
-        data['available_countries'] = COUNTRIES
-        data['all_languages'] = LANGUAGES
-        data['interface_languages'] = settings.LANGUAGES
-        return Response(data)
+        })
