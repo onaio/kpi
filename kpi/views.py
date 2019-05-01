@@ -1003,6 +1003,8 @@ class SubmissionViewSet(NestedViewSetMixin, viewsets.ViewSet):
         # remove `format` from filters, it's redundant.
         filters.pop('format', None)
         submission = deployment.get_submission(pk, format_type=format_type, **filters)
+        if not submission:
+            raise Http404
         return Response(submission)
 
     @detail_route(methods=["GET", "PATCH"], renderer_classes=[renderers.JSONRenderer])
