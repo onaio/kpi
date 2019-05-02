@@ -24,6 +24,11 @@ from formpack import FormPack
 from formpack.utils.flatten_content import flatten_content
 from formpack.utils.json_hash import json_hash
 from formpack.utils.spreadsheet_content import flatten_to_spreadsheet_content
+from jsonbfield.fields import JSONField as JSONBField
+from jsonfield import JSONField
+from taggit.managers import TaggableManager, _TaggableManager
+from taggit.utils import require_instance_manager
+
 from kobo.apps.reports.constants import (SPECIFIC_REPORTS_KEY,
                                          DEFAULT_REPORTS_KEY)
 from kpi.constants import (

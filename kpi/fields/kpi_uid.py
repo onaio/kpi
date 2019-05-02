@@ -2,7 +2,12 @@
 # coding: utf-8
 =======
 # -*- coding: utf-8 -*-
+<<<<<<< HEAD
 >>>>>>> WIP - refactored structure of serializers Fields
+=======
+from __future__ import absolute_import
+
+>>>>>>> Views and Serializers splitted
 from django.db import models
 from shortuuid import ShortUUID
 
