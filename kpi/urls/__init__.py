@@ -1,6 +1,6 @@
 # coding: utf-8
 import private_storage.urls
-<<<<<<< HEAD
+from django.conf import settings
 from django.contrib.auth import logout
 from django.urls import include, re_path, path
 from django.views.i18n import JavaScriptCatalog
@@ -9,14 +9,6 @@ from hub.models import ConfigurationFile
 from hub.views import ExtraDetailRegistrationView
 from kobo.apps.superuser_stats.views import user_report, retrieve_user_report
 from kpi.forms import RegistrationForm
-=======
-
-from hub.models import ConfigurationFile
-from hub.views import ExtraDetailRegistrationView
-from hub.views import switch_builder
-from kpi.forms import RegistrationForm
-from kpi.views import CurrentUserViewSet, TokenView, EnvironmentView
->>>>>>> WIP - Use separate router,views,serializer for api v1 and v2
 from kpi.views import authorized_application_authenticate_user
 from kpi.views import home, one_time_login, browser_tests
 from kpi.views.environment import EnvironmentView
@@ -25,9 +17,6 @@ from kpi.views.token import TokenView
 
 from .router_api_v1 import router_api_v1
 from .router_api_v2 import router_api_v2, URL_NAMESPACE
-
-from .router_api_v1 import router_api_v1
-from .router_api_v2 import router_api_v2
 
 # TODO: Give other apps their own `urls.py` files instead of importing their
 # views directly! See
@@ -41,22 +30,11 @@ urlpatterns = [
         'get': 'retrieve',
         'patch': 'partial_update',
     }), name='currentuser-detail'),
-<<<<<<< HEAD
-    re_path(r'^grant-default-model-level-perms$', CurrentUserViewSet.as_view({
-        'post': 'grant_default_model_level_perms',
-    }), name='currentuser-detail'),
     re_path(r'^', include(router_api_v1.urls)),
     re_path(r'^api/v2/', include((router_api_v2.urls, URL_NAMESPACE))),
     re_path(r'^api-auth/', include('rest_framework.urls',
                                    namespace='rest_framework')),
     re_path(r'^accounts/register/$', ExtraDetailRegistrationView.as_view(
-=======
-    url(r'^', include(router_api_v1.urls)),
-    url(r'^api/v2/', include(router_api_v2.urls, namespace='api_v2')),
-    url(r'^api-auth/', include('rest_framework.urls',
-                               namespace='rest_framework')),
-    url(r'^accounts/register/$', ExtraDetailRegistrationView.as_view(
->>>>>>> WIP - Use separate router,views,serializer for api v1 and v2
         form_class=RegistrationForm), name='registration_register'),
     re_path(r'^accounts/logout/', logout, {'next_page': '/'}),
     re_path(r'^accounts/', include('registration.backends.default.urls')),
@@ -81,3 +59,9 @@ urlpatterns = [
     re_path(r'^superuser_stats/user_report/(?P<base_filename>[^/]+)$',
             retrieve_user_report),
 ]
+
+if settings.DEBUG and settings.ENV == 'dev':
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
