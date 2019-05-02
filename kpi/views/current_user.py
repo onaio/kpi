@@ -8,16 +8,8 @@ from kpi.serializers import CurrentUserSerializer
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
-from distutils.util import strtobool
-from itertools import chain
-import copy
-from hashlib import md5
-import json
-import base64
-import datetime
-
-from django.contrib.auth import login
 from django.contrib.auth.models import User
+<<<<<<< HEAD
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Q, Count
@@ -351,6 +343,10 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     def list(self, request, *args, **kwargs):
         raise exceptions.PermissionDenied()
 >>>>>>> WIP - splitted views.py in several files
+=======
+from rest_framework import viewsets
+from kpi.serializers import CurrentUserSerializer
+>>>>>>> Removed useless imports and unrelated codes from views files
 
 
 class CurrentUserViewSet(viewsets.ModelViewSet):
@@ -359,6 +355,7 @@ class CurrentUserViewSet(viewsets.ModelViewSet):
 
     def get_object(self):
         return self.request.user
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 
@@ -1647,3 +1644,5 @@ class EnvironmentView(APIView):
                 for key in self.CONFIGS_TO_EXPOSE
         })
 >>>>>>> WIP - splitted views.py in several files
+=======
+>>>>>>> Removed useless imports and unrelated codes from views files
