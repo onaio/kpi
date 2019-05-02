@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-
 # coding: utf-8
 from django.conf import settings
 from django.contrib.auth.models import User
-=======
-# -*- coding: utf-8 -*-
-from django.conf import settings
->>>>>>> Removed KC db connection when running tests
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
@@ -20,7 +14,6 @@ from kpi.deployment_backends.kc_access.shadow_models import (
 from kpi.deployment_backends.kc_access.utils import grant_kc_model_level_perms
 from kpi.models import Asset, TagUid
 from kpi.utils.permissions import grant_default_model_level_perms
-
 
 
 @receiver(post_save, sender=User)
@@ -49,7 +42,6 @@ def save_kobocat_user(sender, instance, created, raw, **kwargs):
     `settings.KOBOCAT_DEFAULT_PERMISSION_CONTENT_TYPES`
     """
     if not settings.TESTING:
-<<<<<<< HEAD
         KobocatUser.sync(instance)
 
         if created:
@@ -60,9 +52,6 @@ def save_kobocat_user(sender, instance, created, raw, **kwargs):
             # seem to help. We should roll back the KC user creation if
             # assigning model-level permissions fails
             grant_kc_model_level_perms(instance)
-=======
-        KCUser.sync(instance)
->>>>>>> Removed KC db connection when running tests
 
 
 @receiver(post_save, sender=Token)
@@ -104,15 +93,13 @@ def update_kc_xform_has_kpi_hooks(sender, instance, **kwargs):
         asset.deployment.set_has_kpi_hooks()
 
 
-@receiver(post_delete, sender=Collection)
-def post_delete_collection(sender, instance, **kwargs):
-    # Remove all permissions associated with this object
-    ObjectPermission.objects.filter_for_object(instance).delete()
-    # No recalculation is necessary since children will also be deleted
-
-
 @receiver(post_delete, sender=Asset)
 def post_delete_asset(sender, instance, **kwargs):
-    # Remove all permissions associated with this object
-    ObjectPermission.objects.filter_for_object(instance).delete()
-    # No recalculation is necessary since children will also be deleted
+    # Update parent's languages if this object is a child of another asset.
+    try:
+        parent = instance.parent
+    except Asset.DoesNotExist:  # `parent` may exists in DJANGO models cache but not in DB
+        pass
+    else:
+        if parent:
+            parent.update_languages()
