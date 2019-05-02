@@ -18,6 +18,8 @@ from rest_framework.pagination import LimitOffsetPagination, PageNumberPaginatio
 from rest_framework.reverse import reverse_lazy, reverse
 from taggit.models import Tag
 
+from kobo.static_lists import SECTORS, COUNTRIES, LANGUAGES
+from kpi.constants import PERM_VIEW_ASSET, PERM_VIEW_COLLECTION, PERM_FROM_KC_ONLY
 from hub.models import SitewideMessage, ExtraUserDetail
 from .fields import PaginatedApiField, SerializerMethodFileField
 from .models import Asset
@@ -193,7 +195,7 @@ class TagSerializer(serializers.ModelSerializer):
         # Check if the user is anonymous. The
         # django.contrib.auth.models.AnonymousUser object doesn't work for
         # queries.
-        if user.is_anonymous:
+        if user.is_anonymous():
             user = get_anonymous_user()
         return [reverse('asset-detail', args=(sa.uid,), request=request)
                 for sa in Asset.objects.filter(tags=obj, owner=user).all()]
@@ -204,7 +206,7 @@ class TagSerializer(serializers.ModelSerializer):
         # Check if the user is anonymous. The
         # django.contrib.auth.models.AnonymousUser object doesn't work for
         # queries.
-        if user.is_anonymous:
+        if user.is_anonymous():
             user = get_anonymous_user()
         return [reverse('collection-detail', args=(coll.uid,), request=request)
                 for coll in Collection.objects.filter(tags=obj, owner=user)
@@ -598,7 +600,7 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         # Check if the user is anonymous. The
         # django.contrib.auth.models.AnonymousUser object doesn't work for
         # queries.
-        if user.is_anonymous:
+        if user.is_anonymous():
             user = get_anonymous_user()
         if 'parent' in fields:
             # TODO: remove this restriction?
@@ -914,6 +916,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     date_joined = serializers.SerializerMethodField()
     projects_url = serializers.SerializerMethodField()
     gravatar = serializers.SerializerMethodField()
+    languages = serializers.SerializerMethodField()
     extra_details = WritableJSONField(source='extra_details.data')
     current_password = serializers.CharField(write_only=True, required=False)
     new_password = serializers.CharField(write_only=True, required=False)
@@ -933,6 +936,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             'gravatar',
             'is_staff',
             'last_login',
+            'languages',
             'extra_details',
             'current_password',
             'new_password',
@@ -954,6 +958,9 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     def get_gravatar(self, obj):
         return gravatar_url(obj.email)
 
+    def get_languages(self, obj):
+        return settings.LANGUAGES
+
     def get_git_rev(self, obj):
         request = self.context.get('request', False)
         if settings.EXPOSE_GIT_REV or (request and request.user.is_superuser):
@@ -965,15 +972,21 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         if obj.is_anonymous():
             return {'message': 'user is not logged in'}
         rep = super(CurrentUserSerializer, self).to_representation(obj)
+        if settings.UPCOMING_DOWNTIME:
+            # setting is in the format:
+            # [dateutil.parser.parse('6pm edt').isoformat(), countdown_msg]
+            rep['upcoming_downtime'] = settings.UPCOMING_DOWNTIME
+        # TODO: Find a better location for SECTORS and COUNTRIES
+        # as the functionality develops. (possibly in tags?)
+        rep['available_sectors'] = SECTORS
+        rep['available_countries'] = COUNTRIES
+        rep['all_languages'] = LANGUAGES
         if not rep['extra_details']:
             rep['extra_details'] = {}
         # `require_auth` needs to be read from KC every time
         if settings.KOBOCAT_URL and settings.KOBOCAT_INTERNAL_URL:
             rep['extra_details']['require_auth'] = get_kc_profile_data(
                 obj.pk).get('require_auth', False)
-            rep['extra_details']['can_publicize_collection'] = obj.has_perm(
-                'kpi.publicize_collection'
-            )
 
         return rep
 

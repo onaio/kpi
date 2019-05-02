@@ -1,21 +1,3 @@
-<<<<<<< HEAD
-# coding: utf-8
-import datetime
-import pytz
-
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.models import User
-from django.db import transaction
-from django.conf import settings
-from rest_framework import serializers
-
-from kobo.static_lists import SECTORS, COUNTRIES, LANGUAGES
-from hub.models import ExtraUserDetail
-from kpi.deployment_backends.kc_access.utils import get_kc_profile_data
-from kpi.deployment_backends.kc_access.utils import set_kc_require_auth
-from kpi.fields import WritableJSONField
-from kpi.utils.gravatar_url import gravatar_url
-=======
 # -*- coding: utf-8 -*-
 import datetime
 import json
@@ -926,7 +908,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
                 'lookup_field': 'uid',
             },
         }
->>>>>>> WIP - split serializers
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
@@ -988,11 +969,6 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             return False
 
     def to_representation(self, obj):
-<<<<<<< HEAD
-        if obj.is_anonymous:
-            return {'message': 'user is not logged in'}
-        rep = super().to_representation(obj)
-=======
         if obj.is_anonymous():
             return {'message': 'user is not logged in'}
         rep = super(CurrentUserSerializer, self).to_representation(obj)
@@ -1005,7 +981,6 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         rep['available_sectors'] = SECTORS
         rep['available_countries'] = COUNTRIES
         rep['all_languages'] = LANGUAGES
->>>>>>> WIP - split serializers
         if not rep['extra_details']:
             rep['extra_details'] = {}
         # `require_auth` needs to be read from KC every time
@@ -1036,25 +1011,12 @@ class CurrentUserSerializer(serializers.ModelSerializer):
                 if instance.check_password(current_password):
                     instance.set_password(new_password)
                     instance.save()
-<<<<<<< HEAD
-                    request = self.context.get('request', False)
-                    if request:
-                        update_session_auth_hash(request, instance)
-=======
->>>>>>> WIP - split serializers
                 else:
                     raise serializers.ValidationError({
                         'current_password': 'Incorrect current password.'
                     })
         elif any((current_password, new_password)):
             raise serializers.ValidationError(
-<<<<<<< HEAD
-                'current_password and new_password must both be sent '
-                'together; one or the other cannot be sent individually.'
-            )
-        return super().update(
-            instance, validated_data)
-=======
                 'current_password and new_password must both be sent ' \
                 'together; one or the other cannot be sent individually.'
             )
@@ -1299,4 +1261,3 @@ class UserCollectionSubscriptionSerializer(serializers.ModelSerializer):
         model = UserCollectionSubscription
         lookup_field = 'uid'
         fields = ('url', 'collection', 'uid')
->>>>>>> WIP - split serializers
