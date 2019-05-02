@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 # coding: utf-8
+=======
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals, absolute_import
+
+>>>>>>> Moved current views and serializers under 'v1' parent folder
 from rest_framework import status, exceptions
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -8,7 +14,11 @@ from kpi.models.import_export_task import _resolve_url_to_asset_or_collection
 from kpi.model_utils import remove_string_prefix
 from kpi.serializers import ExportTaskSerializer
 from kpi.tasks import export_in_background
+<<<<<<< HEAD
 from kpi.views.no_update_model import NoUpdateModelViewSet
+=======
+from .no_update_model import NoUpdateModelViewSet
+>>>>>>> Moved current views and serializers under 'v1' parent folder
 
 
 class ExportTaskViewSet(NoUpdateModelViewSet):
@@ -17,7 +27,11 @@ class ExportTaskViewSet(NoUpdateModelViewSet):
     lookup_field = 'uid'
 
     def get_queryset(self, *args, **kwargs):
+<<<<<<< HEAD
         if self.request.user.is_anonymous:
+=======
+        if self.request.user.is_anonymous():
+>>>>>>> Moved current views and serializers under 'v1' parent folder
             return ExportTask.objects.none()
 
         queryset = ExportTask.objects.filter(
@@ -47,7 +61,11 @@ class ExportTaskViewSet(NoUpdateModelViewSet):
         return queryset
 
     def create(self, request, *args, **kwargs):
+<<<<<<< HEAD
         if self.request.user.is_anonymous:
+=======
+        if self.request.user.is_anonymous():
+>>>>>>> Moved current views and serializers under 'v1' parent folder
             raise exceptions.NotAuthenticated()
 
         # Read valid options from POST data

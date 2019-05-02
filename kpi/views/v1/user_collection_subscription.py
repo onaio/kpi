@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 # coding: utf-8
+=======
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals, absolute_import
+
+>>>>>>> Moved current views and serializers under 'v1' parent folder
 from rest_framework import viewsets
 from kpi.models import UserCollectionSubscription
 
@@ -16,7 +22,11 @@ class UserCollectionSubscriptionViewSet(viewsets.ModelViewSet):
         # Check if the user is anonymous. The
         # django.contrib.auth.models.AnonymousUser object doesn't work for
         # queries.
+<<<<<<< HEAD
         if user.is_anonymous:
+=======
+        if user.is_anonymous():
+>>>>>>> Moved current views and serializers under 'v1' parent folder
             user = get_anonymous_user()
         criteria = {'user': user}
         if 'collection__uid' in self.request.query_params:

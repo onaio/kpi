@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # coding: utf-8
 from .asset import AssetViewSet
 from .asset_file import AssetFileViewSet
@@ -14,3 +15,7 @@ from .submission import SubmissionViewSet
 from .tag import TagViewSet
 from .user import UserViewSet
 from .user_collection_subscription import UserCollectionSubscriptionViewSet
+=======
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+>>>>>>> Moved current views and serializers under 'v1' parent folder
