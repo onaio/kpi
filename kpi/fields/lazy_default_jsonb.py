@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 # coding: utf-8
 from collections import Callable
 
 from django.core.exceptions import FieldError
 from django.contrib.postgres.fields import JSONField as JSONBField
+=======
+# -*- coding: utf-8 -*-
+from django.core.exceptions import FieldError
+from jsonbfield.fields import JSONField as JSONBField
+>>>>>>> WIP - refactored structure of serializers Fields
 
 
 class LazyDefaultJSONBField(JSONBField):
@@ -25,16 +31,28 @@ class LazyDefaultJSONBField(JSONBField):
                              'is not None')
         kwargs['null'] = True
         kwargs['default'] = None
+<<<<<<< HEAD
         super().__init__(*args, **kwargs)
 
     def _get_lazy_default(self):
         if isinstance(self.lazy_default, Callable):
+=======
+        super(LazyDefaultJSONBField, self).__init__(*args, **kwargs)
+
+    def _get_lazy_default(self):
+        if callable(self.lazy_default):
+>>>>>>> WIP - refactored structure of serializers Fields
             return self.lazy_default()
         else:
             return self.lazy_default
 
     def deconstruct(self):
+<<<<<<< HEAD
         name, path, args, kwargs = super().deconstruct()
+=======
+        name, path, args, kwargs = super(
+            LazyDefaultJSONBField, self).deconstruct()
+>>>>>>> WIP - refactored structure of serializers Fields
         kwargs['default'] = self.lazy_default
         del kwargs['null']
         return name, path, args, kwargs

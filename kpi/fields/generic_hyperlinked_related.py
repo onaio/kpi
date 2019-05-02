@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # coding: utf-8
 from urllib.parse import urlparse
 
@@ -11,6 +12,18 @@ from django.urls import (
 from rest_framework import serializers
 
 from kpi.models.object_permission import ObjectPermission
+=======
+# -*- coding: utf-8 -*-
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import Resolver404
+from django.core.urlresolvers import get_script_prefix
+from django.core.urlresolvers import resolve
+from django.utils.six.moves.urllib import parse as urlparse
+from rest_framework import serializers
+
+from kpi.models import ObjectPermission
+>>>>>>> WIP - refactored structure of serializers Fields
 
 
 class GenericHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
@@ -20,13 +33,22 @@ class GenericHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
         # situation. We will override them dynamically.
         kwargs['view_name'] = '*'
         kwargs['queryset'] = ObjectPermission.objects.none()
+<<<<<<< HEAD
         super().__init__(**kwargs)
+=======
+        return super(GenericHyperlinkedRelatedField, self).__init__(**kwargs)
+>>>>>>> WIP - refactored structure of serializers Fields
 
     def to_representation(self, value):
         # TODO Figure out why self.view_name is initialized twice in a row?
         self.view_name = '{}-detail'.format(
             ContentType.objects.get_for_model(value).model)
+<<<<<<< HEAD
         result = super().to_representation(value)
+=======
+        result = super(GenericHyperlinkedRelatedField, self).to_representation(
+            value)
+>>>>>>> WIP - refactored structure of serializers Fields
         self.view_name = '*'
         return result
 
@@ -44,7 +66,11 @@ class GenericHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
         # TODO: Figure out why DRF only strips absolute URLs, or file bug
         if True or http_prefix:
             # If needed convert absolute URLs to relative path
+<<<<<<< HEAD
             data = urlparse(data).path
+=======
+            data = urlparse.urlparse(data).path
+>>>>>>> WIP - refactored structure of serializers Fields
             prefix = get_script_prefix()
             if data.startswith(prefix):
                 data = '/' + data[len(prefix):]
