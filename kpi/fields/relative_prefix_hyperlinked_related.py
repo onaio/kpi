@@ -4,6 +4,8 @@ from urllib.parse import urlparse
 from django.urls import get_script_prefix
 from rest_framework.serializers import HyperlinkedRelatedField
 
+from .versioned_hyperlinked_related import VersionedHyperlinkedRelatedField
+
 
 class RelativePrefixHyperlinkedRelatedField(HyperlinkedRelatedField):
 

@@ -4,7 +4,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status, exceptions
 from rest_framework.response import Response
-
 from kpi.filters import KpiObjectPermissionsFilter, SearchFilter
 from kpi.models import Collection
 from kpi.model_utils import disable_auto_field_update
