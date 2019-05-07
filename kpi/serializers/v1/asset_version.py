@@ -7,6 +7,8 @@ from kpi.serializers.v2.asset_version import \
 class AssetVersionListSerializer(AssetVersionListSerializerV2):
     pass
 
+class AssetVersionListSerializer(AssetVersionListSerializerV2):
+    pass
 
 class AssetVersionSerializer(AssetVersionSerializerV2):
     pass
