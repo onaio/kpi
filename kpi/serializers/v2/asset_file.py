@@ -1,10 +1,10 @@
 # coding: utf-8
 from rest_framework import serializers
-from rest_framework.reverse import reverse
 
 from kpi.fields import RelativePrefixHyperlinkedRelatedField, \
     SerializerMethodFileField, WritableJSONField
 from kpi.models import AssetFile
+from kpi.utils.url_helper import UrlHelper
 
 
 class AssetFileSerializer(serializers.ModelSerializer):
