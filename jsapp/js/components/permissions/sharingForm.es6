@@ -170,7 +170,6 @@ class SharingForm extends React.Component {
               {...perm}
             />;
           })}
-
           {!this.state.isAddUserEditorVisible &&
             <bem.Button
               m={['raised', 'colored']}
