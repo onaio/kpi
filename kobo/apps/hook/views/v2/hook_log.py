@@ -1,13 +1,23 @@
+<<<<<<< HEAD
 # coding: utf-8
 from django.utils.translation import ugettext as _
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
+=======
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
+from django.utils.translation import ugettext as _
+from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import detail_route
+>>>>>>> Make Hook app work with v1 & v2
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from kobo.apps.hook.constants import KOBO_INTERNAL_ERROR_STATUS_CODE
 from kobo.apps.hook.models.hook_log import HookLog
 from kobo.apps.hook.serializers.v2.hook_log import HookLogSerializer
+<<<<<<< HEAD
 from kpi.paginators import TinyPaginated
 from kpi.permissions import AssetEditorSubmissionViewerPermission
 from kpi.utils.viewset_mixins import AssetNestedObjectViewsetMixin
@@ -15,6 +25,14 @@ from kpi.utils.viewset_mixins import AssetNestedObjectViewsetMixin
 
 class HookLogViewSet(AssetNestedObjectViewsetMixin,
                      NestedViewSetMixin,
+=======
+from kpi.filters import AssetOwnerFilterBackend
+from kpi.paginators import TinyPaginated
+from kpi.permissions import AssetOwnerNestedObjectPermission
+
+
+class HookLogViewSet(NestedViewSetMixin,
+>>>>>>> Make Hook app work with v1 & v2
                      mixins.RetrieveModelMixin,
                      mixins.ListModelMixin,
                      viewsets.GenericViewSet):
@@ -25,12 +43,20 @@ class HookLogViewSet(AssetNestedObjectViewsetMixin,
 
     #### Lists logs of an external services endpoints accessible to requesting user
     <pre class="prettyprint">
+<<<<<<< HEAD
     <b>GET</b> /api/v2/assets/{asset_uid}/hooks/{hook_uid}/logs/
+=======
+    <b>GET</b> /assets/{asset_uid}/hooks/{hook_uid}/logs/
+>>>>>>> Make Hook app work with v1 & v2
     </pre>
 
     > Example
     >
+<<<<<<< HEAD
     >       curl -X GET https://[kpi-url]/api/v2/assets/a9PkXcgVgaDXuwayVeAuY5/hooks/hSBxsiVNa5UxkVAjwu6dFB/logs/
+=======
+    >       curl -X GET https://[kpi-url]/assets/a9PkXcgVgaDXuwayVeAuY5/hooks/hSBxsiVNa5UxkVAjwu6dFB/logs/
+>>>>>>> Make Hook app work with v1 & v2
 
 
 
@@ -40,23 +66,39 @@ class HookLogViewSet(AssetNestedObjectViewsetMixin,
 
     #### Retrieves a log
     <pre class="prettyprint">
+<<<<<<< HEAD
     <b>GET</b> /api/v2/assets/<code>{asset_uid}</code>/hooks/<code>{hook_uid}</code>/logs/<code>{uid}</code>/
+=======
+    <b>GET</b> /assets/<code>{asset_uid}</code>/hooks/<code>{hook_uid}</code>/logs/<code>{uid}</code>/
+>>>>>>> Make Hook app work with v1 & v2
     </pre>
 
 
     > Example
     >
+<<<<<<< HEAD
     >       curl -X GET https://[kpi-url]/api/v2/assets/a9PkXcgVgaDXuwayVeAuY5/hooks/hfgha2nxBdoTVcwohdYNzb/logs/3005940a-6e30-4699-813a-0ee5b2b07395/
+=======
+    >       curl -X GET https://[kpi-url]/assets/a9PkXcgVgaDXuwayVeAuY5/hooks/hfgha2nxBdoTVcwohdYNzb/logs/3005940a-6e30-4699-813a-0ee5b2b07395/
+>>>>>>> Make Hook app work with v1 & v2
 
 
     #### Retries a failed attempt
     <pre class="prettyprint">
+<<<<<<< HEAD
     <b>PATCH</b> /api/v2/assets/<code>{asset_uid}</code>/hooks/<code>{hook_uid}</code>/logs/<code>{uid}</code>/retry/
+=======
+    <b>PATCH</b> /assets/<code>{asset_uid}</code>/hooks/<code>{hook_uid}</code>/logs/<code>{uid}</code>/retry/
+>>>>>>> Make Hook app work with v1 & v2
     </pre>
 
     > Example
     >
+<<<<<<< HEAD
     >       curl -X GET https://[kpi-url]/api/v2/assets/a9PkXcgVgaDXuwayVeAuY5/hooks/hfgha2nxBdoTVcwohdYNzb/logs/3005940a-6e30-4699-813a-0ee5b2b07395/retry/
+=======
+    >       curl -X GET https://[kpi-url]/assets/a9PkXcgVgaDXuwayVeAuY5/hooks/hfgha2nxBdoTVcwohdYNzb/logs/3005940a-6e30-4699-813a-0ee5b2b07395/retry/
+>>>>>>> Make Hook app work with v1 & v2
 
 
     ### CURRENT ENDPOINT
