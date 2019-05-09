@@ -319,6 +319,17 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
                                                    many=True, read_only=True,
                                                    context=context).data
 
+    def get_permissions(self, obj):
+        object_permissions_queryset = ObjectPermission.objects.filter(
+            object_id=obj.id).all()
+
+        context = self.context
+        context.update({'asset_uid': obj.uid})
+
+        return AssetPermissionSerializer(object_permissions_queryset,
+                                         many=True, read_only=True,
+                                         context=context).data
+
     def _content(self, obj):
         return json.dumps(obj.content)
 
