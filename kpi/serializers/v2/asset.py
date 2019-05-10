@@ -320,13 +320,13 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
                                                    context=context).data
 
     def get_permissions(self, obj):
-        object_permissions_queryset = ObjectPermission.objects.filter(
-            object_id=obj.id).all()
-
         context = self.context
+        request = self.context.get('request')
+        queryset = ObjectPermissionHelper.get_assignments_queryset(obj,
+                                                                   request.user)
         context.update({'asset_uid': obj.uid})
 
-        return AssetPermissionSerializer(object_permissions_queryset,
+        return AssetPermissionSerializer(queryset.all(),
                                          many=True, read_only=True,
                                          context=context).data
 
