@@ -209,6 +209,31 @@ class PostMappedToChangePermission(IsOwnerOrReadOnly):
     perms_map['POST'] = ['%(app_label)s.change_%(model_name)s']
 
 
+# FIXME: Name is no longer accurate.
+class IsOwnerOrReadOnly(permissions.DjangoObjectPermissions):
+    """
+    Custom permission to only allow owners of an object to edit it.
+    """
+
+    # Setting this to False allows real permission checking on AnonymousUser.
+    # With the default of True, anonymous requests are categorically rejected.
+    authenticated_users_only = False
+
+    perms_map = permissions.DjangoObjectPermissions.perms_map
+    perms_map['GET'] = ['%(app_label)s.view_%(model_name)s']
+    perms_map['OPTIONS'] = perms_map['GET']
+    perms_map['HEAD'] = perms_map['GET']
+
+
+class PostMappedToChangePermission(IsOwnerOrReadOnly):
+    """
+    Maps POST requests to the change_model permission instead of DRF's default
+    of add_model
+    """
+    perms_map = IsOwnerOrReadOnly.perms_map
+    perms_map['POST'] = ['%(app_label)s.change_%(model_name)s']
+
+
 class SubmissionPermission(AssetNestedObjectPermission):
     """
     Permissions for submissions.
