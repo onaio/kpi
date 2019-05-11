@@ -135,6 +135,7 @@ class CopyTeamPermissions extends React.Component {
             <bem.FormModal__item>
               {t('This will overwrite any existing sharing settings defined in this project.')}
             </bem.FormModal__item>
+
             <bem.FormModal__item m={['gray-row', 'flexed-row', 'copy-team-permissions']}>
               <Select
                 id='teamPermissions'
