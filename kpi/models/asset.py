@@ -846,7 +846,7 @@ class Asset(ObjectPermissionMixin,
             else:
                 return list(perms)
 
-    def get_usernames_for_restricted_perm(self, user_id, perm=PERM_VIEW_SUBMISSIONS):
+    def get_usernames_for_partial_perm(self, user_id, perm=PERM_VIEW_SUBMISSIONS):
         """
         Returns the list of usernames for a specfic permission `perm`
         and this specific asset.
@@ -855,11 +855,11 @@ class Asset(ObjectPermissionMixin,
         :return:
         """
         if not (perm.endswith(SUFFIX_SUBMISSIONS_PERMS) and
-                not perm == PERM_RESTRICTED_SUBMISSIONS):
+                not perm == PERM_PARTIAL_SUBMISSIONS):
             raise BadPermissionsException("Only global permissions for "
                                           "submissions are supported.")
 
-        perms = self.get_restricted_perms(user_id, True)
+        perms = self.get_partial_perms(user_id, True)
         if perms:
             return perms.get(perm)
         return None

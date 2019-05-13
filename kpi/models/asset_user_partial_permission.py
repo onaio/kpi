@@ -8,7 +8,6 @@ class AssetUserPartialPermission(models.Model):
     """
     Many-to-Many table which provides users' permissions
     on other users' submissions
-
     For example,
         - Asset:
             - uid: aAAAAAA
@@ -21,7 +20,6 @@ class AssetUserPartialPermission(models.Model):
     `permissions` is dict formatted as is:
     asset_id | user_id | permissions
         1    |    1    | {"someuser": ["view_submissions"]}
-
     Using a list per user for permissions, gives the opportunity to add other permissions
     such as `change_submissions`, `delete_submissions` for later purpose
     """
