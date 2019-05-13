@@ -85,7 +85,8 @@
     "expect": false,
     "window": false,
     "document": false,
-    "Parse": false
+    "Parse": false,
+    "chai": true
   },
   "plugins": [
     "react"

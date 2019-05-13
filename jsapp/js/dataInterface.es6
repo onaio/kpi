@@ -222,7 +222,7 @@ var dataInterface;
         data: {
           clone_from: sourceUid
         }
-      })
+      });
     },
     assignPerm (creds) {
       // Do we already have these URLs stored somewhere?
