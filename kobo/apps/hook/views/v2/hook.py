@@ -14,8 +14,14 @@ from kobo.apps.hook.constants import HOOK_LOG_FAILED, HOOK_LOG_PENDING
 from kobo.apps.hook.models import Hook, HookLog
 from kobo.apps.hook.serializers.v2.hook import HookSerializer
 from kobo.apps.hook.tasks import retry_all_task
+<<<<<<< HEAD
 from kpi.permissions import AssetEditorSubmissionViewerPermission
 from kpi.utils.viewset_mixins import AssetNestedObjectViewsetMixin
+=======
+from kpi.filters import AssetOwnerFilterBackend
+from kpi.permissions import AssetOwnerNestedObjectPermission
+from kpi.utils.viewset_mixin import AssetNestedObjectViewsetMixin
+>>>>>>> Working nested permissions serializer, refactored Asset nested View (to use AssetNestedMixin)
 
 
 class HookViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
