@@ -215,6 +215,12 @@ var dataInterface;
         method: 'GET'
       });
     },
+    assetPermissions(uid) {
+      return $ajax({
+        url: `${rootUrl}/assets/${uid}/permissions/`,
+        method: 'GET'
+      });
+    },
     removePerm (permUrl) {
       return $ajax({
         method: 'DELETE',

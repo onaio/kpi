@@ -16,8 +16,6 @@
 
 import Reflux from 'reflux';
 import {Cookies} from 'react-cookie';
-import alertify from 'alertifyjs';
-
 import dkobo_xlform from '../xlform/src/_xlform.init';
 import assetParserUtils from './assetParserUtils';
 import actions from './actions';
