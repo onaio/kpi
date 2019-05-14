@@ -53,7 +53,6 @@ const permConfig = Reflux.createStore({
       this.trigger(changed);
     }
   },
-
   onGetConfigCompleted(response) {
     this.setState({permissions: response.results});
   },
