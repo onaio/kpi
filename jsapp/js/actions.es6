@@ -10,6 +10,7 @@
  */
 
 import alertify from 'alertifyjs';
+import Reflux from 'reflux';
 import {dataInterface} from './dataInterface';
 import permissionsActions from './actions/permissions';
 import {
@@ -21,20 +22,17 @@ import {
   checkCookieExists,
 } from './utils';
 
-var Reflux = require('reflux');
-import RefluxPromise from './libs/reflux-promise';
-Reflux.use(RefluxPromise(window.Promise));
-
-const actions = {};
-
-actions.permissions = permissionsActions;
+const actions = {
+  permissions: permissionsActions,
+  help: helpActions
+};
 
 actions.navigation = Reflux.createActions([
-    'transitionStart',
-    'transitionEnd',
-    'routeUpdate',
-    'documentTitleUpdate'
-  ]);
+  'transitionStart',
+  'transitionEnd',
+  'routeUpdate',
+  'documentTitleUpdate'
+]);
 
 actions.auth = Reflux.createActions({
   verifyLogin: {
