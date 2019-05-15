@@ -11,7 +11,7 @@ from kpi.urls.router_api_v2 import URL_NAMESPACE as ROUTER_URL_NAMESPACE
 from kpi.utils.strings import to_str
 
 
-class TestAssetSnapshotList(KpiTestCase):
+class TestAssetSnapshotList(VersioningTestMixin, KpiTestCase):
     fixtures = ['test_data']
 
     URL_NAMESPACE = ROUTER_URL_NAMESPACE
