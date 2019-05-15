@@ -117,7 +117,7 @@ class ApiPermissionsPublicAssetTestCase(KpiTestCase):
         self.assert_viewable(child_asset, viewable=False)
 
 
-class ApiPermissionsTestCase(KpiTestCase):
+class ApiPermissionsTestCase(VersioningTestMixin, KpiTestCase):
     fixtures = ['test_data']
 
     URL_NAMESPACE = ROUTER_URL_NAMESPACE

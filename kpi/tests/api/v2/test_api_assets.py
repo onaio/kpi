@@ -232,6 +232,7 @@ class AssetsDetailApiTests(BaseAssetTestCase):
         self.r = self.client.post(url, data, format='json')
         self.asset = Asset.objects.get(uid=self.r.data.get('uid'))
         self.asset_url = self.r.data['url']
+        print("ASSET URL {}".format(self.asset_url))
         self.assertEqual(self.r.status_code, status.HTTP_201_CREATED)
         self.asset_uid = self.r.data['uid']
 
