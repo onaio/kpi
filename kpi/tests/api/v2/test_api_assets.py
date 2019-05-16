@@ -172,7 +172,6 @@ class AssetsListApiTests(BaseAssetTestCase):
         results = uids_from_search_results('pk:alrighty')
         self.assertListEqual(results, [])
 
-
 class AssetVersionApiTests(BaseTestCase):
     fixtures = ['test_data']
 
@@ -464,7 +463,6 @@ class AssetsDetailApiTests(BaseAssetTestCase):
         for index, assignable_perm in enumerate(assignable_permissions):
             self.assertEqual(assignable_perm['url'], expected_response[index]['url'])
             self.assertEqual(assignable_perm['label'], expected_response[index]['label'])
-
 
 class AssetsXmlExportApiTests(KpiTestCase):
 
