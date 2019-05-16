@@ -140,6 +140,7 @@ export const ASSET_TYPES = {
 };
 
 export default {
+  PERMISSIONS: PERMISSIONS,
   AVAILABLE_FORM_STYLES: AVAILABLE_FORM_STYLES,
   update_states: update_states,
   VALIDATION_STATUSES: VALIDATION_STATUSES,
