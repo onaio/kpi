@@ -13,6 +13,13 @@ import React from 'react';
 import autoBind from 'react-autobind';
 import bem from '../bem';
 
+/*
+Properties:
+- checked <boolean>
+- disabled <boolean>
+- onChange <function>: required
+- label <string>
+*/
 class Checkbox extends React.Component {
   constructor(props){
     if (typeof props.onChange !== 'function') {
@@ -36,6 +43,7 @@ class Checkbox extends React.Component {
             id={this.props.id}
             onChange={this.onChange}
             checked={this.props.checked}
+            disabled={this.props.disabled}
           />
 
           {this.props.label &&
