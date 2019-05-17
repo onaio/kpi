@@ -150,7 +150,7 @@ class MockDeploymentBackend(BaseDeploymentBackend):
         :return: list
         """
         submissions = self.asset._deployment_data.get("submissions", [])
-        submitted_by = kwargs.get('submitted_by')
+        permission_filters = kwargs.get('permission_filters')
 
         if len(instances_ids) > 0:
             if format_type == INSTANCE_FORMAT_TYPE_XML:
@@ -167,7 +167,8 @@ class MockDeploymentBackend(BaseDeploymentBackend):
         if 'limit' in params:
             submissions = submissions[:params['limit']]
 
-        if submitted_by:
+        if permission_filters:
+            submitted_by = [k.get('_submitted_by') for k in permission_filters]
             if format_type == INSTANCE_FORMAT_TYPE_XML:
                 # TODO handle `submitted_by` too.
                 pass
