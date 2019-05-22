@@ -92,7 +92,7 @@ class ProjectSettings extends React.Component {
 
   componentDidMount() {
     this.setInitialStep();
-    this.listenTo(stores.session, () => {
+    this.listenTo(session, () => {
       this.setState({
         isSessionLoaded: true,
       });

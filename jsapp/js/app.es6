@@ -15,7 +15,6 @@ import DocumentTitle from 'react-document-title';
 import reactMixin from 'react-mixin';
 import autoBind from 'react-autobind';
 import Reflux from 'reflux';
-import RefluxPromise from './libs/reflux-promise';
 import {
   IndexRoute,
   IndexRedirect,
@@ -55,10 +54,6 @@ import { ShortcutManager, Shortcuts } from 'react-shortcuts';
 const shortcutManager = new ShortcutManager(keymap);
 
 import {getZebraLoginUrl} from './config';
-
-
-// Configure Reflux
-Reflux.use(RefluxPromise(window.Promise));
 
 class App extends React.Component {
   constructor(props) {

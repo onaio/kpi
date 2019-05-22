@@ -11,6 +11,7 @@
 
 import alertify from 'alertifyjs';
 import Reflux from 'reflux';
+import RefluxPromise from './libs/reflux-promise';
 import {dataInterface} from './dataInterface';
 import permissionsActions from './actions/permissions';
 import {
@@ -21,6 +22,9 @@ import {
   redirectForAuthentication,
   checkCookieExists,
 } from './utils';
+
+// Configure Reflux
+Reflux.use(RefluxPromise(window.Promise));
 
 const actions = {
   permissions: permissionsActions,
@@ -527,7 +531,7 @@ actions.resources.createResource.listen(function(details){
       notify(t(`Successfully created ${asset_type}.`));
     })
     .fail(function(...args){
-      actions.resources.createResource.failed(...args)
+      actions.resources.createResource.failed(...args);
     });
 });
 
