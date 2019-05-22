@@ -58,7 +58,6 @@ import LibrarySearchableList from './lists/library';
 import FormsSearchableList from './lists/forms';
 import {getZebraLoginUrl} from './config';
 
-
 class App extends React.Component {
   constructor(props) {
     super(props);
