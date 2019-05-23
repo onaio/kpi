@@ -27,8 +27,8 @@ class BaseSubmissionTestCase(BaseTestCase):
         self.client.login(username="someuser", password="someuser")
         self.someuser = User.objects.get(username="someuser")
         self.anotheruser = User.objects.get(username="anotheruser")
-        asset_template = Asset.objects.get(id=1)
-        self.asset = Asset.objects.create(content=asset_template.content,
+        content_source_asset = Asset.objects.get(id=1)
+        self.asset = Asset.objects.create(content=content_source_asset.content,
                                           owner=self.someuser,
                                           asset_type='survey')
 

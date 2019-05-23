@@ -221,6 +221,9 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         if request.method == "GET":
             filters = request.GET.dict()
 
+        # Remove `format` from filters. No need to use it
+        filters.pop('format', None)
+
         permission_filters = self.asset.get_filters_for_partial_perm(request.user.id)
 
         # This should overwrite existing `permission_filters` param.
