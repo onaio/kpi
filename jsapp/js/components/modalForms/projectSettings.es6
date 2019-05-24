@@ -92,7 +92,7 @@ class ProjectSettings extends React.Component {
 
   componentDidMount() {
     this.setInitialStep();
-    this.listenTo(session, () => {
+    this.listenTo(stores.session, () => {
       this.setState({
         isSessionLoaded: true,
       });
@@ -751,8 +751,13 @@ class ProjectSettings extends React.Component {
   }
 
   renderStepProjectDetails() {
+<<<<<<< HEAD
     const sectors = stores.session.environment.available_sectors;
     const countries = stores.session.environment.available_countries;
+=======
+    const sectors = stores.session.currentAccount.available_sectors;
+    const countries = stores.session.currentAccount.available_countries;
+>>>>>>> linter fixes and saving config
 
     return (
       <bem.FormModal__form

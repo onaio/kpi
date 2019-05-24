@@ -395,7 +395,11 @@ export default assign({
       }
       actions.resources.createResource.triggerAsync(params)
         .then((asset) => {
+<<<<<<< HEAD
           hashHistory.push(`/library/${asset.uid}/edit`);
+=======
+          hashHistory.push('/library');
+>>>>>>> linter fixes and saving config
         });
     } else {
       // update existing asset
