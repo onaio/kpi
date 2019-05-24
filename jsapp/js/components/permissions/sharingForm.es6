@@ -43,7 +43,6 @@ class SharingForm extends React.Component {
 
     if (this.props.uid) {
       actions.resources.loadAsset({id: this.props.uid});
-      actions.permissions.getAssetPermissions(this.props.uid);
     }
 
     this.onAllAssetsChange();
@@ -145,7 +144,7 @@ class SharingForm extends React.Component {
     }
 
     let uid = this.state.asset.uid,
-        kind = this.state.asset.kind,
+        assetKind = this.state.asset.kind,
         asset_type = this.state.asset.asset_type,
         objectUrl = this.state.asset.url;
 
@@ -214,7 +213,7 @@ class SharingForm extends React.Component {
         </bem.FormModal__item>
 
         {/* public sharing settings */}
-        { kind !== 'collection' && asset_type === 'survey' &&
+        { assetKind !== 'collection' && asset_type === 'survey' &&
           <React.Fragment>
             <bem.Modal__hr/>
 
