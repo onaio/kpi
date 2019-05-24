@@ -27,7 +27,8 @@ module.exports = WebpackCommon({
     hot: true,
     headers: {'Access-Control-Allow-Origin': '*'},
     port: 3000,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
+    clientLogLevel: 'none' // disables linter warnings appearing in DevTools
   },
   plugins: [
     new BundleTracker({path: __dirname, filename: '../webpack-stats.json'}),
