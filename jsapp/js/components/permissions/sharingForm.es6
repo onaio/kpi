@@ -43,6 +43,7 @@ class SharingForm extends React.Component {
 
     if (this.props.uid) {
       actions.resources.loadAsset({id: this.props.uid});
+      actions.permissions.getAssetPermissions(this.props.uid);
     }
 
     this.onAllAssetsChange();
@@ -86,6 +87,8 @@ class SharingForm extends React.Component {
     const asset = data[uid];
 
     if (asset) {
+      console.debug('onAssetChange', asset);
+
       this.setState({
         asset: asset,
         kind: asset.kind
