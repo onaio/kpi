@@ -216,6 +216,10 @@ export function redirectTo(href) {
   window.location.href = href;
 }
 
+export function getUsernameFromUrl(userUrl) {
+  return userUrl.match(/\/users\/(.*)\//)[1];
+}
+
 export function parsePermissions(owner, permissions) {
   var users = [];
   var perms = {};
