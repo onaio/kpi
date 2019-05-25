@@ -5,10 +5,11 @@
 import {t} from './utils';
 
 /*
- * a hardcoded list of permissions, all of them are really defined on backend,
- * but we need it to be able to build UI for handling them
+ * A hardcoded list of permissions codenames.
+ * All of them are really defined on backend, but we need it here to be able to
+ * build UI for handling them.
  */
-const PERMISSIONS = new Map();
+const PERMISSIONS_CODENAMES = new Map();
 new Set([
   'view_asset',
   'change_asset',
@@ -17,7 +18,7 @@ new Set([
   'view_submissions',
   'change_submissions',
   'validate_submissions'
-]).forEach((codename) => {PERMISSIONS.set(codename, codename);});
+]).forEach((codename) => {PERMISSIONS_CODENAMES.set(codename, codename);});
 
 const HOOK_LOG_STATUSES = {
   SUCCESS: 2,
@@ -107,7 +108,7 @@ const ASSET_TYPES = {
 };
 
 export default {
-  PERMISSIONS: PERMISSIONS,
+  PERMISSIONS_CODENAMES: PERMISSIONS_CODENAMES,
   AVAILABLE_FORM_STYLES: AVAILABLE_FORM_STYLES,
   update_states: update_states,
   VALIDATION_STATUSES: VALIDATION_STATUSES,
