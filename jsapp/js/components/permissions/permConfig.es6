@@ -53,6 +53,7 @@ const permConfig = Reflux.createStore({
       this.trigger(changed);
     }
   },
+
   onGetConfigCompleted(response) {
     this.setState({permissions: response.results});
   },
@@ -93,6 +94,10 @@ const permConfig = Reflux.createStore({
       throw new Error(t('Permission config is not ready or failed to initialize!'));
     }
   },
+
+  /**
+   * Returns a list of available permissions for given asset type.
+   */
   getAvailablePermissions(assetType) {
     if (assetType === 'survey') {
       return [
