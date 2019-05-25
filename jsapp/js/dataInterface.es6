@@ -237,9 +237,9 @@ var dataInterface;
       });
     },
 
-    removeAssetPermissions(assetUid, permUid) {
+    removeAssetPermissions(permUrl) {
       return $ajax({
-        url: `${rootUrl}/api/v2/assets/${assetUid}/permissions/${permUid}/`,
+        url: permUrl,
         method: 'DELETE'
       });
     },
