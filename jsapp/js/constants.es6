@@ -139,6 +139,12 @@ export const ASSET_TYPES = {
   }
 };
 
+const ASSET_KINDS = new Map();
+new Set([
+  'asset',
+  'collection'
+]).forEach((kind) => {ASSET_KINDS.set(kind, kind);});
+
 export default {
   ROOT_URL: ROOT_URL,
   ANON_USERNAME: ANON_USERNAME,

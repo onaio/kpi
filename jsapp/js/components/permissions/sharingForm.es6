@@ -86,8 +86,6 @@ class SharingForm extends React.Component {
     const asset = data[uid];
 
     if (asset) {
-      console.debug('onAssetChange', asset);
-
       this.setState({
         asset: asset,
         kind: asset.kind
