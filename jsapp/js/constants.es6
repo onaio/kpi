@@ -28,7 +28,9 @@ new Set([
   'add_submissions',
   'view_submissions',
   'change_submissions',
-  'validate_submissions'
+  'validate_submissions',
+  'view_collection',
+  'change_collection'
 ]).forEach((codename) => {PERMISSIONS_CODENAMES.set(codename, codename);});
 
 const HOOK_LOG_STATUSES = {
