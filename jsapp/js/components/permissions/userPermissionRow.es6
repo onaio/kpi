@@ -44,6 +44,14 @@ class UserPermissionRow extends React.Component {
 
   removePermissions() {
     const dialog = alertify.dialog('confirm');
+
+    let okCallback;
+    if (this.props.kind === ASSET_KINDS.get('asset')) {
+      okCallback = this.removeAssetPermissions;
+    } else if (this.props.kind === ASSET_KINDS.get('collection')) {
+      okCallback = this.removeCollectionPermissions;
+    }
+
     const opts = {
       title: t('Remove permissions?'),
       message: t('This action will remove all permissions for user ##username##').replace('##username##', `<strong>${this.props.user.name}</strong>`),

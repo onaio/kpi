@@ -259,7 +259,7 @@ function parseBackendData(data, ownerUrl, includeAnon = false) {
  * @param {Object} data - OLD permissions array.
  * @param {string} ownerUrl - Asset owner url (used as identifier).
  *
- * @returns {UserWithPerms[]} An list of users with all their permissions.
+ * @returns {UserWithPerms[]} An ordered list of users with all their permissions.
  */
 function parseOldBackendData(data, ownerUrl) {
   const output = [];

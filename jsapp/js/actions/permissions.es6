@@ -119,10 +119,14 @@ permissionsActions.removeAssetPermission.listen((assetUid, perm) => {
 });
 
 /**
+<<<<<<< HEAD
  * For removing single permission
  *
  * @param {string} uid
  * @param {string} perm - permission url
+=======
+Old actions
+>>>>>>> introduce new editor for collection permissions
  */
 permissionsActions.removeCollectionPermission.listen((uid, perm) => {
   dataInterface.removePermission(perm)
