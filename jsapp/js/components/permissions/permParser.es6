@@ -327,9 +327,6 @@ export const permParser = {
   buildFormData: buildFormData,
   parseBackendData: parseBackendData,
   parseOldBackendData: parseOldBackendData,
-<<<<<<< HEAD
   parseUserWithPermsList: parseUserWithPermsList,
-=======
->>>>>>> clearer name
   sortParseBackendOutput: sortParseBackendOutput // for testing purposes
 };
