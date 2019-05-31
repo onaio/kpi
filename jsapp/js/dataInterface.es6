@@ -230,6 +230,7 @@ export var dataInterface;
       });
     },
 
+<<<<<<< HEAD
     bulkSetAssetPermissions(assetUid, perms) {
       return $ajax({
         url: `${ROOT_URL}/api/v2/assets/${assetUid}/permission-assignments/bulk/`,
@@ -237,7 +238,19 @@ export var dataInterface;
         data: JSON.stringify(perms),
         dataType: 'json',
         contentType: 'application/json'
+=======
+    removeAssetPermissions(perms) {
+      const $ajaxCalls = [];
+      perms.forEach((perm) => {
+        $ajaxCalls.push(
+          $ajax({
+            url: perm,
+            method: 'DELETE'
+          })
+        );
+>>>>>>> handle removing unchecked form options ("permissions")
       });
+      return $.when.apply(undefined, $ajaxCalls);
     },
 
     assignAssetPermission(assetUid, perm) {

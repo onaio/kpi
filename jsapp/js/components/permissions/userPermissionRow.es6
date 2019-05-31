@@ -62,6 +62,7 @@ class UserPermissionRow extends React.Component {
     dialog.set(opts).show();
   }
 
+<<<<<<< HEAD
   /**
    * Note: we remove "view_asset"/"view_collection" permission, as it is
    * the most basic one, so removing it will in fact remove all permissions
@@ -76,6 +77,17 @@ class UserPermissionRow extends React.Component {
       actionFn = actions.permissions.removeCollectionPermission;
       targetPermUrl = permConfig.getPermissionByCodename(PERMISSIONS_CODENAMES.get('view_collection')).url;
     }
+=======
+  removeAssetPermissions() {
+    this.setState({isBeingDeleted: true});
+    // we remove "view_asset" permission, as it is the most basic one, so removing it
+    // will in fact remove all permissions
+    const userViewAssetPerm = this.props.permissions.find((perm) => {
+      return perm.permission === permConfig.getPermissionByCodename(PERMISSIONS_CODENAMES.get('view_asset')).url;
+    });
+    actions.permissions.removeAssetPermissions(this.props.uid, [userViewAssetPerm.url]);
+  }
+>>>>>>> handle removing unchecked form options ("permissions")
 
     this.setState({isBeingDeleted: true});
 

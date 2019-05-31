@@ -83,10 +83,17 @@ permissionsActions.assignCollectionPermission.listen((uid, perm) => {
 });
 
 /**
+<<<<<<< HEAD
  * For adding single asset permission
  *
  * @param {string} assetUid
  * @param {Object} perm - permission to add
+=======
+ * For setting an array of permissions (each permission needs to be a separate call)
+ *
+ * @param {string} assetUid
+ * @param {Object[]} perms - list of permissions to add
+>>>>>>> handle removing unchecked form options ("permissions")
  */
 permissionsActions.assignAssetPermission.listen((assetUid, perm) => {
   dataInterface.assignAssetPermission(assetUid, perm)
@@ -101,6 +108,7 @@ permissionsActions.assignAssetPermission.listen((assetUid, perm) => {
 });
 
 /**
+<<<<<<< HEAD
  * For removing single permission
  *
  * @param {string} assetUid
@@ -108,6 +116,15 @@ permissionsActions.assignAssetPermission.listen((assetUid, perm) => {
  */
 permissionsActions.removeAssetPermission.listen((assetUid, perm) => {
   dataInterface.removePermission(perm)
+=======
+ * For removing an array of permissions
+ *
+ * @param {string} assetUid
+ * @param {string[]} perms - list of permissions urls to remove
+ */
+permissionsActions.removeAssetPermissions.listen((assetUid, perms) => {
+  dataInterface.removeAssetPermissions(perms)
+>>>>>>> handle removing unchecked form options ("permissions")
     .done(() => {
       permissionsActions.getAssetPermissions(assetUid);
       permissionsActions.removeAssetPermission.completed();

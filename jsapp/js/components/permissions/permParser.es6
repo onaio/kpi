@@ -47,9 +47,10 @@ import {
  * Removes contradictory and implied permissions from final output.
  *
  * @param {FormData} data
+ * @param {boolean} doCleanup - Should contradictory and implied permissions be removed from final data.
  * @returns {BackendPerm[]} - An array of permissions to be given.
  */
-function parseFormData(data) {
+function parseFormData(data, doCleanup = true) {
   let parsed = [];
 
   if (data.formView) {
@@ -125,6 +126,31 @@ function removeImpliedPerms(parsed) {
     return !impliedPerms.has(backendPerm.permission);
   });
   return parsed;
+}
+
+/**
+ * Returns a list of permissions that are missing from the first list.
+ *
+ * @param {BackendPerm[]} beforePerms - Old permissions.
+ * @param {BackendPerm[]} afterPerms - New permissions.
+ * @returns {BackendPerm[]} - Removed permissions.
+ */
+function getRemovedPerms(beforePerms, afterPerms) {
+  let removedPerms = [];
+
+  beforePerms.forEach((beforePerm) => {
+    let isInAfter = false;
+    afterPerms.forEach((afterPerm) => {
+      if (beforePerm.permission === afterPerm.permission) {
+        isInAfter = true;
+      }
+    });
+    if (!isInAfter) {
+      removedPerms.push(beforePerm);
+    }
+  });
+
+  return removedPerms;
 }
 
 /**
@@ -325,6 +351,7 @@ function sortParseBackendOutput(output) {
 export const permParser = {
   parseFormData: parseFormData,
   buildFormData: buildFormData,
+  getRemovedPerms: getRemovedPerms,
   parseBackendData: parseBackendData,
   parseOldBackendData: parseOldBackendData,
   parseUserWithPermsList: parseUserWithPermsList,
