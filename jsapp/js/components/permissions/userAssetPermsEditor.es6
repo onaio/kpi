@@ -75,7 +75,6 @@ class UserAssetPermsEditor extends React.Component {
   }
 
   componentDidMount() {
-<<<<<<< HEAD
     this.listenTo(actions.permissions.bulkSetAssetPermissions.completed, this.onBulkSetAssetPermissionCompleted);
     this.listenTo(actions.permissions.bulkSetAssetPermissions.failed, this.onBulkSetAssetPermissionFailed);
     this.listenTo(stores.userExists, this.onUserExistsStoreChange);
@@ -88,43 +87,12 @@ class UserAssetPermsEditor extends React.Component {
 
   onBulkSetAssetPermissionFailed() {
     this.setState({isSubmitPending: false});
-=======
-    this.listenTo(actions.permissions.setAssetPermissions.completed, this.onSetAssetPermissionsCompleted);
-    this.listenTo(actions.permissions.setAssetPermissions.failed, this.onSetAssetPermissionsFailed);
-    this.listenTo(actions.permissions.removeAssetPermissions.completed, this.onRemoveAssetPermissionsCompleted);
-    this.listenTo(actions.permissions.removeAssetPermissions.failed, this.onRemoveAssetPermissionsFailed);
-    this.listenTo(stores.userExists, this.onUserExistsStoreChange);
-  }
-
-  onSetAssetPermissionsCompleted() {
-    this.setState({isSubmitSetPending: false});
-    this.notifyParentAboutSubmitEnd(true);
-  }
-
-  onSetAssetPermissionsFailed() {
-    this.setState({isSubmitSetPending: false});
-    this.notifyParentAboutSubmitEnd(false);
-  }
-
-  onRemoveAssetPermissionsCompleted() {
-    this.setState({isSubmitRemovePending: false});
-    this.notifyParentAboutSubmitEnd(true);
-  }
-
-  onRemoveAssetPermissionsFailed() {
-    this.setState({isSubmitRemovePending: false});
->>>>>>> handle removing unchecked form options ("permissions")
     this.notifyParentAboutSubmitEnd(false);
   }
 
   notifyParentAboutSubmitEnd(isSuccess) {
     if (
-<<<<<<< HEAD
       !this.state.isSubmitPending &&
-=======
-      !this.state.isSubmitSetPending &&
-      !this.state.isSubmitRemovePending &&
->>>>>>> handle removing unchecked form options ("permissions")
       typeof this.props.onSubmitEnd === 'function'
     ) {
       this.props.onSubmitEnd(isSuccess);
@@ -361,13 +329,8 @@ class UserAssetPermsEditor extends React.Component {
     const isPartialValid = this.state.submissionsViewPartial ? this.state.submissionsViewPartialUsers.length !== 0 : true;
     return (
       isAnyCheckboxChecked &&
-<<<<<<< HEAD
       isPartialValid &&
       !this.state.isSubmitPending &&
-=======
-      !this.state.isSubmitSetPending &&
-      !this.state.isSubmitRemovePending &&
->>>>>>> handle removing unchecked form options ("permissions")
       !this.state.isEditingUsername &&
       !this.state.isAddingPartialUsernames &&
       this.state.username.length > 0 &&
@@ -377,7 +340,6 @@ class UserAssetPermsEditor extends React.Component {
     );
   }
 
-<<<<<<< HEAD
   /**
    * Returns only the properties for assignable permissions
    */
@@ -424,54 +386,6 @@ class UserAssetPermsEditor extends React.Component {
     }
 
     return false;
-=======
-  getFormData() {
-    return {
-      username: this.state.username,
-      formView: this.state.formView,
-      formEdit: this.state.formEdit,
-      submissionsView: this.state.submissionsView,
-      submissionsViewPartial: this.state.submissionsViewPartial,
-      submissionsViewPartialUsers: this.state.submissionsViewPartialUsers,
-      submissionsAdd: this.state.submissionsAdd,
-      submissionsEdit: this.state.submissionsEdit,
-      submissionsValidate: this.state.submissionsValidate
-    };
-  }
-
-  submit() {
-    if (!this.isSubmitEnabled()) {
-      return;
-    }
-
-    const parsed = permParser.parseFormData(this.getFormData());
-    const parsedDirty = permParser.parseFormData(this.getFormData(), false);
-    const parsedRemoved = permParser.getRemovedPerms(this.props.permissions, parsedDirty);
-
-    console.debug('TODO: first find permissions that were checked but got unchecked and remove them');
-    console.debug('TODO: second find permissions that were unchecked but got checked and add them');
-    console.debug('TODO: do it for UserCollectionPermsEditor too');
-
-    if (parsedRemoved.length > 0) {
-      actions.permissions.removeAssetPermissions(
-        this.props.uid,
-        parsedRemoved
-      );
-      this.setState({isSubmitRemovePending: true});
-    }
-    if (parsed.length > 0) {
-      actions.permissions.setAssetPermissions(
-        this.props.uid,
-        parsed
-      );
-      this.setState({isSubmitSetPending: true});
-    }
-
-    // if nothing changes but user wants to submit, just notify parent we're good
-    if (parsedRemoved.length === 0 && parsed.length === 0) {
-      this.notifyParentAboutSubmitEnd(true);
-    }
->>>>>>> handle removing unchecked form options ("permissions")
   }
 
   render() {
