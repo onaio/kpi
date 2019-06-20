@@ -36,8 +36,7 @@ class UserAssetPermsEditor extends React.Component {
     this.state = {
       // inner workings
       usernamesBeingChecked: new Set(),
-      isSubmitSetPending: false,
-      isSubmitRemovePending: false,
+      isSubmitPending: false,
       isEditingUsername: false,
       isAddingPartialUsernames: false,
       // form user inputs
@@ -407,7 +406,7 @@ class UserAssetPermsEditor extends React.Component {
     }
 
     const formModifiers = [];
-    if (this.state.isSubmitSetPending || this.state.isSubmitRemovePending) {
+    if (this.state.isSubmitPending) {
       formModifiers.push('pending');
     }
 

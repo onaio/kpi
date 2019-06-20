@@ -223,6 +223,7 @@ export var dataInterface;
       });
     },
 
+
     getCollectionPermissions(uid) {
       return $ajax({
         url: `${ROOT_URL}/api/v2/collections/${uid}/permission-assignments/`,
@@ -230,7 +231,6 @@ export var dataInterface;
       });
     },
 
-<<<<<<< HEAD
     bulkSetAssetPermissions(assetUid, perms) {
       return $ajax({
         url: `${ROOT_URL}/api/v2/assets/${assetUid}/permission-assignments/bulk/`,
@@ -238,19 +238,35 @@ export var dataInterface;
         data: JSON.stringify(perms),
         dataType: 'json',
         contentType: 'application/json'
-=======
-    removeAssetPermissions(perms) {
-      const $ajaxCalls = [];
-      perms.forEach((perm) => {
-        $ajaxCalls.push(
-          $ajax({
-            url: perm,
-            method: 'DELETE'
-          })
-        );
->>>>>>> handle removing unchecked form options ("permissions")
       });
       return $.when.apply(undefined, $ajaxCalls);
+    },
+
+    bulkSetAssetPermissions(assetUid, perms) {
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/assets/${assetUid}/permissions/bulk/`,
+        method: 'POST',
+        data: JSON.stringify(perms),
+        dataType: 'json',
+        contentType: 'application/json'
+      });
+    },
+
+    assignAssetPermission(assetUid, perm) {
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/assets/${assetUid}/permissions/`,
+        method: 'POST',
+        data: JSON.stringify(perm),
+        dataType: 'json',
+        contentType: 'application/json'
+      });
+    },
+
+    removeAssetPermission(perm) {
+      return $ajax({
+        url: perm,
+        method: 'DELETE'
+      });
     },
 
     assignAssetPermission(assetUid, perm) {
