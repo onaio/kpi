@@ -825,6 +825,10 @@ class Asset(ObjectPermissionMixin,
         ```
         ['view_submissions',]
         ```
+<<<<<<< HEAD
+=======
+
+>>>>>>> Applied requested changes (typos, better readability python code) as per discussed with jnm
         `get_partial_perms(user1_obj.id, with_filters=True)` would return
         ```
         {
@@ -848,16 +852,15 @@ class Asset(ObjectPermissionMixin,
 
     def get_filters_for_partial_perm(self, user_id, perm=PERM_VIEW_SUBMISSIONS):
         """
-        Returns the list of filters for a specfic permission `perm`
-        and this specific asset. This
-        :param user_obj: auth.User
+        Returns the list of filters for a specific permission `perm`
+        and this specific asset.
+        :param user_id:
         :param perm: see `constants.*_SUBMISSIONS`
         :return:
         """
-        if not (perm.endswith(SUFFIX_SUBMISSIONS_PERMS) and
-                not perm == PERM_PARTIAL_SUBMISSIONS):
-            raise BadPermissionsException("Only global permissions for "
-                                          "submissions are supported.")
+        if not perm.endswith(SUFFIX_SUBMISSIONS_PERMS) or perm == PERM_PARTIAL_SUBMISSIONS:
+            raise BadPermissionsException(_('Only partial permissions for '
+                                            'submissions are supported'))
 
         perms = self.get_partial_perms(user_id, with_filters=True)
         if perms:
