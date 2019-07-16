@@ -968,7 +968,7 @@ export class DataTable extends React.Component {
             {VALIDATION_STATUSES_LIST.map((item, n) => {
               return (
                 <bem.PopoverMenu__link
-                  onClick={this.bulkUpdateStatus}
+                  onClick={this.onBulkUpdateStatus}
                   data-value={item.value}
                   key={n}
                 >
@@ -976,7 +976,8 @@ export class DataTable extends React.Component {
                 </bem.PopoverMenu__link>
               );
             })}
-            <bem.PopoverMenu__link onClick={this.bulkDelete}>
+            <bem.PopoverMenu__link
+              onClick={this.onBulkDelete}>
               {t('Delete selected')}
             </bem.PopoverMenu__link>
           </ui.PopoverMenu>
