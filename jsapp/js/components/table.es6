@@ -812,26 +812,39 @@ export class DataTable extends React.Component {
   clearSelection() {
     this.setState({selectAll: false, selectedRows: {}});
   }
-  bulkDelete(evt) {
-    let sids = [];
+  onBulkDelete(evt) {
+    const apiFn = dataInterface.bulkDeleteSubmissions;
+    const data = {};
+    let selectedCount;
 
     if (this.state.selectAll) {
-      // TODO
-    } else {
-      sids = Object.keys(this.state.selectedRows);
-    }
-
-    let selectedCount = Object.keys(this.state.selectedRows).length;
-    if (this.state.selectAll) {
+      if (this.state.fetchState.filtered.length) {
+        data.query = {};
+        this.state.fetchState.filtered.map((filteredItem) => {
+          data.query[filteredItem.id] = filteredItem.value;
+        });
+      } else {
+        data.confirm = true;
+      }
       selectedCount = this.state.resultsTotal;
+    } else {
+      data.submissions_ids = Object.keys(this.state.selectedRows);
+      selectedCount = data.submissions_ids.length;
     }
+
     const dialog = alertify.dialog('confirm');
     const opts = {
       title: t('Delete selected submissions'),
       message: t('You have selected ## submissions. Are you sure you would like to delete them? This action is irreversible.').replace('##', selectedCount),
       labels: {ok: t('Delete selected'), cancel: t('Cancel')},
       onok: (evt, val) => {
-        console.log('delete all', sids.join(', '));
+        apiFn(this.props.asset.uid, data).done((res) => {
+          this.fetchData(this.state.fetchState, this.state.fetchInstance);
+          this.setState({loading: true});
+        }).fail((jqxhr)=> {
+          console.error(jqxhr);
+          alertify.error(t('Failed to delete submissions.'));
+        });
       },
       oncancel: () => {
         dialog.destroy();
@@ -886,7 +899,7 @@ export class DataTable extends React.Component {
             {VALIDATION_STATUSES_LIST.map((item, n) => {
               return (
                 <bem.PopoverMenu__link
-                  onClick={this.bulkUpdateStatus}
+                  onClick={this.onBulkUpdateStatus}
                   data-value={item.value}
                   key={n}
                 >
@@ -894,7 +907,8 @@ export class DataTable extends React.Component {
                 </bem.PopoverMenu__link>
               );
             })}
-            <bem.PopoverMenu__link onClick={this.bulkDelete}>
+            <bem.PopoverMenu__link
+              onClick={this.onBulkDelete}>
               {t('Delete selected')}
             </bem.PopoverMenu__link>
           </ui.PopoverMenu>
