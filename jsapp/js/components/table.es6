@@ -883,7 +883,7 @@ export class DataTable extends React.Component {
 
         {Object.keys(selected).length > 0 &&
           <ui.PopoverMenu type='bulkUpdate-menu' triggerLabel={selectedLabel} >
-            {VALIDATION_STATUSES.map((item, n) => {
+            {VALIDATION_STATUSES_LIST.map((item, n) => {
               return (
                 <bem.PopoverMenu__link
                   onClick={this.bulkUpdateStatus}
