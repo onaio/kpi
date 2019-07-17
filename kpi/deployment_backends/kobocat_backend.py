@@ -29,15 +29,13 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
     "self.asset._deployment_data" JSONField.
     """
 
-    INSTANCE_ID_FIELDNAME = "_id"
+    INSTANCE_ID_FIELDNAME = '_id'
 
     @staticmethod
     def make_identifier(username, id_string):
-        """
-        Uses `settings.KOBOCAT_URL` to construct an identifier from a
+        """ Uses `settings.KOBOCAT_URL` to construct an identifier from a
         username and id string, without the caller having to specify a server
-        or know the full format of KC identifiers
-        """
+        or know the full format of KC identifiers """
         # No need to use the internal URL here; it will be substituted in when
         # appropriate
         return u'{}/{}/forms/{}'.format(
@@ -315,9 +313,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         })
 
     def delete(self):
-        """
-        WARNING! Deletes all submitted data!
-        """
+        """ WARNING! Deletes all submitted data! """
         url = self.external_to_internal_url(self.backend_response['url'])
         try:
             self._kobocat_request('DELETE', url)
@@ -500,23 +496,23 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 return submissions[0]
             return None
         else:
-            raise ValueError(_("Primary key must be provided"))
+            raise ValueError(_('Primary key must be provided'))
 
     def get_validation_status(self, submission_pk, params, user):
         url = self.get_submission_validation_status_url(submission_pk)
-        kc_request = requests.Request(method="GET", url=url, data=params)
+        kc_request = requests.Request(method='GET', url=url, data=params)
         kc_response = self.__kobocat_proxy_request(kc_request, user)
         return self.__prepare_as_drf_response_signature(kc_response)
 
     def set_validation_status(self, submission_pk, data, user):
         url = self.get_submission_validation_status_url(submission_pk)
-        kc_request = requests.Request(method="PATCH", url=url, json=data)
+        kc_request = requests.Request(method='PATCH', url=url, json=data)
         kc_response = self.__kobocat_proxy_request(kc_request, user)
         return self.__prepare_as_drf_response_signature(kc_response)
 
     def set_validation_statuses(self, data, user):
         url = self.submission_list_url
-        kc_request = requests.Request(method="PATCH", url=url, json=data)
+        kc_request = requests.Request(method='PATCH', url=url, json=data)
         kc_response = self.__kobocat_proxy_request(kc_request, user)
         return self.__prepare_as_drf_response_signature(kc_response)
 
