@@ -2,14 +2,9 @@
 from django.conf import settings
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
-<<<<<<< HEAD
 from rest_framework import renderers, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import _positive_int as positive_int
-=======
-from rest_framework import renderers, viewsets, status
-from rest_framework.decorators import detail_route, list_route
->>>>>>> Dummy response for FE on bulk deleted
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
@@ -224,22 +219,11 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
                 _('The specified asset has not been deployed'))
         return self.asset.deployment
 
-<<<<<<< HEAD
     @action(detail=False, methods=['DELETE'], renderer_classes=[renderers.JSONRenderer])
     def bulk(self, request, *args, **kwargs):
         deployment = self._get_deployment()
         json_response = deployment.delete_submissions(request.data,
                                                       request.user)
-=======
-    @list_route(methods=['DELETE'], renderer_classes=[renderers.JSONRenderer])
-    def bulk(self, request, *args, **kwargs):
-        # WIP - returns a dummy empty reponse.
-        # ToDo
-        json_response = {
-            'data': '',
-            'status': status.HTTP_204_NO_CONTENT
-        }
->>>>>>> Dummy response for FE on bulk deleted
         return Response(**json_response)
 
     def destroy(self, request, *args, **kwargs):
