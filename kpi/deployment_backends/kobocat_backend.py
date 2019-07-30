@@ -563,9 +563,25 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         )
         return url
 
-    def get_submissions(self, requesting_user_id,
-                        format_type=INSTANCE_FORMAT_TYPE_JSON,
-                        instance_ids=[], **kwargs):
+    def get_submission(self, pk, format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
+        """
+        Returns only one occurrence.
+
+        :param pk: int. `Instance.id`
+        :param format_type: str.  INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
+        :param kwargs: dict. Filter params
+        :return: mixed. JSON or XML
+        """
+
+        if pk:
+            submissions = list(self.get_submissions(format_type, [int(pk)], **kwargs))
+            if len(submissions) > 0:
+                return submissions[0]
+            return None
+        else:
+            raise ValueError(_('Primary key must be provided'))
+
+    def get_submissions(self, format_type=INSTANCE_FORMAT_TYPE_JSON, instances_ids=[], **kwargs):
         """
         Retrieves submissions through Postgres or Mongo depending on `format_type`.
         It can be filtered on instances ids.
@@ -597,7 +613,10 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             raise BadFormatException(
                 "The format {} is not supported".format(format_type)
             )
-        return submissions_kobocat_request
+        return submissions
+
+    def get_submissions_count(self, **kwargs):
+        pass
 
     def get_validation_status(self, submission_pk, params, user):
         url = self.get_submission_validation_status_url(submission_pk)

@@ -1,6 +1,9 @@
 # coding: utf-8
 import pytest
+<<<<<<< HEAD
 from django.conf import settings
+=======
+>>>>>>> Changed DataViewSet response and added pagination
 from rest_framework import status
 
 from kpi.models.asset import Asset
