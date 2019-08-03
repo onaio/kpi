@@ -389,7 +389,7 @@ class KobocatDigestPartial(ShadowModel):
             )
 
 
-class KCUser(ShadowModel):
+class KobocatUser(ShadowModel):
 
     username = models.CharField(_("username"), max_length=30)
     password = models.CharField(_("password"), max_length=128)
@@ -410,7 +410,7 @@ class KCUser(ShadowModel):
         try:
             kc_auth_user = cls.objects.get(pk=auth_user.pk)
             assert kc_auth_user.username == auth_user.username
-        except KCUser.DoesNotExist:
+        except KobocatUser.DoesNotExist:
             kc_auth_user = cls(pk=auth_user.pk, username=auth_user.username)
 
         kc_auth_user.password = auth_user.password
@@ -426,7 +426,7 @@ class KCUser(ShadowModel):
         kc_auth_user.save()
 
 
-class KCToken(ShadowModel):
+class KobocatToken(ShadowModel):
 
     key = models.CharField(_("Key"), max_length=40, primary_key=True)
     user = models.OneToOneField(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
@@ -443,7 +443,7 @@ class KCToken(ShadowModel):
             # Token use a One-to-One relationship on User.
             # Thus, we can retrieve tokens from users' id. 
             kc_auth_token = cls.objects.get(user_id=auth_token.user_id)
-        except KCToken.DoesNotExist:
+        except KobocatToken.DoesNotExist:
             kc_auth_token = cls(pk=auth_token.pk, user=auth_token.user)
 
         kc_auth_token.save()
