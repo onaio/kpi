@@ -235,6 +235,46 @@ class KobocatUser(ShadowModel):
         KobocatDigestPartial.sync(kc_auth_user)
 
 
+class KobocatContentType(ShadowModel):
+    """
+    Minimal representation of Django 1.8's
+    contrib.contenttypes.models.ContentType
+    """
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(_('python model class name'), max_length=100)
+
+    class Meta(ShadowModel.Meta):
+        db_table = 'django_content_type'
+        unique_together = (('app_label', 'model'),)
+
+    def __str__(self):
+        # Not as nice as the original, which returns a human-readable name
+        # complete with whitespace. That requires access to the Python model
+        # class, though
+        return self.model
+
+
+class KobocatPermission(ShadowModel):
+    """
+    Minimal representation of Django 1.8's contrib.auth.models.Permission
+    """
+    name = models.CharField(_('name'), max_length=255)
+    content_type = models.ForeignKey(KobocatContentType)
+    codename = models.CharField(_('codename'), max_length=100)
+
+    class Meta(ShadowModel.Meta):
+        db_table = 'auth_permission'
+        unique_together = (('content_type', 'codename'),)
+        ordering = ('content_type__app_label', 'content_type__model',
+                    'codename')
+
+    def __str__(self):
+        return "%s | %s | %s" % (
+            six.text_type(self.content_type.app_label),
+            six.text_type(self.content_type),
+            six.text_type(self.name))
+
+
 class KobocatUserObjectPermission(ShadowModel):
     """
     For the _sole purpose_ of letting us manipulate KoBoCAT
