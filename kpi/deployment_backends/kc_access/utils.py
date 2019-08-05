@@ -1,12 +1,24 @@
+<<<<<<< HEAD
 # coding: utf-8
+=======
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
+>>>>>>> Reorganized imports
 import json
 import logging
 
 import requests
 from django.conf import settings
+<<<<<<< HEAD
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError, ProgrammingError, transaction
+=======
+from django.contrib.auth.models import User, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.db import ProgrammingError, transaction
+>>>>>>> Reorganized imports
 from rest_framework.authtoken.models import Token
 
 from kpi.exceptions import KobocatProfileException
