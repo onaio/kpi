@@ -49,6 +49,24 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 continue
             assign_applicable_kc_permissions(self.asset, user, perms)
 
+    def bulk_assign_mapped_perms(self):
+        """
+        Bulk assign all `kc` permissions related to `kpi` permissions.
+        Useful to assign permissions retroactively upon deployment.
+        Beware: it only adds permissions, it does not remove or sync permissions.
+        """
+        users_with_perms = self.asset.get_users_with_perms(attach_perms=True)
+
+        # if only the owner has permissions, no need to go further
+        if len(users_with_perms) == 1 and \
+                users_with_perms.keys()[0].id == self.asset.owner_id:
+            return
+
+        for user, perms in users_with_perms.items():
+            if user.id == self.asset.owner_id:
+                continue
+            assign_applicable_kc_permissions(self.asset, user, perms)
+
     @staticmethod
     def make_identifier(username, id_string):
         """ Uses `settings.KOBOCAT_URL` to construct an identifier from a
