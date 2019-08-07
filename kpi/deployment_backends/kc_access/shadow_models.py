@@ -289,8 +289,13 @@ class KobocatUserObjectPermission(ShadowModel):
     CAVEAT LECTOR: The django-guardian custom manager,
     UserObjectPermissionManager, is NOT included!
     """
+<<<<<<< HEAD
     permission = models.ForeignKey(KobocatPermission, on_delete=models.CASCADE)
     content_type = models.ForeignKey(KobocatContentType, on_delete=models.CASCADE)
+=======
+    permission = models.ForeignKey(KobocatPermission)
+    content_type = models.ForeignKey(KobocatContentType)
+>>>>>>> Use new KC shadow models for object-level perms
     object_pk = models.CharField(_('object ID'), max_length=255)
     content_object = GenericForeignKey(fk_field='object_pk')
     # It's okay not to use `KobocatUser` as long as PKs are synchronized
@@ -447,6 +452,8 @@ class KobocatUser(ShadowModel):
 
     @classmethod
     def sync(cls, auth_user):
+        # NB: `KobocatUserObjectPermission` (and probably other things) depend
+        # upon PKs being synchronized between KPI and KoBoCAT
         try:
             kc_auth_user = cls.objects.get(pk=auth_user.pk)
             assert kc_auth_user.username == auth_user.username
