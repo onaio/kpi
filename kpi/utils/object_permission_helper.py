@@ -4,7 +4,7 @@ from django.conf import settings
 from kpi.constants import PERM_SHARE_SUBMISSIONS, PERM_FROM_KC_ONLY
 
 
-class ObjectPermissionHelper:
+class ObjectPermissionHelper(object):
 
     @staticmethod
     def user_can_share(affected_object, user_object, codename=''):
