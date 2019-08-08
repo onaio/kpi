@@ -536,7 +536,7 @@ var dataInterface;
     },
     bulkDeleteSubmissions(uid, data) {
       return $ajax({
-        url: `${ROOT_URL}/api/v2/assets/${uid}/data/bulk/`,
+        url: `${ROOT_URL}/assets/${uid}/submissions/bulk/`,
         method: 'DELETE',
         data: {'payload': JSON.stringify(data)}
       });
