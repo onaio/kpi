@@ -127,7 +127,6 @@ def create_assets(kls, structure, **options):
             obj = Asset.objects.create(**structure)
     return obj
 
-
 @contextlib.contextmanager
 def disable_auto_field_update(kls, field_name):
     field = [f for f in kls._meta.fields if f.name == field_name][0]
