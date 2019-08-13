@@ -5,17 +5,18 @@ import logging
 import requests
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db import ProgrammingError, transaction
-from rest_framework.authtoken.models import Token
-import requests
 from django.core.exceptions import ImproperlyConfigured
+from django.db import IntegrityError, ProgrammingError, transaction
+from rest_framework.authtoken.models import Token
 
 from kpi.exceptions import KobocatProfileException
 from kpi.utils.log import logging
 from .shadow_models import (
     safe_kc_read,
     KobocatContentType,
+    KobocatDigestPartial,
     KobocatPermission,
+    KobocatToken,
     KobocatUser,
     KobocatUserObjectPermission,
     KobocatUserPermission,
@@ -29,9 +30,8 @@ def _trigger_kc_profile_creation(user):
     Get the user's profile via the KC API, causing KC to create a KC
     UserProfile if none exists already
     """
-    url = settings.KOBOCAT_URL + '/api/v1/user'
-    kobo_user = User.objects.using('kobocat').get(username=user.username)
-    token = Token.objects.using('kobocat').get(user=kobo_user)
+    url = settings.KOBOCAT_INTERNAL_URL + '/api/v1/user'
+    token, _ = Token.objects.get_or_create(user=user)
     response = requests.get(
         url, headers={'Authorization': 'Token ' + token.key})
     if not response.status_code == 200:
@@ -117,7 +117,6 @@ def set_kc_require_auth(user_id, require_auth):
     Configure whether or not authentication is required to see and submit data
     to a user's projects.
     WRITES to KobocatUserProfile.require_auth
-
     :param int user_id: ID/primary key of the :py:class:`User` object.
     :param bool require_auth: The desired setting.
     """
@@ -237,7 +236,6 @@ def grant_kc_model_level_perms(user):
             'Searched for content types {}.'.format(content_types)
         )
 
-<<<<<<< HEAD
     # What KC permissions does this user already have? Getting the KC database
     # column names right necessitated a custom M2M model,
     # `KobocatUserPermission`, which means we can't use Django's tolerant
@@ -251,11 +249,6 @@ def grant_kc_model_level_perms(user):
     KobocatUserPermission.objects.bulk_create([
         KobocatUserPermission(user=user, permission=p)
         for p in permissions_to_assign if p.pk not in existing_user_perm_pks
-=======
-    KobocatUserPermission.objects.bulk_create([
-        KobocatUserPermission(user=user, permission=p)
-            for p in permissions_to_assign
->>>>>>> Assign KC model-level perms using shadow models
     ])
 
 
@@ -366,3 +359,36 @@ def remove_applicable_kc_permissions(obj, user, kpi_codenames):
         # `permission` has a FK to `ContentType`, but I'm paranoid
         **content_type_kwargs
     ).delete()
+
+
+def delete_kc_users(deleted_pks: list) -> bool:
+    """
+    Args:
+        deleted_pks: List of primary keys of KPI deleted objects
+    Returns:
+        bool: whether it has succeeded or not.
+    """
+
+    # Then, delete users in KoBoCAT database
+    # Post signal is not triggered because the
+    # deletion is made at the model level, not the object level
+    kc_models = [
+        KobocatDigestPartial,
+        KobocatUserPermission,
+        KobocatUserProfile,
+        KobocatUserObjectPermission,
+        KobocatToken,
+    ]
+    # We can delete related objects
+    for kc_model in kc_models:
+        kc_model.objects.filter(user_id__in=deleted_pks).delete()
+
+    try:
+        # If users have projects/submissions, this query should fail with
+        # an `IntegrityError`.
+        KobocatUser.objects.filter(id__in=deleted_pks).delete()
+    except IntegrityError as e:
+        logging.error(e)
+        return False
+
+    return True
