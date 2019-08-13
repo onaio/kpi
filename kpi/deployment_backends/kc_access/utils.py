@@ -237,6 +237,7 @@ def grant_kc_model_level_perms(user):
             'Searched for content types {}.'.format(content_types)
         )
 
+<<<<<<< HEAD
     # What KC permissions does this user already have? Getting the KC database
     # column names right necessitated a custom M2M model,
     # `KobocatUserPermission`, which means we can't use Django's tolerant
@@ -250,6 +251,11 @@ def grant_kc_model_level_perms(user):
     KobocatUserPermission.objects.bulk_create([
         KobocatUserPermission(user=user, permission=p)
         for p in permissions_to_assign if p.pk not in existing_user_perm_pks
+=======
+    KobocatUserPermission.objects.bulk_create([
+        KobocatUserPermission(user=user, permission=p)
+            for p in permissions_to_assign
+>>>>>>> Assign KC model-level perms using shadow models
     ])
 
 

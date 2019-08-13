@@ -289,13 +289,8 @@ class KobocatUserObjectPermission(ShadowModel):
     CAVEAT LECTOR: The django-guardian custom manager,
     UserObjectPermissionManager, is NOT included!
     """
-<<<<<<< HEAD
     permission = models.ForeignKey(KobocatPermission, on_delete=models.CASCADE)
     content_type = models.ForeignKey(KobocatContentType, on_delete=models.CASCADE)
-=======
-    permission = models.ForeignKey(KobocatPermission)
-    content_type = models.ForeignKey(KobocatContentType)
->>>>>>> Use new KC shadow models for object-level perms
     object_pk = models.CharField(_('object ID'), max_length=255)
     content_object = GenericForeignKey(fk_field='object_pk')
     # It's okay not to use `KobocatUser` as long as PKs are synchronized
@@ -432,6 +427,14 @@ class KobocatDigestPartial(ShadowModel):
                 confirmed=partial_digest.confirmed,
                 partial_digest=partial_digest.partial_digest,
             )
+
+
+class KobocatUserPermission(ShadowModel):
+    """ Needed to assign model-level KoBoCAT permissions """
+    user = models.ForeignKey('KobocatUser', db_column='user_id')
+    permission = models.ForeignKey('KobocatPermission', db_column='permission_id')
+    class Meta(ShadowModel.Meta):
+        db_table = 'auth_user_user_permissions'
 
 
 class KobocatUser(ShadowModel):
