@@ -433,6 +433,7 @@ class KobocatUserPermission(ShadowModel):
     """ Needed to assign model-level KoBoCAT permissions """
     user = models.ForeignKey('KobocatUser', db_column='user_id')
     permission = models.ForeignKey('KobocatPermission', db_column='permission_id')
+
     class Meta(ShadowModel.Meta):
         db_table = 'auth_user_user_permissions'
 
