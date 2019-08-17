@@ -7,9 +7,10 @@ import logging
 import requests
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.db import ProgrammingError, transaction
 from rest_framework.authtoken.models import Token
+import requests
+from django.core.exceptions import ImproperlyConfigured
 
 from kpi.exceptions import KobocatProfileException
 from kpi.utils.log import logging
@@ -26,10 +27,10 @@ from .shadow_models import (
 
 
 def _trigger_kc_profile_creation(user):
-    '''
+    """
     Get the user's profile via the KC API, causing KC to create a KC
     UserProfile if none exists already
-    '''
+    """
     url = settings.KOBOCAT_URL + '/api/v1/user'
     token, _ = Token.objects.get_or_create(user=user)
     response = requests.get(
@@ -61,10 +62,10 @@ def last_submission_time(xform_id_string, user_id):
 
 @safe_kc_read
 def get_kc_profile_data(user_id):
-    '''
+    """
     Retrieve all fields from the user's KC profile and  return them in a
     dictionary
-    '''
+    """
     try:
         profile_model = KobocatUserProfile.objects.get(user_id=user_id)
         # Use a dict instead of the object in case we enter the next exception.
@@ -113,14 +114,14 @@ def get_kc_profile_data(user_id):
 
 
 def set_kc_require_auth(user_id, require_auth):
-    '''
+    """
     Configure whether or not authentication is required to see and submit data
     to a user's projects.
     WRITES to KobocatUserProfile.require_auth
 
     :param int user_id: ID/primary key of the :py:class:`User` object.
     :param bool require_auth: The desired setting.
-    '''
+    """
     user = User.objects.get(pk=user_id)
     _trigger_kc_profile_creation(user)
     token, _ = Token.objects.get_or_create(user=user)
