@@ -1,4 +1,5 @@
 # coding: utf-8
+<<<<<<< HEAD
 from django.http import Http404
 from rest_framework import viewsets, mixins
 
@@ -16,6 +17,17 @@ from kpi.models import Asset
 from kpi.models.object_permission import get_objects_for_user, get_anonymous_user
 >>>>>>> Filter data in reports/exports when user has 'partial_submission' permssion
 from kpi.constants import PERM_VIEW_SUBMISSIONS, PERM_PARTIAL_SUBMISSIONS
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+
+from rest_framework import viewsets, mixins
+
+from kpi.models import Asset
+from kpi.models.object_permission import get_objects_for_user, get_anonymous_user
+from kpi.constants import PERM_VIEW_SUBMISSIONS
+from .serializers import ReportsListSerializer, ReportsDetailSerializer
+>>>>>>> Added __future__ imports to all files
 
 
 class ReportsViewSet(mixins.ListModelMixin,

@@ -1,7 +1,6 @@
 # coding: utf-8
 # 😬
 
-
 class RowHandler:
 
     def handle_row(self, row):

@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+>>>>>>> Added __future__ imports to all files
 import base64
 
 import responses

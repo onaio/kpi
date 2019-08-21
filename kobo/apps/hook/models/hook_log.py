@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+
+>>>>>>> Added __future__ imports to all files
 import constance
 from datetime import timedelta
 from django.db import models

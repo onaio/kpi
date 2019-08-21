@@ -1,5 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
 import json
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+>>>>>>> Added __future__ imports to all files
 
 import json
 

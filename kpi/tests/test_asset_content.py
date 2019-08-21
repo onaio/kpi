@@ -9,6 +9,9 @@ from functools import reduce
 from kpi.models import Asset
 from kpi.utils.sluggify import sluggify_label
 
+from kpi.models import Asset
+from kpi.utils.sluggify import sluggify_label
+
 
 def test_expand_twice():
     a1 = Asset(asset_type='survey', content={'survey': [{'type': 'note',

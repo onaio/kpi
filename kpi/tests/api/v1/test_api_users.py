@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+>>>>>>> Added __future__ imports to all files
 
 from kpi.tests.api.v2 import test_api_users
 from kpi.tests.base_test_case import BaseTestCase

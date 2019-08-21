@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+>>>>>>> Added __future__ imports to all files
 import pytest
 from django.conf import settings
 from rest_framework import status

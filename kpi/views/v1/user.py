@@ -1,4 +1,3 @@
-
 # coding: utf-8
 from kpi.serializers import UserSerializer
 from kpi.views.v2.user import UserViewSet as UserViewSetV2

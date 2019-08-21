@@ -1,4 +1,5 @@
 # coding: utf-8
+<<<<<<< HEAD
 import json
 
 import constance
@@ -16,6 +17,18 @@ from kpi.constants import (
     PERM_CHANGE_ASSET
 )
 from .hook_test_case import HookTestCase, MockSSRFProtect
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+
+import constance
+import responses
+from django.core.urlresolvers import reverse
+from rest_framework import status
+
+from kpi.constants import INSTANCE_FORMAT_TYPE_JSON
+from .hook_test_case import HookTestCase
+>>>>>>> Added __future__ imports to all files
 
 
 class ApiHookTestCase(HookTestCase):

@@ -1,10 +1,4 @@
-<<<<<<< HEAD
 # coding: utf-8
-=======
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
-
->>>>>>> Moved current views and serializers under 'v1' parent folder
 from itertools import chain
 
 from django.db.models import Q
@@ -29,11 +23,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
         # Check if the user is anonymous. The
         # django.contrib.auth.models.AnonymousUser object doesn't work for
         # queries.
-<<<<<<< HEAD
         if user.is_anonymous:
-=======
-        if user.is_anonymous():
->>>>>>> Moved current views and serializers under 'v1' parent folder
             user = get_anonymous_user()
 
         def _get_tags_on_items(content_type_name, avail_items):

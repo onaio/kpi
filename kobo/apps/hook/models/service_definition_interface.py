@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+
+>>>>>>> Added __future__ imports to all files
 import json
 import os
 import re
@@ -6,7 +12,10 @@ from abc import ABCMeta, abstractmethod
 
 import constance
 import requests
+<<<<<<< HEAD
 from ssrf_protect.ssrf_protect import SSRFProtect, SSRFProtectException
+=======
+>>>>>>> Added __future__ imports to all files
 
 from kpi.utils.log import logging
 from .hook import Hook

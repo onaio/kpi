@@ -1,12 +1,5 @@
-<<<<<<< HEAD
+
 # coding: utf-8
-=======
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
-
->>>>>>> Moved current views and serializers under 'v1' parent folder
-import base64
-
 from rest_framework import exceptions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -14,10 +7,7 @@ from rest_framework.reverse import reverse
 from kpi.models import ImportTask
 from kpi.serializers import ImportTaskListSerializer, ImportTaskSerializer
 from kpi.tasks import import_in_background
-<<<<<<< HEAD
 from kpi.utils.strings import to_str
-=======
->>>>>>> Moved current views and serializers under 'v1' parent folder
 
 
 class ImportTaskViewSet(viewsets.ReadOnlyModelViewSet):
@@ -32,22 +22,14 @@ class ImportTaskViewSet(viewsets.ReadOnlyModelViewSet):
             return ImportTaskSerializer
 
     def get_queryset(self, *args, **kwargs):
-<<<<<<< HEAD
         if self.request.user.is_anonymous:
-=======
-        if self.request.user.is_anonymous():
->>>>>>> Moved current views and serializers under 'v1' parent folder
             return ImportTask.objects.none()
         else:
             return ImportTask.objects.filter(
                         user=self.request.user).order_by('date_created')
 
     def create(self, request, *args, **kwargs):
-<<<<<<< HEAD
         if self.request.user.is_anonymous:
-=======
-        if self.request.user.is_anonymous():
->>>>>>> Moved current views and serializers under 'v1' parent folder
             raise exceptions.NotAuthenticated()
         itask_data = {
             'library': request.POST.get('library') not in ['false', False],
@@ -60,11 +42,7 @@ class ImportTaskViewSet(viewsets.ReadOnlyModelViewSet):
             encoded_substr = encoded_str[encoded_str.index('base64') + 7:]
             itask_data['base64Encoded'] = encoded_substr
         elif 'file' in request.data:
-<<<<<<< HEAD
             encoded_xls = to_str(base64.b64encode(request.data['file'].read()))
-=======
-            encoded_xls = base64.b64encode(request.data['file'].read())
->>>>>>> Moved current views and serializers under 'v1' parent folder
             itask_data['base64Encoded'] = encoded_xls
             if 'filename' not in itask_data:
                 itask_data['filename'] = request.data['file'].name

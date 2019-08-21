@@ -1,7 +1,12 @@
 # coding: utf-8
+<<<<<<< HEAD
 import json
 
 import json
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+>>>>>>> Added __future__ imports to all files
 
 import constance
 from django.utils.translation import ugettext as _

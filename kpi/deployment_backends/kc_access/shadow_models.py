@@ -43,6 +43,8 @@ def update_autofield_sequence(model):
     with connection.cursor() as cursor:
         cursor.execute(query)
 
+from kpi.constants import SHADOW_MODEL_APP_LABEL
+
 
 class ReadOnlyModelError(ValueError):
     pass

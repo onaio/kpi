@@ -1,6 +1,7 @@
 # coding: utf-8
 from copy import deepcopy
 from collections import OrderedDict
+from copy import deepcopy
 
 from django.contrib.auth.models import User
 from django.test import TestCase

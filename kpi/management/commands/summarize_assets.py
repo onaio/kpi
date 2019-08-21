@@ -5,6 +5,7 @@ from kpi.models import Asset
 from kpi.model_utils import _set_auto_field_update
 
 
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         _set_auto_field_update(Asset, 'date_modified', False)

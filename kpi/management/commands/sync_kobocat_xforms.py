@@ -2,6 +2,7 @@
 import datetime
 import io
 import json
+import StringIO
 import re
 from collections import defaultdict
 from optparse import make_option

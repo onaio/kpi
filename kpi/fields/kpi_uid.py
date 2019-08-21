@@ -1,13 +1,8 @@
-<<<<<<< HEAD
-# coding: utf-8
-=======
-# -*- coding: utf-8 -*-
-<<<<<<< HEAD
->>>>>>> WIP - refactored structure of serializers Fields
-=======
-from __future__ import absolute_import
 
->>>>>>> Views and Serializers splitted
+
+# coding: utf-8
+
+from __future__ import absolute_import
 from django.db import models
 from shortuuid import ShortUUID
 
@@ -24,17 +19,10 @@ class KpiUidField(models.CharField):
     def __init__(self, uid_prefix):
         self.uid_prefix = uid_prefix
         total_length = len(uid_prefix) + UUID_LENGTH
-<<<<<<< HEAD
         super().__init__(max_length=total_length, unique=True)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-=======
-        super(KpiUidField, self).__init__(max_length=total_length, unique=True)
-
-    def deconstruct(self):
-        name, path, args, kwargs = super(KpiUidField, self).deconstruct()
->>>>>>> WIP - refactored structure of serializers Fields
         kwargs['uid_prefix'] = self.uid_prefix
         del kwargs['max_length']
         del kwargs['unique']
