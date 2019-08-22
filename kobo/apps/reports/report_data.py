@@ -1,10 +1,4 @@
 # coding: utf-8
-<<<<<<< HEAD
-=======
-from __future__ import (division, print_function, absolute_import,
-                        unicode_literals)
-
->>>>>>> Added __future__ imports to all files
 from collections import OrderedDict
 from copy import deepcopy
 
@@ -12,6 +6,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from formpack import FormPack
+from kpi.utils.future import OrderedDict
 from kpi.utils.log import logging
 
 

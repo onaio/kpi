@@ -2,6 +2,7 @@
 from collections import OrderedDict
 
 from formpack.utils.replace_aliases import META_TYPES, GEO_TYPES
+from kpi.utils.future import OrderedDict
 
 
 class AssetContentAnalyzer:

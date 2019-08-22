@@ -6,6 +6,7 @@ from kpi.models import Asset
 from kpi.utils.sluggify import sluggify_label
 
 from kpi.models import Asset
+from kpi.utils.future import OrderedDict
 from kpi.utils.sluggify import sluggify_label
 
 
