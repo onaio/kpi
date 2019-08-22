@@ -128,7 +128,7 @@ def _kc_forms_api_request(token, xform_pk, xlsform=False):
         settings.KOBOCAT_INTERNAL_URL, xform_pk)
     if xlsform:
         url += '/form.xls'
-    headers = {u'Authorization': 'Token ' + token.key}
+    headers = {'Authorization': 'Token ' + token.key}
     return requests.get(url, headers=headers)
 
 
@@ -455,7 +455,11 @@ class Command(BaseCommand):
             print(string)
 
     def _print_tabular(self, *args):
+<<<<<<< HEAD
         self._print_str('\t'.join(['{}'.format(x) for x in args]))
+=======
+        self._print_str('\t'.join(map(lambda x: '{}'.format(x), args)))
+>>>>>>> Removed "u" prefix
 
     def handle(self, *args, **options):
         if not settings.KOBOCAT_URL or not settings.KOBOCAT_INTERNAL_URL:

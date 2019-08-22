@@ -244,7 +244,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             project = self.asset.settings.get('project')
             if project:
                 url = self.external_to_internal_url(
-                    u'{}/api/v1/projects/{}/forms'.format(server, project)
+                    '{}/api/v1/projects/{}/forms'.format(server, project)
                 )
         xls_io = self.asset.to_xls_io(
             versioned=True, append={
@@ -263,10 +263,10 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         #   to query a boolean than string.
         # Don't forget to run Management Command `populate_kc_xform_kpi_asset_uid`
         payload = {
-            u'kpi_asset_uid': self.asset.uid,
-            u'published_by_formbuilder': True,
-            u"downloadable": active,
-            u"has_kpi_hook": self.asset.has_active_hooks,
+            'kpi_asset_uid': self.asset.uid,
+            'published_by_formbuilder': True,
+            "downloadable": active,
+            "has_kpi_hook": self.asset.has_active_hooks,
         }
         files = {'xls_file': ('{}.xls'.format(id_string), xls_io)}
         json_response = self._kobocat_request(

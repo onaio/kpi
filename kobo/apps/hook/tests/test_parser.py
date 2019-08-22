@@ -1,20 +1,11 @@
 # coding: utf-8
-<<<<<<< HEAD
-=======
-from __future__ import (division, print_function, absolute_import,
-                        unicode_literals)
-
->>>>>>> Added __future__ imports to all files
 import json
 import re
 
 from lxml import etree
 
 from kpi.constants import INSTANCE_FORMAT_TYPE_XML
-<<<<<<< HEAD
 from kpi.utils.strings import to_str
-=======
->>>>>>> Added __future__ imports to all files
 from .hook_test_case import HookTestCase
 
 

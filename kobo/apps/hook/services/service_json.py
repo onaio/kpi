@@ -1,11 +1,5 @@
 # coding: utf-8
-<<<<<<< HEAD
 import json
-=======
-from __future__ import (division, print_function, absolute_import,
-                        unicode_literals)
-
->>>>>>> Added __future__ imports to all files
 import re
 
 from ..constants import SUBMISSION_PLACEHOLDER
