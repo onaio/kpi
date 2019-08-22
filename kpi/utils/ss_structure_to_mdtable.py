@@ -1,6 +1,8 @@
 # coding: utf-8
 from collections import OrderedDict
 
+from kpi.utils.future import unicode
+
 
 def _convert_sheets_to_lists(content):
     cols = OrderedDict()
