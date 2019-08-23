@@ -5,6 +5,8 @@ from functools import reduce
 from kpi.models import Asset
 from kpi.utils.sluggify import sluggify_label
 
+from django.utils.six import string_types
+
 from kpi.models import Asset
 from kpi.utils.future import OrderedDict
 from kpi.utils.sluggify import sluggify_label

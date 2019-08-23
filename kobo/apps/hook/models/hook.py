@@ -10,6 +10,7 @@ from kpi.fields import KpiUidField
 from ..constants import HOOK_LOG_PENDING, HOOK_LOG_FAILED, HOOK_LOG_SUCCESS
 
 
+@python_2_unicode_compatible
 class Hook(models.Model):
 
     # Export types

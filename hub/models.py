@@ -8,12 +8,14 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from markitup.fields import MarkupField
 
 from kpi.models.object_permission import get_anonymous_user
 
 
+@python_2_unicode_compatible
 class SitewideMessage(models.Model):
     slug = models.CharField(max_length=50)
     body = MarkupField()
@@ -22,6 +24,7 @@ class SitewideMessage(models.Model):
         return self.slug
 
 
+@python_2_unicode_compatible
 class ConfigurationFile(models.Model):
     LOGO = 'logo'
     LOGO_SMALL = 'logo_small'
@@ -53,6 +56,7 @@ class ConfigurationFile(models.Model):
         return reverse('configurationfile', kwargs={'slug': self.slug})
 
 
+@python_2_unicode_compatible
 class PerUserSetting(models.Model):
     """
     A configuration setting that has different values depending on whether not

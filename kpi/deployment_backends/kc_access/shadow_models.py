@@ -44,7 +44,6 @@ def update_autofield_sequence(model):
         cursor.execute(query)
 
 from kpi.constants import SHADOW_MODEL_APP_LABEL
-from kpi.utils.future import unicode
 
 
 class ReadOnlyModelError(ValueError):
@@ -238,6 +237,7 @@ class KobocatUser(ShadowModel):
         KobocatDigestPartial.sync(kc_auth_user)
 
 
+@python_2_unicode_compatible
 class KobocatContentType(ShadowModel):
     """
     Minimal representation of Django 1.8's
@@ -257,6 +257,7 @@ class KobocatContentType(ShadowModel):
         return self.model
 
 
+@python_2_unicode_compatible
 class KobocatPermission(ShadowModel):
     """
     Minimal representation of Django 1.8's contrib.auth.models.Permission
@@ -273,9 +274,9 @@ class KobocatPermission(ShadowModel):
 
     def __str__(self):
         return "%s | %s | %s" % (
-            six.text_type(self.content_type.app_label),
-            six.text_type(self.content_type),
-            six.text_type(self.name))
+            text_type(self.content_type.app_label),
+            text_type(self.content_type),
+            text_type(self.name))
 
 
 class KobocatUser(ShadowModel):

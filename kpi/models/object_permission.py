@@ -226,6 +226,7 @@ class ObjectPermissionManager(models.Manager):
             super().get_or_create, content_object, **kwargs)
 
 
+@python_2_unicode_compatible
 class ObjectPermission(models.Model):
     """ An application of an auth.Permission instance to a specific
     content_object. Call ObjectPermission.objects.get_for_object() or
@@ -276,7 +277,7 @@ class ObjectPermission(models.Model):
     def delete(self, *args, **kwargs):
         super(self, ObjectPermission).delete(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         for required_field in ('user', 'permission'):
             if not hasattr(self, required_field):
                 return 'incomplete ObjectPermission'

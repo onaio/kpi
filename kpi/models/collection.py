@@ -46,6 +46,7 @@ class CollectionManager(TreeManager, TaggableModelManager):
         return self.filter(tags=tag)
 
 
+@python_2_unicode_compatible
 class Collection(ObjectPermissionMixin, TagStringMixin, MPTTModel):
     name = models.CharField(max_length=255)
     parent = TreeForeignKey('self', null=True, blank=True,

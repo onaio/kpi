@@ -1,6 +1,8 @@
 # coding: utf-8
 from collections import OrderedDict
 
+from django.utils.six import string_types
+
 from formpack.utils.replace_aliases import META_TYPES, GEO_TYPES
 from kpi.utils.future import OrderedDict
 

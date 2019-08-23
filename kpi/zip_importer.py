@@ -4,6 +4,7 @@ import re
 import zipfile
 from io import BytesIO
 
+from django.utils.encoding import python_2_unicode_compatible
 from xlrd import open_workbook
 
 from kpi.exceptions import ImportAssetException

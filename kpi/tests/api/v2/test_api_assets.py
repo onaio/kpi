@@ -4,15 +4,24 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
+<<<<<<< HEAD
 import StringIO
 >>>>>>> Added __future__ imports to all files
+=======
+>>>>>>> Replaced deprecated Python2 libraries with six retro-compatible versions (e.g. xrange, StringIO, urllib, __unicode__, unicode(), basestring)
 import copy
 import json
 from hashlib import md5
 from io import StringIO
 
 from django.contrib.auth.models import User
+<<<<<<< HEAD
 from django.urls import reverse
+=======
+from django.core.urlresolvers import reverse
+from django.utils.six.moves import cStringIO as StringIO
+from formpack.utils.expand_content import SCHEMA_VERSION
+>>>>>>> Replaced deprecated Python2 libraries with six retro-compatible versions (e.g. xrange, StringIO, urllib, __unicode__, unicode(), basestring)
 from rest_framework import status
 
 from kpi.constants import (
@@ -33,7 +42,11 @@ from kpi.models import Asset
 from kpi.models import AssetFile
 from kpi.models import AssetVersion
 from kpi.serializers.v2.asset import AssetListSerializer
+<<<<<<< HEAD
 from kpi.tests.base_test_case import BaseAssetTestCase, BaseTestCase
+=======
+from kpi.tests.base_test_case import BaseTestCase
+>>>>>>> Replaced deprecated Python2 libraries with six retro-compatible versions (e.g. xrange, StringIO, urllib, __unicode__, unicode(), basestring)
 from kpi.tests.kpi_test_case import KpiTestCase
 from kpi.urls.router_api_v2 import URL_NAMESPACE as ROUTER_URL_NAMESPACE
 from kpi.utils.strings import to_str, hashable_str

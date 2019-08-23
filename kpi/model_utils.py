@@ -5,9 +5,8 @@ import re
 from collections import defaultdict
 
 from django.apps import apps
+from django.utils.six import text_type
 from taggit.models import Tag, TaggedItem
-
-from kpi.utils.future import unicode
 
 '''
 This circular import will bite you if you don't import kpi.models before

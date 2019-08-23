@@ -235,6 +235,10 @@ class MockDataExports(TestCase):
             (line + '\r\n').encode('utf-8') for line in expected_lines
         ]
         result_lines = list(export_task.result)
+        print('RESULT LINES')
+        print(result_lines)
+        print('EXPECTED LINES')
+        print(expected_lines)
         self.assertEqual(result_lines, expected_lines)
         self.assertFalse(messages)
 
