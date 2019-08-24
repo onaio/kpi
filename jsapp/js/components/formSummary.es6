@@ -83,7 +83,7 @@ class FormSummary extends React.Component {
 
     const query = `query={"_submission_time": {"$gte":"${wkStart.toISOString()}"}}&fields=["_id","_submission_time"]`;
     dataInterface.getSubmissionsQuery(assetid, query).done((thisWeekSubs) => {
-      var subsCurrentPeriod = thisWeekSubs.length;
+      var subsCurrentPeriod = thisWeekSubs.results.length;
 
       const q2 = `query={"_submission_time": {"$gte":"${lastWeekStart.toISOString()}"}}&fields=["_id"]`;
       dataInterface.getSubmissionsQuery(assetid, q2).done((d) => {
@@ -94,13 +94,9 @@ class FormSummary extends React.Component {
           else
             subsPerDay = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
-          thisWeekSubs.forEach(function(s, i){
-            // As submission times are in UTC,
-            // this will get the computer timezone difference with UTC
-            // and adapt the submission date to reflect that in the chart.
-            var d = new Date(s._submission_time);
-            var timezoneToday = moment(d.valueOf() - (d.getTimezoneOffset() * 60 * 1000));
-            var diff = timezoneToday.diff(wkStart, 'days');
+          thisWeekSubs.results.forEach(function(s, i){
+            var d = moment(s._submission_time);
+            var diff = d.diff(wkStart, 'days');
             subsPerDay[diff] += 1;
           });
 
@@ -121,7 +117,7 @@ class FormSummary extends React.Component {
         }
 
         this.setState({
-          subsPreviousPeriod: d.length - subsCurrentPeriod,
+          subsPreviousPeriod: d.results.length - subsCurrentPeriod,
           subsCurrentPeriod: subsCurrentPeriod,
           chartVisible: subsCurrentPeriod ? true : false
         });
