@@ -609,6 +609,7 @@ class Asset(ObjectPermissionMixin,
             PERM_MANAGE_ASSET,
         ),
     }
+    ASSIGNABLE_PERMISSIONS = tuple(ASSIGNABLE_PERMISSIONS_WITH_LABELS.keys())
 
     # Calculated permissions that are neither directly assignable nor stored
     # in the database, but instead implied by assignable permissions
@@ -737,6 +738,30 @@ class Asset(ObjectPermissionMixin,
             deployed=False,
         )
 
+    def get_label_for_permission(self, permission_or_codename):
+        try:
+            codename = permission_or_codename.codename
+            permission = permission_or_codename
+        except AttributeError:
+            codename = permission_or_codename
+            permission = None
+        try:
+            label = self.ASSIGNABLE_PERMISSIONS_WITH_LABELS[codename]
+        except KeyError:
+            if not permission:
+                # Seems expensive. Cache it?
+                permission = Permission.objects.filter(
+                    content_type=ContentType.objects.get_for_model(self),
+                    codename=codename
+                )
+            label = permission.name
+        label = label.replace(
+            '##asset_type_label##',
+            # Raises TypeError if not coerced explicitly
+            six.text_type(self.ASSET_TYPE_LABELS[self.asset_type])
+        )
+        return label
+
     @property
     def deployed_versions(self):
         return self.asset_versions.filter(deployed=True).order_by(
@@ -825,10 +850,6 @@ class Asset(ObjectPermissionMixin,
         ```
         ['view_submissions',]
         ```
-<<<<<<< HEAD
-=======
-
->>>>>>> Applied requested changes (typos, better readability python code) as per discussed with jnm
         `get_partial_perms(user1_obj.id, with_filters=True)` would return
         ```
         {
