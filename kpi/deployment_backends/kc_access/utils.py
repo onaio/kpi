@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.db import ProgrammingError, transaction
-from django.utils.six import string_types
+from django.utils.six import string_types, iteritems
 from rest_framework.authtoken.models import Token
 
 from kpi.exceptions import KobocatProfileException

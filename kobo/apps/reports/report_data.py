@@ -2,6 +2,7 @@
 from collections import OrderedDict
 from copy import deepcopy
 
+from django.utils.six import iteritems
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
