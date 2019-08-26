@@ -980,6 +980,7 @@ export class DataTable extends React.Component {
               onClick={this.onBulkDelete}>
               {t('Delete selected')}
             </bem.PopoverMenu__link>
+            }
           </ui.PopoverMenu>
         }
       </bem.FormView__item>
