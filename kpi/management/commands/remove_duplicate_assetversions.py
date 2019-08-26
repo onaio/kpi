@@ -8,6 +8,7 @@ from hashlib import md5
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils.six import iteritems
 
 from ...models import Asset, AssetVersion
 
@@ -151,7 +152,7 @@ class Command(BaseCommand):
             versions_for_assets[asset_pk].append(version_pk)
         version_counts_for_assets = {
             asset_pk: len(version_pks) for
-                asset_pk, version_pks in versions_for_assets.iteritems()
+                asset_pk, version_pks in iteritems(versions_for_assets)
         }
         # Sort descending by version count; the higher the version count, the
         # more likely many of the versions are duplicates
@@ -212,7 +213,7 @@ class Command(BaseCommand):
                 if not options.get('dry_run'):
                     # Store the UIDs of all duplicate versions in the original
                     # version's `uid_aliases` field
-                    for (pk, new_uid_aliases) in duplicate_uids.iteritems():
+                    for (pk, new_uid_aliases) in iteritems(duplicate_uids):
                         version_qs = AssetVersion.objects.filter(pk=pk)
                         uid_aliases = version_qs.values_list(
                             'uid_aliases', flat=True)[0]

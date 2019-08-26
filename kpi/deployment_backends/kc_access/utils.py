@@ -9,7 +9,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import ProgrammingError, transaction
-from django.utils.six import string_types
+from django.utils.six import string_types, iteritems
 from rest_framework.authtoken.models import Token
 import requests
 from django.core.exceptions import ImproperlyConfigured
@@ -158,7 +158,7 @@ def _get_content_type_kwargs_for_related(obj):
         )
     # Prepend 'content_type__' to each field name in KC_CONTENT_TYPE_KWARGS
     content_type_kwargs = {
-        'content_type__' + k: v for k, v in content_type_kwargs.iteritems()
+        'content_type__' + k: v for k, v in iteritems(content_type_kwargs)
     }
     return content_type_kwargs
 
@@ -294,7 +294,7 @@ def set_kc_anonymous_permissions_xform_flags(obj, kpi_codenames, xform_id,
             # This permission doesn't map to anything in KC
             continue
         if remove:
-            flags = {flag: not value for flag, value in flags.iteritems()}
+            flags = {flag: not value for flag, value in iteritems(flags)}
         xform_updates.update(flags)
     # Write to the KC database
     ReadOnlyKobocatXForm.objects.filter(pk=xform_id).update(**xform_updates)
