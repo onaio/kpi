@@ -206,7 +206,7 @@ var dataInterface;
 
     getPermissionsConfig() {
       return $ajax({
-        url: `${ROOT_URL}/api/v2/permissions/`,
+        url: `${ROOT_URL}/api/v2/${assetUid}/permissions/`,
         method: 'GET'
       });
     },
@@ -270,7 +270,7 @@ var dataInterface;
       var userUrl = `${ROOT_URL}/api/v2/users/${creds.username}/`;
       var codename = creds.role.includes('_submissions') ? creds.role : `${creds.role}_${creds.kind}`;
       return $ajax({
-        url: `${ROOT_URL}/api/v2/permissions/`,
+        url: `${ROOT_URL}/api/v2/${assetUid}/permissions/`,
         method: 'POST',
         data: {
           'user': userUrl,
