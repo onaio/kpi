@@ -19,7 +19,7 @@ import {
   log,
   stringToColor
 } from '../utils';
-import {ROOT_URL} from './constants';
+import {ROOT_URL} from 'js/constants';
 
 import {WEB_PAGE_TITLE} from '../config';
 
