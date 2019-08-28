@@ -221,7 +221,7 @@ export var dataInterface;
 
     getPermissionsConfig() {
       return $ajax({
-        url: `${ROOT_URL}/api/v2/permissions/`,
+        url: `${ROOT_URL}/api/v2/${assetUid}/permissions/`,
         method: 'GET'
       });
     },
