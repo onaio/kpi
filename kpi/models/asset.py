@@ -525,7 +525,7 @@ class Asset(ObjectPermissionMixin,
         ASSET_TYPE_QUESTION: _('question'),
         ASSET_TYPE_TEXT: _('text'), # unused?
         ASSET_TYPE_EMPTY: _('empty'), # unused?
-        #ASSET_TYPE_COLLECTION: _('Collection'),
+        #ASSET_TYPE_COLLECTION: _('collection'),
     }
 
     # Assignable permissions that are stored in the database.
