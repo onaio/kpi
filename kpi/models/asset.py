@@ -738,6 +738,36 @@ class Asset(ObjectPermissionMixin,
             deployed=False,
         )
 
+    @property
+    def deployed_versions(self):
+        return self.asset_versions.filter(deployed=True).order_by(
+            '-date_modified')
+
+    def get_ancestors_or_none(self):
+        # ancestors are ordered from farthest to nearest
+        if self.parent is not None:
+            return self.parent.get_ancestors(include_self=True)
+        else:
+            return None
+
+    def get_filters_for_partial_perm(self, user_id, perm=PERM_VIEW_SUBMISSIONS):
+        """
+        Returns the list of filters for a specific permission `perm`
+        and this specific asset.
+        :param user_id:
+        :param perm: see `constants.*_SUBMISSIONS`
+        :return:
+        """
+        if not perm.endswith(SUFFIX_SUBMISSIONS_PERMS) or perm == PERM_PARTIAL_SUBMISSIONS:
+            raise BadPermissionsException(_('Only partial permissions for '
+                                            'submissions are supported'))
+
+        perms = self.get_partial_perms(user_id, with_filters=True)
+        if perms:
+            return perms.get(perm)
+        return None
+
+
     def get_label_for_permission(self, permission_or_codename):
         try:
             codename = permission_or_codename.codename
@@ -870,23 +900,6 @@ class Asset(ObjectPermissionMixin,
                 return perms
             else:
                 return list(perms)
-
-    def get_filters_for_partial_perm(self, user_id, perm=PERM_VIEW_SUBMISSIONS):
-        """
-        Returns the list of filters for a specific permission `perm`
-        and this specific asset.
-        :param user_id:
-        :param perm: see `constants.*_SUBMISSIONS`
-        :return:
-        """
-        if not perm.endswith(SUFFIX_SUBMISSIONS_PERMS) or perm == PERM_PARTIAL_SUBMISSIONS:
-            raise BadPermissionsException(_('Only partial permissions for '
-                                            'submissions are supported'))
-
-        perms = self.get_partial_perms(user_id, with_filters=True)
-        if perms:
-            return perms.get(perm)
-        return None
 
     @property
     def has_active_hooks(self):
