@@ -7,6 +7,7 @@
 <<<<<<< HEAD
 -e git+https://github.com/dimagi/django-digest@0eb1c921329dd187c343b61acfbec4e98450136e#egg=django_digest
 <<<<<<< HEAD
+<<<<<<< HEAD
 -e git+https://github.com/kobotoolbox/formpack.git@eb7d723eb2b54dbfd56a1c32d72e0008bbb29149#egg=formpack
 amqp==1.4.9
 =======
@@ -15,6 +16,9 @@ amqp==1.4.9
 -e git+https://github.com/kobotoolbox/formpack.git@45a49bbcc794c6ac3756afe04a4f851c3da9219d#egg=formpack
 =======
 -e git+https://github.com/kobotoolbox/formpack.git@dc54b4184bfbc26dd1b9358d3ae19bca68fbe63f#egg=formpack
+=======
+-e git+https://github.com/kobotoolbox/formpack.git@1124a98c59aaf8ed25a1276042bece688a01553c#egg=formpack
+>>>>>>> Use Formpack.future.OrderedDict instead of recreating the same code
 -e git+https://github.com/jnm/geojson-rewind@0.1.1+py2.jnm#egg=geojson-rewind
 >>>>>>> Added __future__ imports to all files
 amqp==2.4.0
