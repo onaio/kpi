@@ -33,7 +33,8 @@ import formpack.constants
 from formpack.schema.fields import ValidationStatusCopyField
 from formpack.utils.string import ellipsize
 from kobo.apps.reports.report_data import build_formpack
-from kpi.constants import PERM_VIEW_SUBMISSIONS
+
+from kpi.constants import PERM_VIEW_SUBMISSIONS, PERM_PARTIAL_SUBMISSIONS
 from kpi.utils.log import logging
 from ..deployment_backends.mock_backend import MockDeploymentBackend
 from ..fields import KpiUidField
@@ -589,7 +590,10 @@ class ExportTask(ImportExportTask):
             raise NotImplementedError(
                 'only an `Asset` may be exported at this time')
 
-        if not source.has_perm(self.user, PERM_VIEW_SUBMISSIONS):
+        source_perms = source.get_perms(self.user)
+
+        if (PERM_VIEW_SUBMISSIONS not in source_perms and
+                PERM_PARTIAL_SUBMISSIONS not in source_perms):
             # Unsure if DRF exceptions make sense here since we're not
             # returning a HTTP response
             raise exceptions.PermissionDenied(
@@ -608,12 +612,9 @@ class ExportTask(ImportExportTask):
         # Take this opportunity to do some housekeeping
         self.log_and_mark_stuck_as_errored(self.user, source_url)
 
-        if isinstance(source.deployment, MockDeploymentBackend):
-            # Currently used only for unit testing (`MockDeploymentBackend`)
-            # TODO: Have the KC backend also implement `_get_submissions()`?
-            submission_stream = source.deployment.get_submissions()
-        else:
-            submission_stream = None
+        permission_filters = source.get_filters_for_partial_perm(self.user.id)
+        submission_stream = source.deployment.get_submissions(
+            permission_filters=permission_filters)
 
         pack, submission_stream = build_formpack(
             source, submission_stream, self._fields_from_all_versions)
