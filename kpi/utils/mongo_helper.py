@@ -81,7 +81,7 @@ class MongoHelper:
     @classmethod
     def get_instances(
             cls, mongo_userform_id, hide_deleted=True, start=None, limit=None,
-            sort=None, fields=None, query=None, instances_ids=None,
+            sort=None, fields=None, query=None, instance_ids=None,
             permission_filters=None
     ):
         cursor, total_count = cls._get_cursor_and_count(
