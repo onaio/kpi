@@ -116,7 +116,9 @@ export class DataTable extends React.Component {
             tableData: results
           });
         } else {
-          this.setState({error: t('Error: could not load data.'), loading: false});
+          this.setState({error: t('This project has no submitted data. ' +
+                                  'Please collect some and try again.'),
+                         loading: false});
         }
       }
     }).fail((error)=>{
