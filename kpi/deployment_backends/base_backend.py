@@ -102,6 +102,15 @@ class BaseDeploymentBackend(object):
             params['limit'] = limit
         return params
 
+    def calculated_submission_count(self, **kwargs):
+        params = self.validate_submission_list_params(**kwargs)
+        # Remove useless property for count
+        params.pop('fields', None)
+        params.pop('start', None)
+        params.pop('start', None)
+        params.pop('sort', None)
+        return self._calculated_submission_count(**params)
+
     @property
     def backend(self):
         return self.asset._deployment_data.get('backend', None)
@@ -133,3 +142,4 @@ class BaseDeploymentBackend(object):
     @property
     def mongo_userform_id(self):
         return None
+
