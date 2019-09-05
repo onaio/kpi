@@ -745,6 +745,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         if len(instance_ids) > 0 or use_mongo:
             queryset = queryset.filter(id__in=instance_ids)
 
+        # Python-only attribute used by `kpi.views.v2.data.DataViewSet.list()`
         self.current_submissions_count = queryset.count()
 
         # Force Sort by id (see fixme above)
