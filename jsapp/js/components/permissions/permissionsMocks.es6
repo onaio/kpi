@@ -192,7 +192,11 @@ const assetWithMultipleUsers = {
       'permission': '/api/v2/permissions/view_submissions/'
     },
     {
+<<<<<<< HEAD
       'url': '/api/v2/assets/arMB2dNgwewktv954wmo9e/permission-assignments/pETvxGayAJwvPaCnt5biVD/',
+=======
+      'url': '/api/v2/assets/arMB2dNgwewktv954wmo9e/permissions/pETvxGayAJwvPaCnt5biVD/',
+>>>>>>> Fix a few typos causing front-end tests to fail
       'user': '/api/v2/users/olivier/',
       'permission': '/api/v2/permissions/view_asset/'
     },
