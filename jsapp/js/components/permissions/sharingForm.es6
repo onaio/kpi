@@ -81,6 +81,18 @@ class SharingForm extends React.Component {
     });
   }
 
+  onGetCollectionPermissionsCompleted(response) {
+    const parsedPerms = permParser.parseBackendData(response.results, this.state.asset.owner);
+    let nonOwnerPerms = permParser.parseUserWithPermsList(parsedPerms).filter((perm) => {
+      return perm.user !== buildUserUrl(this.state.asset.owner);
+    });
+
+    this.setState({
+      permissions: parsedPerms,
+      nonOwnerPerms: nonOwnerPerms
+    });
+  }
+
   onAssetChange (data) {
     const uid = this.props.uid || this.currentAssetID;
     const asset = data[uid];
