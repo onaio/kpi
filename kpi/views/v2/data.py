@@ -215,7 +215,7 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         Returns the deployment for the asset specified by the request
         """
         if not self.asset.has_deployment:
-            raise serializers.ValidationError(
+            raise ValidationError(
                 _('The specified asset has not been deployed'))
         return self.asset.deployment
 
@@ -271,7 +271,6 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         page = self.paginate_queryset(dummy_submissions_list)
         if page is not None:
             return self.get_paginated_response(submissions)
-
         return Response(list(submissions))
 
     def retrieve(self, request, pk, *args, **kwargs):

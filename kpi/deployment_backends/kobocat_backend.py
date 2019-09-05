@@ -565,21 +565,28 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
 
     def get_submission(self, pk, format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
         """
-        Returns only one occurrence.
+        Returns submission if `pk` exists otherwise `None`
 
-        :param pk: int. `Instance.id`
-        :param format_type: str.  INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
-        :param kwargs: dict. Filter params
-        :return: mixed. JSON or XML
+
+        Args:
+            pk (int). Primary key. Must be a positive integer
+            format_type (str): INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
+            kwargs (dict): Filters to pass to MongoDB. See
+                https://docs.mongodb.com/manual/reference/operator/query/
+
+        Returns:
+            (dict|str|`None`): Depending of `format_type`, it can return:
+                - Mongo JSON representation as a dict
+                - Instance's XML as string
+                - `None` if doesn't exist
         """
 
-        if pk:
-            submissions = list(self.get_submissions(format_type, [int(pk)], **kwargs))
-            if len(submissions) > 0:
-                return submissions[0]
-            return None
-        else:
-            raise ValueError(_('Primary key must be provided'))
+        submissions = list(self.get_submissions(format_type, [int(pk)], **kwargs))
+        try:
+            return submissions[0]
+        except IndexError:
+            pass
+        return None
 
     def get_submissions(self, format_type=INSTANCE_FORMAT_TYPE_JSON, instances_ids=[], **kwargs):
         """
@@ -614,9 +621,6 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 "The format {} is not supported".format(format_type)
             )
         return submissions
-
-    def get_submissions_count(self, **kwargs):
-        pass
 
     def get_validation_status(self, submission_pk, params, user):
         url = self.get_submission_validation_status_url(submission_pk)
@@ -716,6 +720,11 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             raise serializers.ValidationError({
                 'sort': _('This param is not supported in `XML` format')
             })
+
+        # FIXME. Use Mongo to sort data and ask PostgreSQL to follow the order.
+        # See. https://stackoverflow.com/a/867578
+        if 'sort' in kwargs:
+            raise ValueError(_('`sort` param is not supported with XML format'))
 
         # Because `kwargs`' values are for `Mongo`'s query engine
         # We still use MongoHelper to validate params.
