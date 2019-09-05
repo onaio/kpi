@@ -30,10 +30,12 @@ class ServiceDefinitionInterface(object):
         Retrieves data from deployment backend of the asset.
         """
         try:
-            submission = self._hook.asset.deployment.get_submission(self._instance_id, self._hook.export_type)
+            submission = self._hook.asset.deployment.get_submission(
+                self._instance_id, self._hook.export_type)
             return self._parse_data(submission, self._hook.subset_fields)
         except Exception as e:
-            logging.error("service_json.ServiceDefinition._get_data - Hook #{} - Data #{} - {}".format(
+            logging.error("service_json.ServiceDefinition._get_data "
+                          "- Hook #{} - Data #{} - {}".format(
                 self._hook.uid, self._instance_id, str(e)), exc_info=True)
         return None
 
@@ -77,7 +79,8 @@ class ServiceDefinitionInterface(object):
                 request_kwargs = self._prepare_request_kwargs()
 
                 # Add custom headers
-                request_kwargs.get("headers").update(self._hook.settings.get("custom_headers", {}))
+                request_kwargs.get("headers").update(
+                    self._hook.settings.get("custom_headers", {}))
 
                 # Add user agent
                 public_domain = "- {} ".format(os.getenv("PUBLIC_DOMAIN_NAME"))\
@@ -110,7 +113,8 @@ class ServiceDefinitionInterface(object):
                 self.save_log(status_code, text)
 
             except Exception as e:
-                logging.error("service_json.ServiceDefinition.send - Hook #{} - Data #{} - {}".format(
+                logging.error("service_json.ServiceDefinition.send - "
+                              "Hook #{} - Data #{} - {}".format(
                     self._hook.uid, self._instance_id, str(e)), exc_info=True)
                 self.save_log(
                     KOBO_INTERNAL_ERROR_STATUS_CODE,

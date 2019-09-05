@@ -514,9 +514,6 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             )
         return submissions_kobocat_request
 
-    def get_submissions_count(self, **kwargs):
-        pass
-
     def get_validation_status(self, submission_pk, params, user):
         url = self.get_submission_validation_status_url(submission_pk)
         kc_request = requests.Request(method='GET', url=url, data=params)
@@ -601,11 +598,15 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         :return: list<XML>
         """
 
-        sort = {'id': 1}
         kwargs['instance_ids'] = instance_ids
 
         if 'fields' in kwargs:
             raise ValueError(_('`Fields` param is not supported with XML format'))
+
+        # FIXME. Use Mongo to sort data and ask PostgreSQL to follow the order.
+        # See. https://stackoverflow.com/a/867578
+        if 'sort' in kwargs:
+            raise ValueError(_('`sort` param is not supported with XML format'))
 
         # Because `kwargs`' values are for `Mongo`'s query engine
         # We still use MongoHelper to validate params.
@@ -619,8 +620,10 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             # We use Mongo to retrieve matching instances.
             # Get only their ids and pass them to PostgreSQL.
             params['fields'] = ['_id']
+            # Force `sort` by `_id` for Mongo (see fixme above)
+            params['sort'] = {'_id': 1}
             instance_ids = [instance.get('_id') for instance in
-                             MongoHelper.get_instances(self.mongo_userform_id, **params)]
+                            MongoHelper.get_instances(self.mongo_userform_id, **params)]
 
         queryset = ReadOnlyKobocatInstance.objects.filter(
             xform_id=self.xform_id,
@@ -632,14 +635,8 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
 
         self.current_submissions_count = queryset.count()
 
-        # Sort
-        sort = params.get('sort') or sort
-        sort_key = sort.keys()[0]
-        sort_dir = int(sort[sort_key])  # -1 for desc, 1 for asc
-        queryset = queryset.order_by('{direction}{field}'.format(
-            direction='-' if sort_dir < 0 else '',
-            field=sort_key
-        ))
+        # Force Sort by id (see fixme above)
+        queryset = queryset.order_by('id')
 
         # When using Mongo, data is already paginated, no need to do it with PostgreSQL too.
         if not use_mongo:
