@@ -85,7 +85,7 @@ var dataInterface;
     },
     createAssetSnapshot (data) {
       return $ajax({
-        url: `${ROOT_URL}/api/v2/asset_snapshots/`,
+        url: url,
         method: 'POST',
         data: data
       });
@@ -170,7 +170,7 @@ var dataInterface;
     },
     createTemporaryAssetSnapshot ({source}) {
       return $ajax({
-        url: `${ROOT_URL}/api/v2/asset_snapshots/`,
+        url: url,
         method: 'POST',
         data: {
           source: source

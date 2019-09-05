@@ -491,31 +491,13 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         )
         return url
 
-    def get_submission(self, pk, format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
-        """
-        Returns only one occurrence.
-
-        :param pk: int. `Instance.id`
-        :param format_type: str.  INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
-        :param kwargs: dict. Filter params
-        :return: mixed. JSON or XML
-        """
-
-        if pk:
-            submissions = list(self.get_submissions(format_type, [int(pk)], **kwargs))
-            if len(submissions) > 0:
-                return submissions[0]
-            return None
-        else:
-            raise ValueError(_('Primary key must be provided'))
-
-    def get_submissions(self, format_type=INSTANCE_FORMAT_TYPE_JSON, instances_ids=[], **kwargs):
+    def get_submissions(self, format_type=INSTANCE_FORMAT_TYPE_JSON, instance_ids=[], **kwargs):
         """
         Retrieves submissions through Postgres or Mongo depending on `format_type`.
         It can be filtered on instances ids.
 
         :param format_type: str. INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
-        :param instances_ids: list. Ids of instances to retrieve
+        :param instance_ids: list. Ids of instances to retrieve
         :param kwargs: dict. Filter parameters for Mongo query. See
             https://docs.mongodb.com/manual/reference/operator/query/
         :return: list: mixed
@@ -523,9 +505,9 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         submissions = []
 
         if format_type == INSTANCE_FORMAT_TYPE_JSON:
-            submissions = self.__get_submissions_in_json(instances_ids, **kwargs)
+            submissions = self.__get_submissions_in_json(instance_ids, **kwargs)
         elif format_type == INSTANCE_FORMAT_TYPE_XML:
-            submissions = self.__get_submissions_in_xml(instances_ids, **kwargs)
+            submissions = self.__get_submissions_in_xml(instance_ids, **kwargs)
         else:
             raise BadFormatException(
                 "The format {} is not supported".format(format_type)
@@ -583,26 +565,25 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         url = self.submission_list_url
         data = data.copy()  # Need to get a copy to update the dict
 
+        if method == 'DELETE':
+            data['reset'] = True
+
         # `PATCH` KC even if kpi receives `DELETE`
         kc_request = requests.Request(method='PATCH', url=url, json=data)
         kc_response = self.__kobocat_proxy_request(kc_request, user)
         return self.__prepare_as_drf_response_signature(kc_response)
 
-    def _calculated_submission_count(self, **kwargs):
-        return MongoHelper.get_count(self.mongo_userform_id, **kwargs)
-
-    def __get_submissions_in_json(self, instances_ids=[], **kwargs):
+    def __get_submissions_in_json(self, instance_ids=[], **kwargs):
         """
         Retrieves instances directly from Mongo.
 
-        :param instances_ids: list. Optional
+        :param instance_ids: list. Optional
         :param kwargs: dict. Filter params
         :return: generator<JSON>
         """
 
-        kwargs['instances_ids'] = instances_ids
-        instances, total_count = MongoHelper.get_instances(self.mongo_userform_id,
-                                                           **kwargs)
+        kwargs["instance_ids"] = instance_ids
+        params = self.validate_submission_list_params(**kwargs)
 
         self.current_submissions_count = total_count
 
@@ -611,17 +592,17 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             for instance in instances
         )
 
-    def __get_submissions_in_xml(self, instances_ids=[], **kwargs):
+    def __get_submissions_in_xml(self, instance_ids=[], **kwargs):
         """
         Retrieves instances directly from Postgres.
 
-        :param instances_ids: list. Optional
+        :param instance_ids: list. Optional
         :param kwargs: dict. Filter params
         :return: list<XML>
         """
 
         sort = {'id': 1}
-        kwargs['instances_ids'] = instances_ids
+        kwargs['instance_ids'] = instance_ids
 
         if 'fields' in kwargs:
             raise ValueError(_('`Fields` param is not supported with XML format'))
@@ -638,7 +619,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             # We use Mongo to retrieve matching instances.
             # Get only their ids and pass them to PostgreSQL.
             params['fields'] = ['_id']
-            instances_ids = [instance.get('_id') for instance in
+            instance_ids = [instance.get('_id') for instance in
                              MongoHelper.get_instances(self.mongo_userform_id, **params)]
 
         queryset = ReadOnlyKobocatInstance.objects.filter(
@@ -646,8 +627,8 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             deleted_at=None
         )
 
-        if len(instances_ids) > 0 or use_mongo:
-            queryset = queryset.filter(id__in=instances_ids)
+        if len(instance_ids) > 0 or use_mongo:
+            queryset = queryset.filter(id__in=instance_ids)
 
         self.current_submissions_count = queryset.count()
 
@@ -716,4 +697,3 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 }
 
         return prepared_drf_response
-
