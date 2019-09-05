@@ -241,6 +241,13 @@ export var dataInterface;
       });
     },
 
+    getCollectionPermissions(uid) {
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/collections/${uid}/permissions/`,
+        method: 'GET'
+      });
+    },
+
     bulkSetAssetPermissions(assetUid, perms) {
       return $ajax({
         url: `${ROOT_URL}/api/v2/assets/${assetUid}/permission-assignments/bulk/`,
@@ -265,6 +272,16 @@ export var dataInterface;
     assignAssetPermission(assetUid, perm) {
       return $ajax({
         url: `${ROOT_URL}/api/v2/assets/${assetUid}/permissions/`,
+        method: 'POST',
+        data: JSON.stringify(perm),
+        dataType: 'json',
+        contentType: 'application/json'
+      });
+    },
+
+    assignCollectionPermission(uid, perm) {
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/collections/${uid}/permissions/`,
         method: 'POST',
         data: JSON.stringify(perm),
         dataType: 'json',
