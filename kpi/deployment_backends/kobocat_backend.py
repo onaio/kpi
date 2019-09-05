@@ -723,7 +723,9 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         # FIXME. Use Mongo to sort data and ask PostgreSQL to follow the order.
         # See. https://stackoverflow.com/a/867578
         if 'sort' in kwargs:
-            raise ValueError(_('`sort` param is not supported with XML format'))
+            raise serializers.ValidationError({
+                'sort': _('This param is not supported in `XML` format')
+            })
 
         # Because `kwargs`' values are for `Mongo`'s query engine
         # We still use MongoHelper to validate params.

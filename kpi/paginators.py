@@ -28,9 +28,6 @@ class DataPagination(LimitOffsetPagination):
 
 class Paginated(LimitOffsetPagination):
 
-    """ Adds 'root' to the wrapping response object. """
-    root = SerializerMethodField('get_parent_url', read_only=True)
-
     def get_parent_url(self, obj):
         return reverse_lazy('api-root', request=self.context.get('request'))
 
