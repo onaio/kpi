@@ -491,6 +491,30 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         )
         return url
 
+    def get_submission(self, pk, format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
+        """
+        Returns submission if `pk` exists otherwise `None`
+
+        Args:
+            pk (int). Primary key. Must be a positive integer
+            format_type (str): INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
+            kwargs (dict): Filters to pass to MongoDB. See
+                https://docs.mongodb.com/manual/reference/operator/query/
+
+        Returns:
+            (dict|str|`None`): Depending of `format_type`, it can return:
+                - Mongo JSON representation as a dict
+                - Instance's XML as string
+                - `None` if doesn't exist
+        """
+
+        submissions = list(self.get_submissions(format_type, [int(pk)], **kwargs))
+        try:
+            return submissions[0]
+        except IndexError:
+            pass
+        return None
+
     def get_submissions(self, format_type=INSTANCE_FORMAT_TYPE_JSON, instance_ids=[], **kwargs):
         """
         Retrieves submissions through Postgres or Mongo depending on `format_type`.
