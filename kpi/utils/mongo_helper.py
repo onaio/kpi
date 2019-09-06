@@ -375,7 +375,8 @@ class MongoHelper:
             # Retrieve all fields except `cls.USERFORM_ID`
             fields_to_select = {cls.USERFORM_ID: 0}
 
-        return settings.MONGO_DB.instances.find(query, fields_to_select)
+        cursor = settings.MONGO_DB.instances.find(query, fields_to_select)
+        return cursor, cursor.count()
 
     @classmethod
     def _is_attribute_encoded(cls, key):

@@ -47,7 +47,7 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         :param request:
         :return:
         """
-<<<<<<< HEAD
+
         try:
             instance_id = positive_int(
                 request.data.get('instance_id'), strict=True)
@@ -56,13 +56,12 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
                 {'instance_id': _('A positive integer is required.')})
 
         # Check if instance really belongs to Asset.
-=======
-        instance_id = request.data.get("instance_id")
-        if instance_id is None:
             raise serializers.ValidationError(
-                {'instance_id': _('This field is required.')})
+                {'instance_id': _('A positive integer is required.')})
 
->>>>>>> Moved the filtering logic of partial permissions into `get_submissions()`
+
+        # Check if instance really belongs to Asset.
+
         try:
             instance = self.asset.deployment.get_submission(instance_id,
                                                             request.user.id)
@@ -79,13 +78,9 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
             response_status_code = status.HTTP_202_ACCEPTED
             response = {
                 "detail": _(
-<<<<<<< HEAD
+
                     "We got and saved your data, but may not have "
                     "fully processed it. You should not try to resubmit.")
-=======
-                    "We got and saved your data, but may not have fully "
-                    "processed it. You should not try to resubmit.")
->>>>>>> Moved the filtering logic of partial permissions into `get_submissions()`
             }
         else:
             # call_services() refused to launch any task because this
