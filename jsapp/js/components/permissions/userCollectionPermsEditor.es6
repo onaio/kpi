@@ -6,31 +6,20 @@ import autoBind from 'react-autobind';
 import Reflux from 'reflux';
 import Checkbox from 'js/components/checkbox';
 import TextBox from 'js/components/textBox';
-<<<<<<< HEAD
 import {stores} from 'js/stores';
 import {actions} from 'js/actions';
 import {bem} from 'js/bem';
-=======
-import stores from 'js/stores';
-import actions from 'js/actions';
-import bem from 'js/bem';
-import classNames from 'classnames';
->>>>>>> update calls, some fixes left to be made
 import permConfig from './permConfig';
 import {
   t,
   notify,
   buildUserUrl
 } from 'js/utils';
-<<<<<<< HEAD
 import {
   ANON_USERNAME,
   PERMISSIONS_CODENAMES,
   COLLECTION_PERMISSIONS
 } from 'js/constants';
-=======
-import {PERMISSIONS_CODENAMES} from 'js/constants';
->>>>>>> update calls, some fixes left to be made
 
 /**
  * Form for adding/changing user permissions for collections.
@@ -89,7 +78,7 @@ class UserCollectionPermissionsEditor extends React.Component {
   }
 
   componentDidMount() {
-<<<<<<< HEAD
+
     this.listenTo(actions.permissions.assignCollectionPermission.completed, this.onChangeCollectionPermissionCompleted);
     this.listenTo(actions.permissions.assignCollectionPermission.failed, this.onChangeCollectionPermissionFailed);
     this.listenTo(actions.permissions.removeCollectionPermission.completed, this.onChangeCollectionPermissionCompleted);
@@ -98,14 +87,11 @@ class UserCollectionPermissionsEditor extends React.Component {
   }
 
   onChangeCollectionPermissionCompleted() {
-=======
-    this.listenTo(actions.permissions.assignCollectionPermission.completed, this.onAssignCollectionPermissionCompleted);
-    this.listenTo(actions.permissions.assignCollectionPermission.failed, this.onAssignCollectionPermissionFailed);
+
     this.listenTo(stores.userExists, this.onUserExistsStoreChange);
   }
 
-  onAssignCollectionPermissionCompleted() {
->>>>>>> update calls, some fixes left to be made
+  onChangeCollectionPermissionCompleted() {
     this.setState({isSubmitPending: false});
     if (typeof this.props.onSubmitEnd === 'function') {
       this.props.onSubmitEnd(true);
