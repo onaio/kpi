@@ -83,11 +83,6 @@ export class DataTable extends React.Component {
           filterQuery += ',';
       });
       filterQuery += '}';
-      dataInterface.getSubmissions(this.props.asset.uid, pageSize, page, sort, [], filterQuery, true).done((data) => {
-        this.setState({resultsTotal: data.count});
-      });
-    } else {
-      this.setState({resultsTotal: this.props.asset.deployment__submission_count});
     }
 
     dataInterface.getSubmissions(this.props.asset.uid, pageSize, page, sort, [], filterQuery).done((data) => {
@@ -105,7 +100,8 @@ export class DataTable extends React.Component {
           selectedRows: {},
           selectAll: false,
           tableData: results,
-          submissionPager: false
+          submissionPager: false,
+          resultsTotal: data.count
         });
         this._prepColumns(results);
       } else {
@@ -113,7 +109,8 @@ export class DataTable extends React.Component {
           this.setState({
             loading: false,
             selectedRows: {},
-            tableData: results
+            tableData: results,
+            resultsTotal: 0
           });
         } else {
           this.setState({error: t('This project has no submitted data. ' +

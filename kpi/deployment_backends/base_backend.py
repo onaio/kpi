@@ -6,8 +6,10 @@ import json
 
 from bson import json_util, ObjectId
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import exceptions
+from rest_framework import exceptions, serializers
 from rest_framework.pagination import _positive_int as positive_int
+
+from kpi.constants import INSTANCE_FORMAT_TYPE_XML, INSTANCE_FORMAT_TYPE_JSON
 
 
 class BaseDeploymentBackend(object):
@@ -25,15 +27,43 @@ class BaseDeploymentBackend(object):
     def delete(self):
         self.asset._deployment_data.clear()
 
-    @classmethod
-    def validate_submission_list_params(cls, **kwargs):
+    def validate_submission_list_params(self,
+                                        requesting_user_id,
+                                        format_type=INSTANCE_FORMAT_TYPE_JSON,
+                                        count=False,
+                                        **kwargs):
         """
-        Ensure types of query and each param
+        Ensure types of query and each param.
 
-        :param query: dict
-        :param kwargs: dict
-        :return: dict
+        Args:
+            requesting_user_id (int)
+            format_type (str): INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
+            count (bool): If `True`, ignores `start`, `limit`, `fields` & `sort`
+            kwargs (dict): Can contain
+                - start
+                - limit
+                - sort
+                - fields
+                - query
+                - instance_ids
+
+
+        Returns:
+            dict
         """
+
+        if count is False and format_type == INSTANCE_FORMAT_TYPE_XML:
+            if 'sort' in kwargs:
+                # FIXME. Use Mongo to sort data and ask PostgreSQL to follow the order.
+                # See. https://stackoverflow.com/a/867578
+                raise serializers.ValidationError({
+                    'sort': _('This param is not supported in `XML` format')
+                })
+
+            if 'fields' in kwargs:
+                raise serializers.ValidationError({
+                    'fields': _('This is not supported in `XML` format')
+                })
 
         start = kwargs.get('start', 0)
         limit = kwargs.get('limit')
@@ -41,7 +71,6 @@ class BaseDeploymentBackend(object):
         fields = kwargs.get('fields', [])
         query = kwargs.get('query', {})
         instance_ids = kwargs.get('instance_ids', [])
-        permission_filters = kwargs.get('permission_filters')
 
         # I've copied these `ValidationError` messages verbatim from DRF where
         # possible. TODO: Should this validation be in (or called directly by)
@@ -51,29 +80,49 @@ class BaseDeploymentBackend(object):
             try:
                 query = json.loads(query, object_hook=json_util.object_hook)
             except ValueError:
-                raise exceptions.ValidationError(
+                raise serializers.ValidationError(
                     {'query': _('Value must be valid JSON.')}
                 )
+
+        if not isinstance(instance_ids, list):
+            raise serializers.ValidationError(
+                {'instance_ids': _('Value must be a list.')}
+            )
+
+        # This error should not be returned as `ValidationError` to user.
+        # We want to return a 500.
+        try:
+            permission_filters = self.asset.get_filters_for_partial_perm(
+                requesting_user_id)
+        except ValueError:
+            raise ValueError(_('Invalid `requesting_user_id` param'))
+
+        if count:
+            return {
+                'query': query,
+                'instance_ids': instance_ids,
+                'permission_filters': permission_filters
+            }
 
         if isinstance(sort, basestring):
             try:
                 sort = json.loads(sort, object_hook=json_util.object_hook)
             except ValueError:
-                raise exceptions.ValidationError(
+                raise serializers.ValidationError(
                     {'sort': _('Value must be valid JSON.')}
                 )
 
         try:
             start = positive_int(start)
         except ValueError:
-            raise exceptions.ValidationError(
+            raise serializers.ValidationError(
                 {'start': _('A positive integer is required.')}
             )
         try:
             if limit is not None:
                 limit = positive_int(limit, strict=True)
         except ValueError:
-            raise exceptions.ValidationError(
+            raise serializers.ValidationError(
                 {'limit': _('A positive integer is required.')}
             )
 
@@ -81,7 +130,7 @@ class BaseDeploymentBackend(object):
             try:
                 fields = json.loads(fields, object_hook=json_util.object_hook)
             except ValueError:
-                raise exceptions.ValidationError(
+                raise serializers.ValidationError(
                     {'fields': _('Value must be valid JSON.')}
                 )
 
@@ -104,17 +153,11 @@ class BaseDeploymentBackend(object):
 
     def calculated_submission_count(self, requesting_user_id, **kwargs):
 
-        # Add extra filters to narrow down results in case requesting user has
-        # only partial permissions
-        kwargs.update({
-            'permission_filters': self.asset.get_filters_for_partial_perm(
-                requesting_user_id),
-            'requesting_user_id': requesting_user_id,  # For unittests
-        })
-        params = self.validate_submission_list_params(**kwargs)
-        # Remove useless property for count
-        for useless_property in ['fields', 'start', 'limit', 'sort']:
-            params.pop(useless_property, None)
+        params = self.validate_submission_list_params(requesting_user_id,
+                                                      count=True,
+                                                      **kwargs)
+        if self.__class__.__name__ == 'MockDeploymentBackend':
+            params['requesting_user_id'] = requesting_user_id
 
         return self._calculated_submission_count(**params)
 

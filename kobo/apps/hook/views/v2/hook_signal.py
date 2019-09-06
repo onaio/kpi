@@ -50,11 +50,14 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         :param request:
         :return:
         """
-        instance_id = request.data.get("instance_id")
-        if instance_id is None:
+        try:
+            instance_id = positive_int(
+                request.data.get('instance_id'), strict=True)
+        except ValueError:
             raise serializers.ValidationError(
-                {'instance_id': _('This field is required.')})
+                {'instance_id': _('A positive integer is required.')})
 
+        # Check if instance really belongs to Asset.
         try:
             instance = self.asset.deployment.get_submission(instance_id,
                                                             request.user.id)
@@ -71,8 +74,8 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
             response_status_code = status.HTTP_202_ACCEPTED
             response = {
                 "detail": _(
-                    "We got and saved your data, but may not have fully "
-                    "processed it. You should not try to resubmit.")
+                    "We got and saved your data, but may not have "
+                    "fully processed it. You should not try to resubmit.")
             }
         else:
             # call_services() refused to launch any task because this

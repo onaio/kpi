@@ -491,6 +491,34 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         )
         return url
 
+    def get_submission(self, pk, requesting_user_id,
+                       format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
+        """
+        Returns submission if `pk` exists otherwise `None`
+
+        Args:
+            pk (int): Submission's primary key
+            requesting_user_id (int)
+            format_type (str): INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
+            kwargs (dict): Filters to pass to MongoDB. See
+                https://docs.mongodb.com/manual/reference/operator/query/
+
+        Returns:
+            (dict|str|`None`): Depending of `format_type`, it can return:
+                - Mongo JSON representation as a dict
+                - Instance's XML as string
+                - `None` if doesn't exist
+        """
+
+        submissions = list(self.get_submissions(requesting_user_id,
+                                                format_type, [int(pk)],
+                                                **kwargs))
+        try:
+            return submissions[0]
+        except IndexError:
+            pass
+        return None
+
     def get_submissions(self, requesting_user_id,
                         format_type=INSTANCE_FORMAT_TYPE_JSON,
                         instance_ids=[], **kwargs):
@@ -512,49 +540,20 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 - `None` if no results
         """
 
-        # Add extra filters to narrow down results in case requesting user has
-        # only partial permissions
-        kwargs.update({
-            'permission_filters': self.asset.get_filters_for_partial_perm(
-                requesting_user_id)
-        })
+        kwargs['instance_ids'] = instance_ids
+        params = self.validate_submission_list_params(requesting_user_id,
+                                                      format_type,
+                                                      **kwargs)
 
         if format_type == INSTANCE_FORMAT_TYPE_JSON:
-            submissions = self.__get_submissions_in_json(instance_ids, **kwargs)
+            submissions = self.__get_submissions_in_json(**params)
         elif format_type == INSTANCE_FORMAT_TYPE_XML:
-            submissions = self.__get_submissions_in_xml(instance_ids, **kwargs)
+            submissions = self.__get_submissions_in_xml(**params)
         else:
             raise BadFormatException(
                 "The format {} is not supported".format(format_type)
             )
         return submissions
-
-    def get_submission(self, pk, requesting_user_id,
-                       format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
-        """
-        Returns submission if `pk` exists otherwise `None`
-        Args:
-            pk (int): Primary key. Must be a positive integer
-            requesting_user_id (int)
-            format_type (str): INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
-            kwargs (dict): Filters to pass to MongoDB. See
-                https://docs.mongodb.com/manual/reference/operator/query/
-        Returns:
-            (dict|str|`None`): Depending of `format_type`, it can return:
-                - Mongo JSON representation as a dict
-                - Instance's XML as string
-                - `None` if doesn't exist
-        """
-
-        if pk:
-            submissions = list(self.get_submissions(requesting_user_id,
-                                                    format_type, [int(pk)],
-                                                    **kwargs))
-            if len(submissions) > 0:
-                return submissions[0]
-            return None
-        else:
-            raise ValueError(_('Primary key must be provided'))
 
     def get_validation_status(self, submission_pk, params, user):
         url = self.get_submission_validation_status_url(submission_pk)
@@ -616,7 +615,6 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         """
         Retrieves instances directly from Mongo.
 
-        :param instance_ids: list. Optional
         :param kwargs: dict. Filter params
         :return: generator<JSON>
         """
@@ -631,11 +629,10 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             for instance in instances
         )
 
-    def __get_submissions_in_xml(self, instance_ids=[], **kwargs):
+    def __get_submissions_in_xml(self, **params):
         """
         Retrieves instances directly from Postgres.
 
-        :param instance_ids: list. Optional
         :param kwargs: dict. Filter params
         :return: list<XML>
         """
@@ -659,8 +656,11 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         params = self.validate_submission_list_params(**kwargs)
 
         mongo_filters = ['query', 'permission_filters']
-        use_mongo = any(mongo_filter in mongo_filters for mongo_filter in kwargs
-                        if kwargs.get(mongo_filter) is not None)
+        use_mongo = any(mongo_filter in mongo_filters for mongo_filter in params
+                        if params.get(mongo_filter) is not None)
+
+        print('USE MONGO')
+        print(use_mongo)
 
         if use_mongo:
             # We use Mongo to retrieve matching instances.

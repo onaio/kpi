@@ -106,6 +106,55 @@ class SubmissionApiTests(BaseSubmissionTestCase):
         self.assertEqual(response.data.get('results'), self.submissions)
         self.assertEqual(response.data.get('count'), len(self.submissions))
 
+    def test_list_submissions_owner_with_params(self):
+        """
+        The mock backend doesn't support all of these parameters, but we can at
+        least check that they pass through
+        `BaseDeploymentBackend.validate_submission_list_params()` without error
+        """
+        response = self.client.get(
+            self.submission_url, {
+                'format': 'json',
+                'start': 1,
+                'limit': 1,
+                'sort': '{"dummy": -1}',
+                'fields': '{"dummy": 1}',
+                'query': '{"dummy": "make me a match"}',
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_list_submissions_limit(self):
+        limit = settings.SUBMISSION_LIST_LIMIT
+        excess = 10
+        asset = Asset.objects.create(
+            name='Lots of submissions',
+            owner=self.asset.owner,
+            content={'survey': [{'name': 'q', 'type': 'integer'}]},
+        )
+        asset.deploy(backend='mock', active=True)
+        submissions = [
+            {
+                '__version__': asset.latest_deployed_version.uid,
+                'q': i,
+            } for i in range(limit + excess)
+        ]
+        asset.deployment.mock_submissions(submissions)
+        # Server-wide limit should apply if no limit specified
+        response = self.client.get(
+            asset.deployment.submission_list_url, {'format': 'json'}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), limit)
+        # Limit specified in query parameters should not be able to exceed
+        # server-wide limit
+        response = self.client.get(
+            asset.deployment.submission_list_url,
+            {'limit': limit + excess, 'format': 'json'}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), limit)
+
     def test_list_submissions_not_shared_other(self):
         self._other_user_login()
         response = self.client.get(self.submission_url, {"format": "json"})
