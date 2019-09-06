@@ -158,7 +158,7 @@ class ServiceDefinitionInterface(object):
         # In case of failure, it should be HTML (or plaintext), we can remove tags
         try:
             json.loads(message)
-        except ValueError as e:
+        except ValueError:
             message = re.sub(r"<[^>]*>", " ", message).strip()
 
         log.message = message
