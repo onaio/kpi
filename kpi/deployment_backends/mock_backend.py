@@ -4,6 +4,7 @@ from __future__ import (unicode_literals, print_function,
 
 import re
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from rest_framework import status
 
@@ -144,16 +145,34 @@ class MockDeploymentBackend(BaseDeploymentBackend):
         self.store_data({"submissions": submissions})
         self.asset.save(create_version=False)
 
-    def get_submissions(self, format_type=INSTANCE_FORMAT_TYPE_JSON, instances_ids=[], **kwargs):
+    def get_submissions(self, requesting_user_id,
+                        format_type=INSTANCE_FORMAT_TYPE_JSON,
+                        instance_ids=[], **kwargs):
         """
-        Returns a list of json representation of instances.
+        Retrieves submissions on `format_type`.
+        It can be filtered on instances ids.
 
-        :param format_type: str. xml or json
-        :param instances_ids: list. Ids of instances to retrieve
-        :return: list
+        Args:
+            requesting_user_id (int)
+            format_type (str): INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
+            instance_ids (list): Instance ids to retrieve
+            kwargs (dict): Filters to pass to MongoDB. See
+                https://docs.mongodb.com/manual/reference/operator/query/
+
+        Returns:
+            (dict|str|`None`): Depending of `format_type`, it can return:
+                - Mongo JSON representation as a dict
+                - Instances' XML as string
+                - `None` if no results
         """
+
         submissions = self.asset._deployment_data.get("submissions", [])
-        permission_filters = kwargs.get('permission_filters')
+
+        # Add extra filters to narrow down results in case requesting user has
+        # only partial permissions.
+        permission_filters = kwargs.get('permission_filters',
+                                        self.asset.get_filters_for_partial_perm(
+                                            requesting_user_id))
 
         if len(instances_ids) > 0:
             if format_type == INSTANCE_FORMAT_TYPE_XML:
@@ -162,13 +181,8 @@ class MockDeploymentBackend(BaseDeploymentBackend):
                 submissions = [submission for submission in submissions
                                if re.search(r"<id>({})<\/id>".format(pattern), submission)]
             else:
-                submissions = [submission for submission in submissions if submission.get("id") in
-                               map(int, instances_ids)]
-
-        params = self.validate_submission_list_params(**kwargs)
-        # TODO: support other query parameters?
-        if 'limit' in params:
-            submissions = submissions[:params['limit']]
+                submissions = [submission for submission in submissions
+                               if submission.get("id") in map(int, instance_ids)]
 
         if permission_filters:
             submitted_by = [k.get('_submitted_by') for k in permission_filters]
@@ -184,9 +198,11 @@ class MockDeploymentBackend(BaseDeploymentBackend):
 
         return submissions
 
-    def get_submission(self, pk, format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
+    def get_submission(self, pk, requesting_user_id,
+                       format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
         if pk:
-            submissions = list(self.get_submissions(format_type, [pk], **kwargs))
+            submissions = list(self.get_submissions(requesting_user_id,
+                                                    format_type, [pk], **kwargs))
             if len(submissions) > 0:
                 return submissions[0]
             return None
@@ -194,7 +210,8 @@ class MockDeploymentBackend(BaseDeploymentBackend):
             raise ValueError("Primary key must be provided")
 
     def get_validation_status(self, submission_pk, params, user):
-        submission = self.get_submission(submission_pk, INSTANCE_FORMAT_TYPE_JSON)
+        submission = self.get_submission(submission_pk, user.id,
+                                         INSTANCE_FORMAT_TYPE_JSON)
         return {
             "data": submission.get("_validation_status")
         }
@@ -215,9 +232,15 @@ class MockDeploymentBackend(BaseDeploymentBackend):
         })
 
     def _calculated_submission_count(self, **kwargs):
+
         kwargs.update({
             'start': 0,
             'limit': None,
         })
-        instances = self.get_submissions(**kwargs)
+        # Because `BaseDeploymentBackend.calculated_submission_count()` doesn't
+        # provide `requesting_user_id` but `permission_filters`.
+        # Only `MockBackend` needs it at this moment. We force
+        # anonymous user to ensure that it has no permissions.
+
+        instances = self.get_submissions(settings.ANONYMOUS_USER_ID, **kwargs)
         return len(instances)

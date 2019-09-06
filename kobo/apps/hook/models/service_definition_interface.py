@@ -31,7 +31,8 @@ class ServiceDefinitionInterface(object):
         """
         try:
             submission = self._hook.asset.deployment.get_submission(
-                self._instance_id, self._hook.export_type)
+                self._instance_id, self._hook.asset.owner.id,
+                self._hook.export_type)
             return self._parse_data(submission, self._hook.subset_fields)
         except Exception as e:
             logging.error("service_json.ServiceDefinition._get_data "

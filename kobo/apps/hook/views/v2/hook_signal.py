@@ -4,7 +4,7 @@ from __future__ import (division, print_function, absolute_import,
 
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, serializers
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import _positive_int as positive_int
@@ -50,17 +50,14 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         :param request:
         :return:
         """
-        try:
-            instance_id = positive_int(
-                request.data.get('instance_id'), strict=True)
-        except ValueError:
-            raise ValidationError(
-                {'instance_id': _('A positive integer is required.')})
+        instance_id = request.data.get("instance_id")
+        if instance_id is None:
+            raise serializers.ValidationError(
+                {'instance_id': _('This field is required.')})
 
-        # Check if instance really belongs to Asset.
         try:
-            instance_id = request.data.get("instance_id")
-            instance = self.asset.deployment.get_submission(instance_id)
+            instance = self.asset.deployment.get_submission(instance_id,
+                                                            request.user.id)
         except ValueError:
             raise Http404
 
@@ -74,8 +71,8 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
             response_status_code = status.HTTP_202_ACCEPTED
             response = {
                 "detail": _(
-                    "We got and saved your data, but may not have "
-                    "fully processed it. You should not try to resubmit.")
+                    "We got and saved your data, but may not have fully "
+                    "processed it. You should not try to resubmit.")
             }
         else:
             # call_services() refused to launch any task because this

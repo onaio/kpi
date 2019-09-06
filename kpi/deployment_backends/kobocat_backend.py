@@ -491,42 +491,33 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         )
         return url
 
-    def get_submission(self, pk, format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
+    def get_submissions(self, requesting_user_id,
+                        format_type=INSTANCE_FORMAT_TYPE_JSON,
+                        instance_ids=[], **kwargs):
         """
-        Returns submission if `pk` exists otherwise `None`
+        Retrieves submissions through Postgres or Mongo depending on `format_type`.
+        It can be filtered on instances ids.
 
         Args:
-            pk (int). Primary key. Must be a positive integer
+            requesting_user_id (int)
             format_type (str): INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
+            instance_ids (list): Instance ids to retrieve
             kwargs (dict): Filters to pass to MongoDB. See
                 https://docs.mongodb.com/manual/reference/operator/query/
 
         Returns:
             (dict|str|`None`): Depending of `format_type`, it can return:
                 - Mongo JSON representation as a dict
-                - Instance's XML as string
-                - `None` if doesn't exist
+                - Instances' XML as string
+                - `None` if no results
         """
 
-        submissions = list(self.get_submissions(format_type, [int(pk)], **kwargs))
-        try:
-            return submissions[0]
-        except IndexError:
-            pass
-        return None
-
-    def get_submissions(self, format_type=INSTANCE_FORMAT_TYPE_JSON, instance_ids=[], **kwargs):
-        """
-        Retrieves submissions through Postgres or Mongo depending on `format_type`.
-        It can be filtered on instances ids.
-
-        :param format_type: str. INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
-        :param instance_ids: list. Ids of instances to retrieve
-        :param kwargs: dict. Filter parameters for Mongo query. See
-            https://docs.mongodb.com/manual/reference/operator/query/
-        :return: list: mixed
-        """
-        submissions = []
+        # Add extra filters to narrow down results in case requesting user has
+        # only partial permissions
+        kwargs.update({
+            'permission_filters': self.asset.get_filters_for_partial_perm(
+                requesting_user_id)
+        })
 
         if format_type == INSTANCE_FORMAT_TYPE_JSON:
             submissions = self.__get_submissions_in_json(instance_ids, **kwargs)
@@ -536,7 +527,34 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             raise BadFormatException(
                 "The format {} is not supported".format(format_type)
             )
-        return submissions_kobocat_request
+        return submissions
+
+    def get_submission(self, pk, requesting_user_id,
+                       format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
+        """
+        Returns submission if `pk` exists otherwise `None`
+        Args:
+            pk (int): Primary key. Must be a positive integer
+            requesting_user_id (int)
+            format_type (str): INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
+            kwargs (dict): Filters to pass to MongoDB. See
+                https://docs.mongodb.com/manual/reference/operator/query/
+        Returns:
+            (dict|str|`None`): Depending of `format_type`, it can return:
+                - Mongo JSON representation as a dict
+                - Instance's XML as string
+                - `None` if doesn't exist
+        """
+
+        if pk:
+            submissions = list(self.get_submissions(requesting_user_id,
+                                                    format_type, [int(pk)],
+                                                    **kwargs))
+            if len(submissions) > 0:
+                return submissions[0]
+            return None
+        else:
+            raise ValueError(_('Primary key must be provided'))
 
     def get_validation_status(self, submission_pk, params, user):
         url = self.get_submission_validation_status_url(submission_pk)
