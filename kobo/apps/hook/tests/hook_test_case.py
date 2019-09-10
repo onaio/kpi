@@ -100,11 +100,8 @@ class HookTestCase(KpiTestCase):
 
         ServiceDefinition = self.hook.get_service_definition()
         submissions = self.asset.deployment.get_submissions(self.asset.owner.id)
-<<<<<<< HEAD
+
         instance_id = submissions[0].get(self.asset.deployment.INSTANCE_ID_FIELDNAME)
-=======
-        instance_id = submissions[0].get("id")
->>>>>>> Moved the filtering logic of partial permissions into `get_submissions()`
         service_definition = ServiceDefinition(self.hook, instance_id)
         first_mock_response = {'error': 'not found'}
 

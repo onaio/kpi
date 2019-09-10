@@ -2,6 +2,7 @@
 import json
 
 from dicttoxml import dicttoxml
+from django.utils.six import text_type
 from rest_framework import renderers
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
