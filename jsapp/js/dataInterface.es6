@@ -85,9 +85,18 @@ var dataInterface;
     },
     createAssetSnapshot (data) {
       return $ajax({
-        url: url,
+        url: `${ROOT_URL}/api/v2/asset_snapshots/`,
         method: 'POST',
         data: data
+      });
+    },
+    createTemporaryAssetSnapshot ({source}) {
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/asset_snapshots/`,
+        method: 'POST',
+        data: {
+          source: source
+        }
       });
     },
 
@@ -166,15 +175,6 @@ var dataInterface;
 
       return $ajax({
         url: `${ROOT_URL}/reports/${data.uid}/${identifierString}`,
-      });
-    },
-    createTemporaryAssetSnapshot ({source}) {
-      return $ajax({
-        url: url,
-        method: 'POST',
-        data: {
-          source: source
-        }
       });
     },
     cloneAsset ({uid, name, version_id, new_asset_type}) {
