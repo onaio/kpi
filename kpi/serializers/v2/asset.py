@@ -319,6 +319,16 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
                                                    many=True, read_only=True,
                                                    context=context).data
 
+    def get_assignable_permissions(self, asset):
+        return [
+            {
+                'url': reverse('permission-detail',
+                               kwargs={'codename': codename},
+                               request=self.context.get('request')),
+                'label': asset.get_label_for_permission(codename),
+            }
+        for codename in asset.assignable_permissions]
+
     def get_permissions(self, obj):
         context = self.context
         request = self.context.get('request')
