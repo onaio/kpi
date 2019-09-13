@@ -222,9 +222,7 @@ class AssetVersionApiTests(BaseTestCase):
 class AssetsDetailApiTests(BaseAssetTestCase):
     fixtures = ['test_data']
 
-    def __init__(self, *args, **kwargs):
-        self.URL_NAMESPACE = ROUTER_URL_NAMESPACE
-        return super(AssetsDetailApiTests, self).__init__(*args, **kwargs)
+    URL_NAMESPACE = ROUTER_URL_NAMESPACE
 
     def setUp(self):
         self.client.login(username='someuser', password='someuser')
