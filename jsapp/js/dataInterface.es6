@@ -233,7 +233,7 @@ export var dataInterface;
 
     getCollectionPermissions(uid) {
       return $ajax({
-        url: `${ROOT_URL}/api/v2/collections/${uid}/permissions/`,
+        url: `${ROOT_URL}/api/v2/collections/${uid}/permission-assignments/`,
         method: 'GET'
       });
     },
@@ -261,7 +261,7 @@ export var dataInterface;
 
     assignAssetPermission(assetUid, perm) {
       return $ajax({
-        url: `${ROOT_URL}/api/v2/assets/${assetUid}/permissions/`,
+        url: `${ROOT_URL}/api/v2/assets/${assetUid}/permission-assignments/`,
         method: 'POST',
         data: JSON.stringify(perm),
         dataType: 'json',
@@ -271,7 +271,7 @@ export var dataInterface;
 
     assignCollectionPermission(uid, perm) {
       return $ajax({
-        url: `${ROOT_URL}/api/v2/collections/${uid}/permissions/`,
+        url: `${ROOT_URL}/api/v2/collections/${uid}/permission-assignments/`,
         method: 'POST',
         data: JSON.stringify(perm),
         dataType: 'json',
