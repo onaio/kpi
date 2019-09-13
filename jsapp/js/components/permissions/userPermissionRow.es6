@@ -88,9 +88,16 @@ class UserPermissionRow extends React.Component {
           }
 
           let permName = '???';
-          if (this.props.assignablePerms.has(perm.permission)) {
-            permName = this.props.assignablePerms.get(perm.permission);
+          // TODO after collection is meged with asset simplify this
+          if (this.props.kind === ASSET_KINDS.get('asset')) {
+            if (this.props.assignablePerms.has(perm.permission)) {
+              permName = this.props.assignablePerms.get(perm.permission);
+            }
           }
+          if (this.props.kind === ASSET_KINDS.get('collection')) {
+            permName = COLLECTION_PERMISSIONS[permConfig.getPermission(perm.permission).codename];
+          }
+          // ENDTODO
 
           // Hopefully this is friendly to translators of RTL languages
           let permNameTemplate;
