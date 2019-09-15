@@ -77,7 +77,8 @@ class SharingForm extends React.Component {
 
     this.setState({
       permissions: parsedPerms,
-      nonOwnerPerms: nonOwnerPerms
+      nonOwnerPerms: nonOwnerPerms,
+      publicPerms: publicPerms
     });
   }
 
