@@ -270,6 +270,11 @@ class ObjectPermission(models.Model):
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
 
+    @void_cache_for_request(keys=('__get_all_object_permissions',
+                                  '__get_all_user_permissions',))
+    def delete(self, *args, **kwargs):
+        super(self, ObjectPermission).delete(*args, **kwargs)
+
     def __unicode__(self):
         for required_field in ('user', 'permission'):
             if not hasattr(self, required_field):

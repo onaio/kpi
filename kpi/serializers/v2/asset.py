@@ -337,11 +337,12 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
                                request=self.context.get('request')),
                 'label': asset.get_label_for_permission(codename),
             }
-        for codename in asset.ASSIGNABLE_PERMISSIONS_BY_TYPE[asset.asset_type]]
+            for codename in asset.ASSIGNABLE_PERMISSIONS_BY_TYPE[asset.asset_type]]
 
     def get_permissions(self, obj):
         context = self.context
         request = self.context.get('request')
+
         queryset = ObjectPermissionHelper.get_assignments_queryset(obj,
                                                                    request.user)
         # Need to pass `asset` and `asset_uid` to context of
