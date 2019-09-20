@@ -348,8 +348,8 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         # Need to pass `asset` and `asset_uid` to context of
         # AssetPermissionAssignmentSerializer serializer to avoid extra queries to DB
         # within the serializer to retrieve the asset object.
-        context.update({'asset': obj})
-        context.update({'asset_uid': obj.uid})
+        context['asset'] = obj
+        context['asset_uid'] = obj.uid
 
         return AssetPermissionAssignmentSerializer(queryset.all(),
                                                    many=True, read_only=True,
