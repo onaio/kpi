@@ -205,15 +205,20 @@ SKIP_HEAVY_MIGRATIONS = os.environ.get('SKIP_HEAVY_MIGRATIONS', 'False') == 'Tru
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+
+kobocat_database_url = os.getenv("KC_DATABASE_URL", "sqlite:///%s/db.sqlite3" % BASE_DIR)
+
 DATABASES = {
     'default': dj_database_url.config(default="sqlite:///%s/db.sqlite3" % BASE_DIR),
     'kobocat': dj_database_url.config(default="sqlite:///%s/db.sqlite3" % BASE_DIR),
 }
 
-# Tmp hack to point DB to kc_kobo @to-Do remove when kobo-docker supports it
-DATABASES['kobocat']['NAME'] = "kc_kobo"
+USE_SAME_DATABASE = DATABASES['default'] == DATABASES['kobocat']
 
-DATABASE_ROUTERS = ["kpi.db_routers.DefaultDatabaseRouter"]
+DATABASE_ROUTERS = ['kpi.db_routers.DefaultDatabaseRouter']
+if USE_SAME_DATABASE is True:
+    DATABASE_ROUTERS = ['kpi.db_routers.SingleDatabaseRouter']
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
