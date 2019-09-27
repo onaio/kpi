@@ -568,7 +568,6 @@ actions.map.setMapStyles.listen(function(assetUid, mapStyles) {
 
 
 actions.resources.createResource.listen(function(details){
-  console.log("details", details);
   dataInterface.createResource(details)
     .done(function(asset){
       actions.resources.createResource.completed(asset);
