@@ -20,6 +20,8 @@ import {
   t,
   notify,
   replaceSupportEmail,
+  redirectForAuthentication,
+  checkCookieExists,
 } from './utils';
 
 // Configure Reflux
@@ -364,6 +366,7 @@ actions.resources.listTags.completed.listen(function(results){
 });
 
 actions.resources.updateAsset.listen(function(uid, values, params={}) {
+<<<<<<< HEAD
   dataInterface.patchAsset(uid, values)
     .done((asset) => {
       actions.resources.updateAsset.completed(asset);
@@ -378,6 +381,40 @@ actions.resources.updateAsset.listen(function(uid, values, params={}) {
         params.onFailed(resp);
       }
     });
+=======
+  if (checkCookieExists("__kpi_formbuilder")) {
+    redirectForAuthentication();
+} else {
+  return new Promise(function(resolve, reject){
+    dataInterface.patchAsset(uid, values)
+      .done(function(asset){
+        actions.resources.updateAsset.completed(asset);
+        resolve(asset);
+      })
+      .fail(function(...args){
+        reject(args)
+      });
+  }).then(function(asset) {
+    var has_deployment = asset.has_deployment;
+    dataInterface.deployAsset(asset, has_deployment)
+      .done((data) => {
+        if (has_deployment) {
+          notify(t('Successfully updated published form.'));
+        } else {
+          notify(t('Successfully published form.'));
+        }
+      })
+      .fail((data) => {
+        if (data.status === 500) {
+          alertify.error(t('Please add at least one question.'));
+        } else {
+          alertify.error(t(data.responseText));
+        }
+      });
+    return asset
+  })
+}
+>>>>>>> Include modifications to get kpi able to create and edit forms
 });
 
 actions.resources.deployAsset.listen(function(asset, redeployment, params={}){
@@ -531,6 +568,7 @@ actions.map.setMapStyles.listen(function(assetUid, mapStyles) {
 
 
 actions.resources.createResource.listen(function(details){
+  console.log("details", details);
   dataInterface.createResource(details)
     .done(function(asset){
       actions.resources.createResource.completed(asset);

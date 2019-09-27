@@ -276,6 +276,9 @@ export class FormLanding extends React.Component {
     var chosenMethod = this.state.selectedCollectMethod;
 
     var kc_server = document.createElement('a');
+    console.log(">>> START - this.state: ")
+    console.log(this.state)
+    console.log(">>> STOP - this.state: ")
     kc_server.href = this.state.deployment__identifier;
     var kobocollect_url = kc_server.origin;
 

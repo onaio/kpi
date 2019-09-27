@@ -12,7 +12,7 @@ import AssetRow from './assetrow';
 import DocumentTitle from 'react-document-title';
 import $ from 'jquery';
 import Dropzone from 'react-dropzone';
-import {t, validFileTypes} from '../utils';
+import {t, validFileTypes, ONA_TITLE} from '../utils';
 import {ASSET_TYPES} from '../constants';
 
 class SearchCollectionList extends Reflux.Component {
@@ -203,7 +203,7 @@ class SearchCollectionList extends Reflux.Component {
       docTitle = t('Library');
     }
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
         <Dropzone
           onDrop={this.dropFiles}
           disableClick

@@ -20,7 +20,7 @@ import ReportViewItem from './reportViewItem';
 import {
   assign,
   t,
-  launchPrinting
+  ONA_TITLE,
 } from '../utils';
 
 function labelVal(label, value) {
@@ -1153,7 +1153,7 @@ class Reports extends React.Component {
     const hasGroupBy = this.state.groupBy.length !== 0;
 
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
         <bem.FormView m={formViewModifiers}>
           <bem.ReportView>
             {this.renderReportButtons()}
