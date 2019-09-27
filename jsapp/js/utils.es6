@@ -12,8 +12,11 @@ import clonedeep from 'lodash.clonedeep';
 import moment from 'moment';
 import alertify from 'alertifyjs';
 import {Cookies} from 'react-cookie';
+import {getAuthUrl} from './config';
 
 export const LANGUAGE_COOKIE_NAME = 'django_language';
+
+export const ONA_TITLE = 'Ona';
 
 export var assign = require('object-assign');
 
@@ -25,6 +28,15 @@ const cookies = new Cookies();
 
 export function notify(msg, atype='success') {
   alertify.notify(msg, atype);
+}
+
+export function checkCookieExists(cookieName) {
+  return document.cookie.indexOf(cookieName) < 0;
+}
+
+export function redirectForAuthentication() {
+  var current_url = encodeURIComponent(window.location.href);
+  window.location = getAuthUrl(current_url);
 }
 
 export function formatTime(timeStr) {

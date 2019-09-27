@@ -18,6 +18,7 @@ import {
   t,
   log,
   stringToColor,
+  ONA_TITLE,
 } from '../utils';
 
 export class AccountSettings extends React.Component {
@@ -182,7 +183,7 @@ export class AccountSettings extends React.Component {
     };
 
     return (
-      <DocumentTitle title={`${accountName} | KoboToolbox`}>
+      <DocumentTitle title={`${accountName} | ${ONA_TITLE}`}>
       <ui.Panel>
         <bem.AccountSettings>
           <bem.AccountSettings__item m={'column'}>

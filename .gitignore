@@ -25,3 +25,4 @@ celerybeat-schedule
 deployments.json
 .DS_Store
 jsapp/fonts
+kobo/settings/local_settings.py

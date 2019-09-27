@@ -91,6 +91,7 @@ pyquery==1.4.0
 python-dateutil==2.7.5
 python-digest==1.7
 pytz==2018.9
+PyJWT==1.4.0
 pyxform==0.13.1
 redis==3.2.0
 requests==2.21.0

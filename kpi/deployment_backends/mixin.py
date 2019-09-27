@@ -54,14 +54,14 @@ class DeployableMixin:
 
     @property
     def has_deployment(self):
-        return 'backend' in self._deployment_data
+        return 'backend_response' in self._deployment_data
 
     @property
     def deployment(self):
         if not self.has_deployment:
             raise Exception('must call asset.connect_deployment first')
         try:
-            backend = self._deployment_data['backend']
+            backend = self._deployment_data["backend"]
             return DEPLOYMENT_BACKENDS[backend](self)
         except KeyError as e:
             raise KeyError('cannot retrieve asset backend: {}'.format(backend))

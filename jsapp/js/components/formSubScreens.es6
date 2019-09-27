@@ -60,6 +60,7 @@ export class FormSubScreens extends React.Component {
 
     if (this.state.uid != undefined) {
       if (this.state.deployment__identifier != undefined) {
+        console.log(">>>> deployment__identifier is missing.")
         deployment__identifier = this.state.deployment__identifier;
         report__base = deployment__identifier.replace('/forms/', '/reports/');
       }

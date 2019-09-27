@@ -17,7 +17,10 @@ import {
   unnullifyTranslations,
   assign,
   t,
-  koboMatrixParser
+  koboMatrixParser, 
+  ONA_TITLE,
+  checkCookieExists,
+  redirectForAuthentication
 } from '../utils';
 import {
   ASSET_TYPES,
@@ -337,6 +340,7 @@ export default assign({
   },
 
   saveForm(evt) {
+    // debugger;
     if (evt && evt.preventDefault) {
       evt.preventDefault();
     }
@@ -703,7 +707,7 @@ export default assign({
             <bem.FormBuilderHeader__button
               m={['preview', {previewdisabled: previewDisabled}]}
               onClick={this.previewForm}
-              disabled={previewDisabled}
+              // disabled={previewDisabled}
               data-tip={t('Preview form')}
             >
               <i className='k-icon-view' />
@@ -917,10 +921,13 @@ export default assign({
   },
 
   render() {
+    if (checkCookieExists("__kpi_formbuilder")) {
+      redirectForAuthentication();
+  } else {
     var docTitle = this.state.name || t('Untitled');
 
     return (
-      <DocumentTitle title={`${docTitle} | KoboToolbox`}>
+      <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
         <ui.Panel m={['transparent', 'fixed']}>
           {this.renderAside()}
 
@@ -935,44 +942,36 @@ export default assign({
               </div>
             </bem.FormBuilder__contents>
           </bem.FormBuilder>
-
-          {this.state.enketopreviewOverlay &&
-            <ui.Modal
-              open
-              large
-              onClose={this.hidePreview}
-              title={t('Form Preview')}
-            >
-              <ui.Modal.Body>
-                <div className='enketo-holder'>
+            { this.state.enketopreviewOverlay ?
+              <ui.Modal open large
+                  onClose={this.hidePreview} title={t('Form Preview')}>
+                <ui.Modal.Body>
                   <iframe src={this.state.enketopreviewOverlay} />
-                </div>
-              </ui.Modal.Body>
-            </ui.Modal>
-          }
+                </ui.Modal.Body>
+              </ui.Modal>
 
-          {!this.state.enketopreviewOverlay && this.state.enketopreviewError &&
-            <ui.Modal
-              open
-              error
-              onClose={this.clearPreviewError}
-              title={t('Error generating preview')}
-            >
-              <ui.Modal.Body>{this.state.enketopreviewError}</ui.Modal.Body>
-            </ui.Modal>
-          }
+            : (
+                this.state.enketopreviewError ?
+                  <ui.Modal open error
+                      onClose={this.clearPreviewError} title={t('Error generating preview')}>
+                    <ui.Modal.Body>
+                      {this.state.enketopreviewError}
+                    </ui.Modal.Body>
+                  </ui.Modal>
+                : null
+              ) }
+            {this.state.showCascadePopup ?
+              <ui.Modal open onClose={this.hideCascade} title={t('Import Cascading Select Questions')}>
+                <ui.Modal.Body>
+                  {this.renderCascadePopup()}
+                </ui.Modal.Body>
+              </ui.Modal>
 
-          {this.state.showCascadePopup &&
-            <ui.Modal
-              open
-              onClose={this.hideCascade}
-              title={t('Import Cascading Select Questions')}
-            >
-              <ui.Modal.Body>{this.renderCascadePopup()}</ui.Modal.Body>
-            </ui.Modal>
-          }
-        </ui.Panel>
-      </DocumentTitle>
-    );
-  },
+            : null}
+
+          </ui.Panel>
+        </DocumentTitle>
+      );
+  }
+},
 }, cascadeMixin);
