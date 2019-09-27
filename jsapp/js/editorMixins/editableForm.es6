@@ -340,7 +340,6 @@ export default assign({
   },
 
   saveForm(evt) {
-    // debugger;
     if (evt && evt.preventDefault) {
       evt.preventDefault();
     }
