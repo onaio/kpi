@@ -14,7 +14,8 @@ import alertify from 'alertifyjs';
 import {Cookies} from 'react-cookie';
 import {getAuthUrl} from './config';
 // imporitng whole constants, as we override ROOT_URL in tests
-import constants from 'js/constants';
+import {constants} from 'js/constants';
+import {getAuthUrl} from './config';
 
 export const LANGUAGE_COOKIE_NAME = 'django_language';
 

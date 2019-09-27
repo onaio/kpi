@@ -244,10 +244,10 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         #   to query a boolean than string.
         # Don't forget to run Management Command `populate_kc_xform_kpi_asset_uid`
         payload = {
+            u'kpi_asset_uid': self.asset.uid,
             u'published_by_formbuilder': True,
-            'downloadable': active,
-            'has_kpi_hook': self.asset.has_active_hooks,
-            'kpi_asset_uid': self.asset.uid
+            u"downloadable": active,
+            u"has_kpi_hook": self.asset.has_active_hooks,
         }
         files = {'xls_file': ('{}.xls'.format(id_string), xls_io)}
         json_response = self._kobocat_request(
@@ -578,7 +578,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             raise BadFormatException(
                 "The format {} is not supported".format(format_type)
             )
-        return submissions
+        return submissions_kobocat_request
 
     def get_validation_status(self, submission_pk, params, user):
         url = self.get_submission_validation_status_url(submission_pk)

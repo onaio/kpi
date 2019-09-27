@@ -53,12 +53,22 @@ import {
 } from './utils';
 import {keymap} from './keymap';
 import { ShortcutManager, Shortcuts } from 'react-shortcuts';
+const shortcutManager = new ShortcutManager(keymap);
 import LibrarySearchableList from './lists/library';
 import FormsSearchableList from './lists/forms';
 
-const shortcutManager = new ShortcutManager(keymap);
-
 import {getZebraLoginUrl} from './config';
+
+
+function stringifyRoutes(contextRouter) {
+  return JSON.stringify(contextRouter.getCurrentRoutes().map(function(r){
+    return {
+      name: r.name,
+      href: r.path
+    };
+  }), null, 4);
+}
+
 
 class App extends React.Component {
   constructor(props) {
@@ -357,13 +367,7 @@ export default class RunRoutes extends React.Component {
     );
   }
 }
-<<<<<<< HEAD
-
-export default RunRoutes;
-
 
 var RedirectToOna = function() {
   window.location = getZebraLoginUrl()
 }
-=======
->>>>>>> update exports

@@ -20,7 +20,7 @@ import ReportViewItem from './reportViewItem';
 import {
   assign,
   t,
-  launchPrinting
+  launchPrinting,
 } from '../utils';
 import {WEB_PAGE_TITLE} from '../config';
 

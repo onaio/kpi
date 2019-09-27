@@ -228,6 +228,7 @@ export default assign({
   },
 
   saveForm(evt) {
+    // debugger;
     if (evt && evt.preventDefault) {
       evt.preventDefault();
     }
@@ -536,8 +537,6 @@ export default assign({
     return (
       <bem.FormBuilderHeader>
         <bem.FormBuilderHeader__row m='primary'>
-<<<<<<< HEAD
-=======
           <bem.FormBuilderHeader__cell
             m={'logo'}
             data-tip={t('Return to list')}
@@ -548,7 +547,6 @@ export default assign({
             <i className='k-icon-kobo' />
           </bem.FormBuilderHeader__cell>
 
->>>>>>> Added boxes to all tabbable elements
           <bem.FormBuilderHeader__cell m={'name'} >
             <bem.FormModal__item>
               {nameFieldLabel &&

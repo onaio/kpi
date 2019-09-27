@@ -70,6 +70,7 @@ def replace_with_autofields(content):
             row['name'] = _auto
 
 
+
 def to_xlsform_structure(surv,
                          deprecated_autoname=False,
                          extract_rank_and_score=True,
