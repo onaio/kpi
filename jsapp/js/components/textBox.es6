@@ -9,6 +9,7 @@
  * - label <string>
  * - placeholder <string>
  * - description <string>
+ * - readOnly <boolean>
  *
  * TODO: would be best to move it to `jsapp/js/components/generic` directory.
  */
@@ -45,6 +46,9 @@ class TextBox extends React.Component {
   }
 
   onChange(evt) {
+    if (this.props.readOnly) {
+      return;
+    }
     this.props.onChange(evt.currentTarget.value);
   }
 
@@ -96,18 +100,15 @@ class TextBox extends React.Component {
           </bem.TextBox__label>
         }
 
-        {this.props.type === 'text-multiline' &&
-          <TextareaAutosize
-            className='text-box__input'
-            {...inputProps}
-          />
-        }
-        {this.props.type !== 'text-multiline' &&
-          <bem.TextBox__input
-            type={type}
-            {...inputProps}
-          />
-        }
+        <bem.TextBox__input
+          type={type}
+          value={this.props.value}
+          placeholder={this.props.placeholder}
+          onChange={this.onChange}
+          readOnly={this.props.readOnly}
+          onBlur={this.onBlur}
+          onKeyPress={this.onKeyPress}
+        />
 
         {this.props.description &&
           <bem.TextBox__description>
