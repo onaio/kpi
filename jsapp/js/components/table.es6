@@ -33,6 +33,14 @@ const NOT_ASSIGNED = 'validation_status_not_assigned';
 
 export const SUBMISSION_LINKS_ID = '__SubmissionLinks';
 
+const renderCheckbox = (id, label, isImportant) => {
+  let additionalClass = '';
+  if (isImportant) {
+    additionalClass += 'alertify-toggle-important';
+  }
+  return `<div class="alertify-toggle checkbox ${additionalClass}"><label class="checkbox__wrapper"><input type="checkbox" class="checkbox__input" id="${id}"><span class="checkbox__label">${label}</span></label></div>`;
+};
+
 export class DataTable extends React.Component {
   constructor(props){
     super(props);
