@@ -13,6 +13,8 @@ import {bem} from 'js/bem';
 
 const AUDIT_HELP_URL = 'http://support.kobotoolbox.org/en/articles/2648050-audit-logging-meta-question-type';
 
+const AUDIT_HELP_URL = 'http://support.kobotoolbox.org/en/articles/2648050-audit-logging-meta-question-type';
+
 /**
  * @prop {object} survey
  * @prop {function} onChange
@@ -79,6 +81,20 @@ export default class MetadataEditor extends React.Component {
   getAuditParameters() {
     const metaProp = this.getMetaProperty(META_QUESTION_TYPES.get('audit'));
     return metaProp.parameters;
+  }
+
+  renderAuditInputLabel() {
+    return (
+      <React.Fragment>
+        {t('Audit settings')}
+        <bem.TextBox__labelLink
+          href={AUDIT_HELP_URL}
+          target='_blank'
+        >
+          <i className='k-icon k-icon-help'/>
+        </bem.TextBox__labelLink>
+      </React.Fragment>
+    );
   }
 
   renderAuditInputLabel() {
