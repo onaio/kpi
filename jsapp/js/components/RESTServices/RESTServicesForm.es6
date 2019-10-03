@@ -115,14 +115,10 @@ export default class RESTServicesForm extends React.Component {
    * helpers
    */
 
-  amIBeingCalled(){
-    console.log('am i being called');
-  }
-
   updatePreview() {
     console.log('updatePreview called');
     document.getElementById("chatInput").onkeyup = function() {
-      document.getElementById("printChatInput").innerHTML = '"' + document.getElementById("chatInput").innerHTML + '": {';
+      document.getElementById("printChatInput").innerHTML = '"' + document.getElementById("chatInput").value + '": {';
     }
   }
 
@@ -392,7 +388,7 @@ export default class RESTServicesForm extends React.Component {
   }
 
   renderCustomWrapper() {
-
+    console.log('value: ' + this.state.customWrapper);
     return(
       <bem.FormModal__item m='http-headers'>
         <label>
@@ -400,8 +396,11 @@ export default class RESTServicesForm extends React.Component {
         </label>
         <input
           type='text'
-          placeholder={t('Add field')}
+          placeholder={t('Add Custom Wrapper')}
           id='chatInput'
+          value={this.state.customWrapper.toString}
+          errors={this.state.customWrapperError}
+          onChange={this.handleCustomWrapperChange.bind(this)}
         />
 
         <p>Example:</p>
