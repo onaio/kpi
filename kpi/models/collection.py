@@ -135,7 +135,11 @@ class CollectionChildrenQuerySet:
         return repr(data)
 
     def __getitem__(self, k):
+<<<<<<< HEAD
         if not isinstance(k, (slice, int)):
+=======
+        if not isinstance(k, (slice, integer_types)):
+>>>>>>> Re-applied python3 rules after merge
             raise TypeError
         assert ((not isinstance(k, slice) and (k >= 0))
                 or (isinstance(k, slice) and (k.start is None or k.start >= 0)

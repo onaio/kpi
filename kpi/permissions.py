@@ -1,6 +1,7 @@
 # coding: utf-8
 from django.http import Http404
 from rest_framework import exceptions, permissions
+from six import add_metaclass
 
 from kpi.models.asset import Asset
 from kpi.models.asset_user_partial_permission import AssetUserPartialPermission

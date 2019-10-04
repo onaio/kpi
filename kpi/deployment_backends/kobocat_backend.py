@@ -43,6 +43,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         # if only the owner has permissions, no need to go further
         if len(users_with_perms) == 1 and \
                 list(users_with_perms)[0].id == self.asset.owner_id:
+<<<<<<< HEAD
             return
 
         for user, perms in users_with_perms.items():
@@ -61,6 +62,8 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         # if only the owner has permissions, no need to go further
         if len(users_with_perms) == 1 and \
                 users_with_perms.keys()[0].id == self.asset.owner_id:
+=======
+>>>>>>> Re-applied python3 rules after merge
             return
 
         for user, perms in users_with_perms.items():

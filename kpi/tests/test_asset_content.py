@@ -7,8 +7,8 @@ from kpi.utils.sluggify import sluggify_label
 
 from django.utils.six import string_types
 
-from kpi.models import Asset
 from formpack.utils.future import OrderedDict
+from kpi.models import Asset
 from kpi.utils.sluggify import sluggify_label
 
 
