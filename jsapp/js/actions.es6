@@ -73,7 +73,7 @@ actions.auth = Reflux.createActions({
 });
 
 actions.survey = Reflux.createActions({
-  addItemAtPosition: {
+  addExternalItemAtPosition: {
     children: [
       'completed',
       'failed'
