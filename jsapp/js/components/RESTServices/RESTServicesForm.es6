@@ -115,13 +115,6 @@ export default class RESTServicesForm extends React.Component {
    * helpers
    */
 
-  updatePreview() {
-    console.log('updatePreview called');
-    document.getElementById("chatInput").onkeyup = function() {
-      document.getElementById("printChatInput").innerHTML = '"' + document.getElementById("chatInput").value + '": {';
-    }
-  }
-
   getEmptyHeaderRow() {
     return {name: '', value: ''};
   }
@@ -232,6 +225,7 @@ export default class RESTServicesForm extends React.Component {
     if (this.state.authPassword) {
       data.settings.password = this.state.authPassword;
     }
+    console.log('payload_template: ' + data.payload_template); 
     return data;
   }
 
@@ -385,32 +379,6 @@ export default class RESTServicesForm extends React.Component {
         </button>
       </bem.FormModal__item>
     );
-  }
-
-  renderCustomWrapper() {
-    console.log('value: ' + this.state.customWrapper + "name: " + this.state.name);
-    return(
-      <bem.FormModal__item m='http-headers'>
-        <label>
-          {t('Add custom wrapper around JSON submission (%SUBMISSION% will be replaced by JSON)')}
-        </label>
-        <input
-          type='text'
-          placeholder={t('Add Custom Wrapper')}
-          id='chatInput'
-          value={this.state.customWrapper}
-          errors={this.state.customWrapperError}
-          onChange={this.handleCustomWrapperChange.bind(this)}
-        />
-
-        <p>Example:</p>
-
-        <label id="printChatInput"> {t('"fields": {')}</label>
-        <label>{t('     %SUBMISSION%')}</label>
-        <label>{t('}')}</label>
-        {/*TODO: Get live updating? Maybe not useful. {this.updatePreview()}*/}
-      </bem.FormModal__item>
-    )
   }
 
   /*
