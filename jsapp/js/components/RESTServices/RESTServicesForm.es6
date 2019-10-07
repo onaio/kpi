@@ -388,7 +388,7 @@ export default class RESTServicesForm extends React.Component {
   }
 
   renderCustomWrapper() {
-    console.log('value: ' + this.state.customWrapper);
+    console.log('value: ' + this.state.customWrapper + "name: " + this.state.name);
     return(
       <bem.FormModal__item m='http-headers'>
         <label>
@@ -398,7 +398,7 @@ export default class RESTServicesForm extends React.Component {
           type='text'
           placeholder={t('Add Custom Wrapper')}
           id='chatInput'
-          value={this.state.customWrapper.toString}
+          value={this.state.customWrapper}
           errors={this.state.customWrapperError}
           onChange={this.handleCustomWrapperChange.bind(this)}
         />
