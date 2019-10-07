@@ -253,11 +253,9 @@ class ApiBulkAssetPermissionTestCase(BaseApiAssetPermissionTestCase):
         permission_list_response = self.client.get(self.asset_permissions_list_url,
                                                    format='json')
         self.assertEqual(permission_list_response.status_code, status.HTTP_200_OK)
-<<<<<<< HEAD
+
         total = len(permission_list_response.data)
-=======
-        total = permission_list_response.data.get('count')
->>>>>>> Renamed nested 'permissions' endpoints to 'permission-assignments'
+
         # Add number of permissions added with 'view_asset'
         total += len(Asset.get_implied_perms(PERM_VIEW_ASSET)) + 1
         # Add number of permissions added with 'change_asset'
@@ -270,9 +268,6 @@ class ApiBulkAssetPermissionTestCase(BaseApiAssetPermissionTestCase):
         ])
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-<<<<<<< HEAD
+
         self.assertEqual(len(response.data), total)
-=======
-        self.assertEqual(response.data.get('count'), total)
->>>>>>> Renamed nested 'permissions' endpoints to 'permission-assignments'
 
