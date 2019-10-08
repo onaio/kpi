@@ -13,12 +13,9 @@ import TextBox from './textBox';
 import Checkbox from './checkbox';
 import ApiTokenDisplay from './apiTokenDisplay';
 import ui from '../ui';
-import $ from 'jquery';
 import {
-  assign,
   t,
-  log,
-  stringToColor
+  stringToColor,
 } from '../utils';
 import {ROOT_URL} from 'js/constants';
 
@@ -30,29 +27,35 @@ export class AccountSettings extends React.Component {
     let state = {
       requireAuth: false,
       fieldsErrors: {}
-    }
+    };
     this.state = state;
     autoBind(this);
+  }
 
-    if (stores.session && stores.session.currentAccount) {
-      this.state = this.getStateFromCurrentAccount(stores.session.currentAccount);
+  rebuildState() {
+    if (
+      stores.session &&
+      stores.session.currentAccount &&
+      stores.session.environment
+    ) {
+      this.setStateFromSession(
+        stores.session.currentAccount,
+        stores.session.environment
+      );
     }
   }
 
   componentDidMount() {
-    this.listenTo(stores.session, ({currentAccount}) => {
-      if (currentAccount) {
-        this.setState(this.getStateFromCurrentAccount(currentAccount));
-      }
-    });
+    this.listenTo(stores.session, this.rebuildState);
+    this.rebuildState();
   }
 
-  getStateFromCurrentAccount(currentAccount) {
-    if (currentAccount.extra_details == undefined) {
+  setStateFromSession(currentAccount, environment) {
+    if (currentAccount.extra_details === undefined) {
       currentAccount.extra_details = {};
     }
 
-    return {
+    this.setState({
       name: currentAccount.extra_details.name,
       email: currentAccount.email,
       organization: currentAccount.extra_details.organization,
@@ -71,9 +74,9 @@ export class AccountSettings extends React.Component {
       instagram: currentAccount.extra_details.instagram,
       metadata: currentAccount.extra_details.metadata,
 
-      languageChoices: stores.session.environment.all_languages,
-      countryChoices: stores.session.environment.available_countries,
-      sectorChoices: stores.session.environment.available_sectors,
+      languageChoices: environment.all_languages,
+      countryChoices: environment.available_countries,
+      sectorChoices: environment.available_sectors,
       genderChoices: [
         {
           value: 'male',
@@ -89,7 +92,7 @@ export class AccountSettings extends React.Component {
         },
       ],
       fieldsErrors: {}
-    };
+    });
   }
 
   updateProfile() {
@@ -122,7 +125,7 @@ export class AccountSettings extends React.Component {
     );
   }
 
-  onUpdateComplete(data) {
+  onUpdateComplete() {
     this.setState({fieldsErrors: {}});
   }
 
@@ -133,7 +136,7 @@ export class AccountSettings extends React.Component {
   handleChange(evt, attr) {
     let val;
     if (evt && evt.target) {
-      if (evt.target.type == 'checkbox') {
+      if (evt.target.type === 'checkbox') {
         val = evt.target.checked;
       } else {
         val = evt.target.value;
@@ -163,7 +166,11 @@ export class AccountSettings extends React.Component {
   metadataChange (e) {this.handleChange(e, 'metadata');}
 
   render() {
-    if(!stores.session || !stores.session.currentAccount) {
+    if(
+      !stores.session ||
+      !stores.session.currentAccount ||
+      !stores.session.environment
+    ) {
       return (
         <ui.Panel>
           <bem.AccountSettings>
@@ -427,7 +434,7 @@ export class AccountSettings extends React.Component {
       </DocumentTitle>
     );
   }
-};
+}
 
 reactMixin(AccountSettings.prototype, Reflux.connect(stores.session, 'session'));
 reactMixin(AccountSettings.prototype, Reflux.ListenerMixin);
@@ -460,7 +467,7 @@ export class ChangePassword extends React.Component {
     this.validateRequired('currentPassword');
     this.validateRequired('newPassword');
     this.validateRequired('verifyPassword');
-    if (this.state.newPassword != this.state.verifyPassword) {
+    if (this.state.newPassword !== this.state.verifyPassword) {
       this.errors['newPassword'] = t('This field must match the Verify Password field.');
     }
     if (Object.keys(this.errors).length === 0) {
@@ -563,7 +570,7 @@ export class ChangePassword extends React.Component {
               />
             </bem.ChangePassword__item>
 
-            <bem.ChangePassword__item  m='actions'>
+            <bem.ChangePassword__item m='actions'>
               <button
                 onClick={this.changePassword}
                 className='mdl-button mdl-button--raised mdl-button--colored'
@@ -576,7 +583,7 @@ export class ChangePassword extends React.Component {
       </ui.Panel>
     );
   }
-};
+}
 
 reactMixin(ChangePassword.prototype, Reflux.connect(stores.session, 'session'));
 reactMixin(ChangePassword.prototype, Reflux.ListenerMixin);
