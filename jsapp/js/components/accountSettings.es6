@@ -535,7 +535,7 @@ export class ChangePassword extends React.Component {
     this.validateRequired('currentPassword');
     this.validateRequired('newPassword');
     this.validateRequired('verifyPassword');
-    if (this.state.newPassword != this.state.verifyPassword) {
+    if (this.state.newPassword !== this.state.verifyPassword) {
       this.errors['newPassword'] = t('This field must match the Verify Password field.');
     }
     if (Object.keys(this.errors).length === 0) {
@@ -638,7 +638,7 @@ export class ChangePassword extends React.Component {
               />
             </bem.ChangePassword__item>
 
-            <bem.ChangePassword__item  m='actions'>
+            <bem.ChangePassword__item m='actions'>
               <button
                 onClick={this.changePassword}
                 className='mdl-button mdl-button--raised mdl-button--colored'
@@ -651,7 +651,7 @@ export class ChangePassword extends React.Component {
       </ui.Panel>
     );
   }
-};
+}
 
 reactMixin(ChangePassword.prototype, Reflux.connect(stores.session, 'session'));
 reactMixin(ChangePassword.prototype, Reflux.ListenerMixin);
