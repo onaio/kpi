@@ -1,14 +1,12 @@
-# coding: utf-8
-from __future__ import (division, print_function, absolute_import,
-                        unicode_literals)
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
-import responses
 from django.conf import settings
 from django.core import mail
 from django_celery_beat.models import PeriodicTask
 from django.template.loader import get_template
 from django.utils import translation, dateparse
-from django_celery_beat.models import PeriodicTask
+import responses
 
 from .hook_test_case import HookTestCase
 from ..tasks import failures_reports
@@ -35,7 +33,7 @@ class EmailTestCase(HookTestCase):
             "email": self.asset.owner.email,
             "language": "en",
             "assets": {
-                self.asset.id: {
+                self.asset.uid: {
                     "name": self.asset.name,
                     "max_length": len(self.hook.name),
                     "logs": [{
@@ -53,7 +51,8 @@ class EmailTestCase(HookTestCase):
 
         variables = {
             "username": expected_record.get("username"),
-            "assets": expected_record.get("assets")
+            "assets": expected_record.get("assets"),
+            'kpi_base_url': settings.KPI_URL
         }
         # Localize templates
         translation.activate(expected_record.get("language"))
