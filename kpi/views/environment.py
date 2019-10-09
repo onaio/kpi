@@ -6,6 +6,9 @@ import constance
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from kobo.static_lists import COUNTRIES, LANGUAGES, SECTORS
+from kobo.apps.hook.constants import SUBMISSION_PLACEHOLDER
+
 
 class EnvironmentView(APIView):
     """ GET-only view for certain server-provided configuration data """
@@ -26,4 +29,10 @@ class EnvironmentView(APIView):
         return Response({
             key.lower(): getattr(constance.config, key)
                 for key in self.CONFIGS_TO_EXPOSE
-        })
+        }
+        data['available_sectors'] = SECTORS
+        data['available_countries'] = COUNTRIES
+        data['all_languages'] = LANGUAGES
+        data['interface_languages'] = settings.LANGUAGES
+        data['submission_placeholder'] = SUBMISSION_PLACEHOLDER
+        return Response(data)
