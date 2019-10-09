@@ -18,6 +18,15 @@ class ServiceDefinition(ServiceDefinitionInterface):
 
         return json.loads(custom_payload)
 
+    def __add_payload_template(self, submission):
+        if not self._hook.payload_template:
+            return submission
+
+        custom_payload = self._hook.payload_template.replace(
+            SUBMISSION_PLACEHOLDER, json.dumps(submission))
+
+        return json.loads(custom_payload)
+
     def _parse_data(self, submission, fields):
 
         if len(fields) > 0:

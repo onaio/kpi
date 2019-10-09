@@ -1,6 +1,8 @@
 # coding: utf-8
 import json
 
+import json
+
 import constance
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
