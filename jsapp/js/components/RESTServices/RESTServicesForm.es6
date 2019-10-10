@@ -225,7 +225,6 @@ export default class RESTServicesForm extends React.Component {
     if (this.state.authPassword) {
       data.settings.password = this.state.authPassword;
     }
-    console.log('payload_template: ' + data.payload_template); 
     return data;
   }
 
@@ -549,9 +548,7 @@ export default class RESTServicesForm extends React.Component {
               { isEditingExistingHook ? t('Save') : t('Create') }
             </bem.Modal__footerButton>
           </bem.Modal__footer>
-          
         </bem.FormModal__form>
-
       );
     }
   }
