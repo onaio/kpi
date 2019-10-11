@@ -14,6 +14,7 @@ import pytz
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
+from rest_framework.authtoken.models import Token
 from django.urls import Resolver404, resolve
 from django.db import models, transaction
 from jsonfield import JSONField
@@ -252,6 +253,19 @@ class ImportTask(ImportExportTask):
         for (orm_obj, parent_item) in collections_to_assign:
             orm_obj.parent = parent_item
             orm_obj.save()
+    
+    def get_form_information(self, survey_dict):
+        '''
+        Get form information via the API
+        '''
+        url = '{}/api/v1/forms/{}'.format(
+            settings.KOBOCAT_INTERNAL_URL, self.data['filename'])
+        token, _ = Token.objects.get_or_create(user=self.user)
+
+        response = requests.get(url, headers={'Authorization': 'Token ' + token.key})
+
+        return response
+
 
     def _parse_b64_upload(self, base64_encoded_upload, messages, **kwargs):
         filename = kwargs.get('filename', False)
@@ -263,6 +277,12 @@ class ImportTask(ImportExportTask):
         library = kwargs.get('library')
         survey_dict = _b64_xls_to_dict(base64_encoded_upload)
         survey_dict_keys = survey_dict.keys()
+
+        form_info = self.get_form_information(survey_dict)
+
+        json_response = form_info.json()
+        json_response['has_id_string_changed'] = False
+
 
         destination = kwargs.get('destination', False)
         destination_kls = kwargs.get('destination_kls', False)
@@ -313,6 +333,21 @@ class ImportTask(ImportExportTask):
             else:
                 asset = destination
                 asset.content = survey_dict
+                server = settings.KOBOCAT_URL
+                username = asset.owner.username
+                id_string = asset.name
+                identifier = '{server}/{username}/forms/{id_string}'.format(
+                        server=server,
+                        username=username,
+                        id_string=id_string,
+                    )
+                asset._deployment_data.update({
+                'backend': 'kobocat',
+                'identifier': identifier,
+                'active': json_response['downloadable'],
+                'backend_response': json_response,
+                'version': asset.version_id,
+                })
                 asset.save()
                 msg_key = 'updated'
 
