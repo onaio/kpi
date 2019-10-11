@@ -179,7 +179,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 )
             server = settings.KOBOCAT_URL
             username = self.asset.owner.username
-            id_string = self.asset.uid
+            id_string = self.asset.name
             identifier = '{server}/{username}/forms/{id_string}'.format(
                 server=server,
                 username=username,
