@@ -33,14 +33,6 @@ const NOT_ASSIGNED = 'validation_status_not_assigned';
 
 export const SUBMISSION_LINKS_ID = '__SubmissionLinks';
 
-const renderCheckbox = (id, label, isImportant) => {
-  let additionalClass = '';
-  if (isImportant) {
-    additionalClass += 'alertify-toggle-important';
-  }
-  return `<div class="alertify-toggle checkbox ${additionalClass}"><label class="checkbox__wrapper"><input type="checkbox" class="checkbox__input" id="${id}"><span class="checkbox__label">${label}</span></label></div>`;
-};
-
 export class DataTable extends React.Component {
   constructor(props){
     super(props);
@@ -824,7 +816,6 @@ export class DataTable extends React.Component {
           this.fetchData(this.state.fetchState, this.state.fetchInstance);
           dialog.destroy();
         }).fail((jqxhr) => {
-          console.error(jqxhr);
           alertify.error(t('Failed to update status.'));
           dialog.destroy();
         });
@@ -892,7 +883,6 @@ export class DataTable extends React.Component {
           this.fetchData(this.state.fetchState, this.state.fetchInstance);
           dialog.destroy();
         }).fail((jqxhr) => {
-          console.error(jqxhr);
           alertify.error(t('Failed to delete submissions.'));
           dialog.destroy();
         });
