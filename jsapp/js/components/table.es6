@@ -816,6 +816,7 @@ export class DataTable extends React.Component {
           this.fetchData(this.state.fetchState, this.state.fetchInstance);
           dialog.destroy();
         }).fail((jqxhr) => {
+          console.error(jqxhr);
           alertify.error(t('Failed to update status.'));
           dialog.destroy();
         });
@@ -883,6 +884,7 @@ export class DataTable extends React.Component {
           this.fetchData(this.state.fetchState, this.state.fetchInstance);
           dialog.destroy();
         }).fail((jqxhr) => {
+          console.error(jqxhr);
           alertify.error(t('Failed to delete submissions.'));
           dialog.destroy();
         });
