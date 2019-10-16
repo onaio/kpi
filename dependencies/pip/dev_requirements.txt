@@ -45,6 +45,7 @@ django-markitup==4.0.0    # via -r dependencies/pip/requirements.in
 django-mptt==0.10.0       # via -r dependencies/pip/requirements.in
 django-oauth-toolkit==1.2.0  # via -r dependencies/pip/requirements.in
 django-picklefield==2.0   # via django-constance
+<<<<<<< HEAD
 django-private-storage==2.2.1  # via -r dependencies/pip/requirements.in
 django-redis-sessions==0.6.1  # via -r dependencies/pip/requirements.in
 django-registration-redux==2.6  # via -r dependencies/pip/requirements.in
@@ -52,6 +53,16 @@ django-request-cache==1.2  # via -r dependencies/pip/requirements.in
 django-reversion==3.0.1   # via -r dependencies/pip/requirements.in
 django-storages==1.7.2    # via -r dependencies/pip/requirements.in
 django-taggit==1.1.0      # via -r dependencies/pip/requirements.in
+=======
+django-private-storage==2.2
+django-redis-sessions==0.6.1
+django-registration-redux==2.6
+django-request-cache==1.1
+django-reversion==3.0.1
+django-ses==0.8.12
+django-storages==1.7.2
+django-taggit==0.24.0
+>>>>>>> Updated `django-registration-redux` to latest version
 django-timezone-field==3.1  # via django-celery-beat
 django-userforeignkey==0.3.0  # via django-request-cache
 django-webpack-loader==0.6.0  # via -r dependencies/pip/requirements.in

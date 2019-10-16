@@ -13,6 +13,13 @@ if [[ -z $DATABASE_URL ]]; then
     exit 1
 fi
 
+<<<<<<< HEAD
+=======
+# ToDo Removed this comment when we're sure `syncdb` is not needed
+# Removed in Django 1.9 in favor of `python manage.py migrate`
+# echo 'Synchronizing database.'
+# python manage.py syncdb --noinput
+>>>>>>> Updated `django-registration-redux` to latest version
 
 # Wait for databases to be up & running before going further
 /bin/bash "${INIT_PATH}/wait_for_mongo.bash"

@@ -27,12 +27,19 @@ dj-static
 dj-database-url
 django-braces
 django-constance[database]
-django-cors-headers<3 # 3.0.0 dropped support for Last Python2 support: 3.0.2
+django-cors-headers<3 # 3.0.0 dropped support for Python2 support
 django-debug-toolbar<2 # Last Python2 support: 1.11
 django-extensions
+<<<<<<< HEAD
 django-oauth-toolkit
 django-registration-redux
 django-amazon-ses
+=======
+django-jsonbfield
+django-oauth-toolkit<1.1.1 # Last Python2 support: 1.1.0
+django-registration-redux
+django-ses
+>>>>>>> Updated `django-registration-redux` to latest version
 django-webpack-loader
 django-loginas
 django-markdownx
