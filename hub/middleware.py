@@ -2,11 +2,8 @@
 from __future__ import (division, print_function, absolute_import,
                         unicode_literals)
 
-from django.conf import settings
-from django.http import HttpResponseRedirect
+from django.utils.deprecation import MiddlewareMixin
 
-from hub.views import switch_builder
-from .models import FormBuilderPreference
 
 
 class OtherFormBuilderRedirectMiddleware(object):
