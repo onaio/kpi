@@ -4,66 +4,25 @@
 #
 #    make pip_compile
 #
-<<<<<<< HEAD
--e git+https://github.com/dimagi/django-digest@0eb1c921329dd187c343b61acfbec4e98450136e#egg=django_digest
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
--e git+https://github.com/kobotoolbox/formpack.git@eb7d723eb2b54dbfd56a1c32d72e0008bbb29149#egg=formpack
-amqp==1.4.9
-=======
 -e git+https://github.com/dimagi/django-digest@52ba7edeb326efd97d5670273bb6fa8b0539e501#egg=django_digest
 -e git+https://github.com/jnm/django-haystack@3a3b04564e189c11fdc20a4be43e360b5396708c#egg=django_haystack
 -e git+https://github.com/kobotoolbox/formpack.git@45a49bbcc794c6ac3756afe04a4f851c3da9219d#egg=formpack
-=======
--e git+https://github.com/kobotoolbox/formpack.git@dc54b4184bfbc26dd1b9358d3ae19bca68fbe63f#egg=formpack
-=======
--e git+https://github.com/kobotoolbox/formpack.git@1124a98c59aaf8ed25a1276042bece688a01553c#egg=formpack
->>>>>>> Use Formpack.future.OrderedDict instead of recreating the same code
 -e git+https://github.com/jnm/geojson-rewind@0.1.1+py2.jnm#egg=geojson-rewind
-<<<<<<< HEAD
->>>>>>> Added __future__ imports to all files
-=======
--e git+https://github.com/kobotoolbox/formpack.git@200-geojson-export#egg=formpack
-=======
 -e git+https://github.com/kobotoolbox/formpack.git@7bd244c43c1da64d13fd152974fa6d7b392f279c#egg=formpack
->>>>>>> Update formpack requirement
--e git+https://github.com/jnm/geojson-rewind@0.1.1+py2.jnm#egg=geojson-rewind
->>>>>>> Update formpack; add geojson-rewind requirement
+
 amqp==2.4.0
->>>>>>> Support Django 1.11
 anyjson==0.3.3
 argparse==1.4.0           # via unittest2
 asn1crypto==0.24.0        # via cryptography
-<<<<<<< HEAD
-<<<<<<< HEAD
-atomicwrites==1.3.0       # via pytest
-attrs==18.2.0             # via pytest
-=======
 backports.csv==1.0.7
->>>>>>> Added __future__ imports to all files
-=======
-=======
 amqp==2.5.1
 anyjson==0.3.3
 argparse==1.4.0           # via unittest2
 asn1crypto==1.2.0         # via cryptography
 attrs==19.3.0             # via jsonschema
->>>>>>> - Updated dependencies to latest version which support Python 2.7 and Django 1.11.
 backports.csv==1.0.7
->>>>>>> Update formpack; add geojson-rewind requirement
 backports.os==0.1.1       # via path.py
 begins==0.9
-<<<<<<< HEAD
-billiard==3.3.0.23
-boto3==1.9.80
-boto==2.49.0
-botocore==1.12.80         # via boto3, s3transfer
-celery==3.1.1
-certifi==2018.11.29       # via requests
-cffi==1.8.3               # via cryptography
-=======
 billiard==3.6.1.0
 boto3==1.9.250
 boto==2.49.0
@@ -71,7 +30,6 @@ botocore==1.12.250        # via boto3, s3transfer
 celery[redis]==4.3.0
 certifi==2019.9.11        # via requests
 cffi==1.13.0              # via cryptography
->>>>>>> - Updated dependencies to latest version which support Python 2.7 and Django 1.11.
 chardet==3.0.4            # via requests
 configparser==4.0.2       # via importlib-metadata
 contextlib2==0.6.0.post1  # via importlib-metadata
@@ -84,25 +42,14 @@ dicttoxml==1.7.4
 dj-database-url==0.5.0
 dj-static==0.0.6
 django-braces==1.13.0
-<<<<<<< HEAD
-django-constance[database]==2.2.0
-<<<<<<< HEAD
-django-cors-headers==2.4.0
-django-debug-toolbar==1.4
-django-extensions==1.6.7
-django-haystack==2.6.0
-=======
 django-debug-toolbar==1.11
 django-extensions==2.1.5
->>>>>>> Support Django 1.11
-=======
 django-celery-beat==1.5.0
 django-constance[database]==2.4.0
 django-cors-headers==2.5.3
 django-debug-toolbar==1.11
 django-extensions==2.2.3
 django-js-asset==1.2.2    # via django-mptt
->>>>>>> - Updated dependencies to latest version which support Python 2.7 and Django 1.11.
 django-jsonbfield==0.1.0
 django-loginas==0.3.6
 django-markdownx==2.0.28
@@ -113,21 +60,13 @@ django-picklefield==2.0   # via django-constance
 django-private-storage==2.2
 django-redis-sessions==0.6.1
 django-registration-redux==1.3
-<<<<<<< HEAD
-django-request-cache==1.0.0
-django-reversion==2.0.8
-django-ses==0.8.9
-django-storages==1.6.5
-django-taggit==0.22.0
-django-toolbelt==0.0.1
-=======
+django-registration-redux==2.6
 django-request-cache==1.1
 django-reversion==3.0.1
 django-ses==0.8.12
 django-storages==1.7.2
 django-taggit==0.24.0
 django-timezone-field==3.1  # via django-celery-beat
->>>>>>> - Updated dependencies to latest version which support Python 2.7 and Django 1.11.
 django-userforeignkey==0.3.0  # via django-request-cache
 django-webpack-loader==0.6.0
 django==1.11.25
@@ -137,14 +76,8 @@ docutils==0.15.2          # via botocore, statistics
 drf-extensions==0.5.0
 enum34==1.1.6             # via cryptography
 formencode==1.3.1         # via pyxform
-<<<<<<< HEAD
 funcsigs==1.0.2           # via begins, mock
 functools32==3.2.3.post2  # via jsonschema, pyxform
-<<<<<<< HEAD
-=======
-funcsigs==1.0.2           # via begins, mock, pytest
-functools32==3.2.3.post2  # via jsonschema
->>>>>>> Support Django 1.11
 future==0.17.1            # via backports.os, django-ses
 futures==3.2.0            # via s3transfer
 gunicorn==19.4.5
@@ -155,7 +88,6 @@ jmespath==0.9.3           # via boto3, botocore
 jsonfield==1.0.3
 jsonschema==2.6.0
 kombu==3.0.37
-=======
 future==0.18.0            # via backports.os, django-ses
 futures==3.3.0            # via s3transfer
 idna==2.8                 # via requests
@@ -165,29 +97,9 @@ jmespath==0.9.4           # via boto3, botocore
 jsonfield==2.0.2
 jsonschema==3.1.1
 kombu==4.6.5
->>>>>>> - Updated dependencies to latest version which support Python 2.7 and Django 1.11.
 linecache2==1.0.0         # via traceback2
 lxml==4.4.1
 markdown==2.6.11
-<<<<<<< HEAD
-mock==2.0.0
-more-itertools==5.0.0     # via pytest
-ndg-httpsclient==0.4.2
-oauthlib==1.0.3
-path.py==11.5.0
-pathlib2==2.3.3           # via importlib-metadata, pytest, pytest-django
-pbr==4.0.2                # via mock
-pillow==5.4.1             # via django-markdownx
-psycopg2==2.7.7           # via django-jsonbfield, django-toolbelt
-py-gfm==0.1.4
-pluggy==0.8.1             # via pytest
-py==1.7.0                 # via pytest
-pyasn1==0.1.9
-pycparser==2.14           # via cffi
-pygments==2.1.3
-pymongo==3.7.2
-pyopenssl==18.0.0
-=======
 mock==3.0.5
 more-itertools==5.0.0     # via zipp
 ndg-httpsclient==0.5.1
@@ -202,22 +114,11 @@ pycparser==2.19           # via cffi
 pygments==2.4.2
 pymongo==3.9.0
 pyopenssl==19.0.0
->>>>>>> - Updated dependencies to latest version which support Python 2.7 and Django 1.11.
 pyquery==1.4.0
 pyrsistent==0.15.4        # via jsonschema
 python-crontab==2.3.9     # via django-celery-beat
 python-dateutil==2.8.0
 python-digest==1.7
-<<<<<<< HEAD
-pytz==2018.9
-pyxform==0.13.1
-redis==3.2.0
-requests==2.21.0
-responses==0.9.0
-s3transfer==0.1.13        # via boto3
-scandir==1.9.0            # via pathlib2
-shortuuid==0.4.3
-=======
 pytz==2019.3
 pyxform==0.15.1
 redis==3.3.11             # via celery, django-redis-sessions
@@ -226,7 +127,6 @@ responses==0.10.6
 s3transfer==0.2.1         # via boto3
 scandir==1.10.0           # via pathlib2
 shortuuid==0.5.0
->>>>>>> - Updated dependencies to latest version which support Python 2.7 and Django 1.11.
 six==1.12.0
 sqlparse==0.3.0
 static3==0.7.0
@@ -236,26 +136,12 @@ traceback2==1.4.0         # via unittest2
 typing==3.7.4.1           # via django-extensions
 unicodecsv==0.14.1
 unittest2==1.1.0          # via pyxform
-<<<<<<< HEAD
-urllib3==1.24.1           # via botocore, requests
-uwsgi==2.0.17
-whitenoise==3.3.1
-=======
 urllib3==1.25.6           # via botocore, requests
 uwsgi==2.0.18
 vine==1.3.0               # via amqp, celery
 whitenoise==4.1.4
->>>>>>> - Updated dependencies to latest version which support Python 2.7 and Django 1.11.
 whoosh==2.7.4
 xlrd==1.2.0
 xlsxwriter==1.2.1
 xlwt==1.3.0
-<<<<<<< HEAD
-zipp==0.3.3               # via importlib-metadata
-
-# The following packages are considered to be unsafe in a requirements file:
-# pip==19.3.1               # via django-markdownx
-# setuptools==41.4.0        # via py-gfm
-=======
 zipp==0.6.0               # via importlib-metadata
->>>>>>> - Updated dependencies to latest version which support Python 2.7 and Django 1.11.
