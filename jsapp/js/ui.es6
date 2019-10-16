@@ -265,8 +265,7 @@ class PopoverMenu extends React.Component {
       });
     }
 
-    if (this.props.type == 'assetrow-menu' && !this.state.popoverVisible) {
-      this.props.popoverSetVisible();
+    if (this.props.type === 'assetrow-menu' && !this.state.popoverVisible) {
       // if popover doesn't fit above, place it below
       // 20px is a nice safety margin
       const $assetRow = $(evt.target).parents('.asset-row');
@@ -276,6 +275,10 @@ class PopoverMenu extends React.Component {
       } else {
         this.setState({placement: 'below'});
       }
+    }
+
+    if (typeof this.props.popoverSetVisible === 'function' && !this.state.popoverVisible) {
+      this.props.popoverSetVisible();
     }
   }
   componentWillReceiveProps(nextProps) {
