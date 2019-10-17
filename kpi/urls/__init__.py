@@ -9,7 +9,8 @@ import private_storage.urls
 
 from hub.models import ConfigurationFile
 from hub.views import ExtraDetailRegistrationView
-from hub.views import switch_builder
+# from hub.views import switch_builder
+from kobo.apps.superuser_stats.views import user_report, retrieve_user_report
 from kpi.forms import RegistrationForm
 from kpi.views import authorized_application_authenticate_user
 from kpi.views import home, one_time_login, browser_tests
@@ -55,7 +56,7 @@ urlpatterns = [
     ),
     url(r'^browser_tests/$', browser_tests),
     url(r'^authorized_application/one_time_login/$', one_time_login),
-    url(r'^hub/switch_builder$', switch_builder, name='toggle-preferred-builder'),
+    # url(r'^hub/switch_builder$', switch_builder, name='toggle-preferred-builder'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     # Translation catalog for client code.
     url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
