@@ -4,8 +4,9 @@
 #
 #    pip-compile --output-file dependencies/pip/dev_requirements.txt dependencies/pip/dev_requirements.in
 #
--e git+https://github.com/dimagi/django-digest@0eb1c921329dd187c343b61acfbec4e98450136e#egg=django_digest
--e git+https://github.com/kobotoolbox/formpack.git@7bd244c43c1da64d13fd152974fa6d7b392f279c#egg=formpack
+-e git+https://github.com/dimagi/django-digest@52ba7edeb326efd97d5670273bb6fa8b0539e501#egg=django_digest
+-e git+https://github.com/jnm/django-haystack@3a3b04564e189c11fdc20a4be43e360b5396708c#egg=django_haystack
+-e git+https://github.com/kobotoolbox/formpack.git@696cdb16534e43afe47ba424a178743551e11943#egg=formpack
 -e git+https://github.com/jnm/geojson-rewind@0.1.1+py2.jnm#egg=geojson-rewind
 amqp==2.5.1
 anyjson==0.3.3

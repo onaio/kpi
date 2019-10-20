@@ -2,8 +2,6 @@
 from __future__ import (unicode_literals, print_function,
                         absolute_import, division)
 
-import base64
-import json
 import re
 
 from bson import ObjectId
@@ -13,6 +11,7 @@ from django.utils.translation import ugettext as _
 from django.utils.six import string_types
 
 from kpi.constants import NESTED_MONGO_RESERVED_ATTRIBUTES
+from kpi.utils.future import base64_encodestring
 
 
 class MongoHelper(object):
@@ -27,13 +26,13 @@ class MongoHelper(object):
                      '$lt', '$lte', '$regex', '$options', '$all']
 
     ENCODING_SUBSTITUTIONS = [
-        (re.compile(r'^\$'), base64.encodestring('$').strip()),
-        (re.compile(r'\.'), base64.encodestring('.').strip()),
+        (re.compile(r'^\$'), base64_encodestring('$').strip()),
+        (re.compile(r'\.'), base64_encodestring('.').strip()),
     ]
 
     DECODING_SUBSTITUTIONS = [
-        (re.compile(r'^' + base64.encodestring('$').strip()), '$'),
-        (re.compile(base64.encodestring('.').strip()), '.'),
+        (re.compile(r'^' + base64_encodestring('$').strip()), '$'),
+        (re.compile(base64_encodestring('.').strip()), '.'),
     ]
 
     # Match KoBoCat's variables of ParsedInstance class
