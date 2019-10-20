@@ -5,6 +5,8 @@ import re
 
 from kpi.utils.strings import hashable_str
 
+from kpi.utils.future import hashable_str
+
 # an approximation of the max size.
 # actual max length will be 40 + len(join_with) + len("_001")
 MAX_NAME_LENGTH = 40

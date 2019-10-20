@@ -44,6 +44,7 @@ def update_autofield_sequence(model):
         cursor.execute(query)
 
 from kpi.constants import SHADOW_MODEL_APP_LABEL
+from kpi.utils.future import hashable_str
 
 
 class ReadOnlyModelError(ValueError):

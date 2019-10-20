@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+>>>>>>> - Updated PIP dependencies to use latest Formpack commit for Python 3
 import re
 
 from bson import ObjectId
@@ -8,7 +14,11 @@ from django.utils.translation import ugettext as _
 from django.utils.six import string_types
 
 from kpi.constants import NESTED_MONGO_RESERVED_ATTRIBUTES
+<<<<<<< HEAD
 from kpi.utils.strings import base64_encodestring
+=======
+from kpi.utils.future import base64_encodestring
+>>>>>>> - Updated PIP dependencies to use latest Formpack commit for Python 3
 
 
 class MongoHelper:

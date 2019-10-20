@@ -1,4 +1,5 @@
 # coding: utf-8
+<<<<<<< HEAD
 import base64
 
 from django.utils.six import PY2, BytesIO
@@ -6,6 +7,17 @@ from django.utils.six.moves import cStringIO as StringIO
 
 # ToDo When Python2 support is dropped, this helper should be removed and
 # related code should be replaced with Python 3 code.
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+import base64
+import sys
+
+# These helpers are duplicated from `six`.
+# When KPI stops support for Python2, this file can be removed and code
+# can be replaced with Python3 code
+PY2 = sys.version_info[0] == 2
+>>>>>>> - Updated PIP dependencies to use latest Formpack commit for Python 3
 
 
 def base64_encodestring(obj):
@@ -26,6 +38,7 @@ def hashable_str(obj):
         return obj
 
     # utf-8 is not mandatory for Python3
+<<<<<<< HEAD
     return obj.encode('utf-8')
 
 
@@ -42,3 +55,10 @@ class ObjectIO(object):
 
     def get_obj(self):
         return self.__obj
+=======
+    # TODO Remove when Python 2 support is dropped
+    return obj.encode('utf-8')
+
+
+
+>>>>>>> - Updated PIP dependencies to use latest Formpack commit for Python 3
