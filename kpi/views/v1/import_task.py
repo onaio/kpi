@@ -7,7 +7,11 @@ from rest_framework.reverse import reverse
 from kpi.models import ImportTask
 from kpi.serializers import ImportTaskListSerializer, ImportTaskSerializer
 from kpi.tasks import import_in_background
+<<<<<<< HEAD
 from kpi.utils.strings import to_str
+=======
+from kpi.utils.future import to_str
+>>>>>>> Fixed XLS imports
 
 
 class ImportTaskViewSet(viewsets.ReadOnlyModelViewSet):

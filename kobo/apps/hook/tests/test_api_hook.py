@@ -63,8 +63,11 @@ class ApiHookTestCase(HookTestCase):
     def test_create_hook(self):
         self._create_hook()
 
+<<<<<<< HEAD
     @patch('ssrf_protect.ssrf_protect.SSRFProtect._get_ip_address',
            new=MockSSRFProtect._get_ip_address)
+=======
+>>>>>>> Fixed XLS imports
     @responses.activate
     def test_data_submission(self):
         # Create first hook

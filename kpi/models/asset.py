@@ -15,6 +15,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.postgres.fields import JSONField as JSONBField
 from django.db import models
 from django.db import transaction
+<<<<<<< HEAD
 from django.db.models import Exists, OuterRef, Prefetch, Q
 from django.utils.translation import ugettext_lazy as _
 from taggit.managers import TaggableManager, _TaggableManager
@@ -24,6 +25,12 @@ from formpack import FormPack
 from formpack.utils.flatten_content import flatten_content
 from formpack.utils.json_hash import json_hash
 from formpack.utils.spreadsheet_content import flatten_to_spreadsheet_content
+=======
+from django.db.models import Prefetch
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.six import text_type, iteritems
+from django.utils.translation import ugettext_lazy as _
+>>>>>>> Fixed XLS imports
 from jsonbfield.fields import JSONField as JSONBField
 from jsonfield import JSONField
 from taggit.managers import TaggableManager, _TaggableManager
@@ -31,6 +38,7 @@ from taggit.utils import require_instance_manager
 
 from formpack import FormPack
 from formpack.utils.flatten_content import flatten_content
+from formpack.utils.future import OrderedDict
 from formpack.utils.json_hash import json_hash
 from formpack.utils.spreadsheet_content import flatten_to_spreadsheet_content
 from kobo.apps.reports.constants import (SPECIFIC_REPORTS_KEY,
@@ -75,7 +83,7 @@ from kpi.utils.asset_translation_utils import (
 )
 from kpi.utils.autoname import (autoname_fields_in_place,
                                 autovalue_choices_in_place)
-from formpack.utils.future import OrderedDict
+from kpi.utils.future import ObjectIO
 from kpi.utils.kobo_to_xlsform import (expand_rank_and_score_in_place,
                                        replace_with_autofields,
                                        remove_empty_expressions_in_place)
@@ -452,11 +460,18 @@ class XlsExportable:
             # and its return value *only*. Calling deepcopy() is required to
             # achieve this isolation.
             ss_dict = self.ordered_xlsform_content(**kwargs)
+<<<<<<< HEAD
             output = BytesIO()
             with xlsxwriter.Workbook(output) as workbook:
                 for sheet_name, contents in ss_dict.items():
                     cur_sheet = workbook.add_worksheet(sheet_name)
                     _add_contents_to_sheet(cur_sheet, contents)
+=======
+            workbook = xlwt.Workbook()
+            for sheet_name, contents in iteritems(ss_dict):
+                cur_sheet = workbook.add_sheet(sheet_name)
+                _add_contents_to_sheet(cur_sheet, contents)
+>>>>>>> Fixed XLS imports
         except Exception as e:
             six.reraise(
                 type(e),
@@ -467,8 +482,16 @@ class XlsExportable:
                 sys.exc_info()[2],
             )
 
+<<<<<<< HEAD
         output.seek(0)
         return output
+=======
+        object_io = ObjectIO()
+        obj = object_io.get_obj()
+        workbook.save(obj)
+        obj.seek(0)
+        return obj
+>>>>>>> Fixed XLS imports
 
 
 @python_2_unicode_compatible
@@ -1016,14 +1039,23 @@ class Asset(ObjectPermissionMixin,
         # infer asset_type only between question and block
         if self.asset_type in [ASSET_TYPE_QUESTION, ASSET_TYPE_BLOCK]:
             try:
+<<<<<<< HEAD
                 row_count = int(self.summary.get('row_count'))
             except TypeError:
                 pass
             else:
+=======
+                row_count = self.summary['row_count']
+>>>>>>> Fixed XLS imports
                 if row_count == 1:
                     self.asset_type = ASSET_TYPE_QUESTION
                 elif row_count > 1:
                     self.asset_type = ASSET_TYPE_BLOCK
+<<<<<<< HEAD
+=======
+            except (KeyError, TypeError):  # `row_count` is `None` or doesn't exist
+                pass  # Leave `asset_type` as is.
+>>>>>>> Fixed XLS imports
 
         self._populate_report_styles()
 

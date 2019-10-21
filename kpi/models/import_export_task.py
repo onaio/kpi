@@ -18,6 +18,11 @@ from rest_framework.authtoken.models import Token
 from django.core.files.base import ContentFile
 from django.urls import Resolver404, resolve
 from django.db import models, transaction
+<<<<<<< HEAD
+=======
+from django.utils.six import text_type
+from django.utils.six.moves.urllib.parse import urlparse
+>>>>>>> Fixed XLS imports
 from jsonfield import JSONField
 from private_storage.fields import PrivateFileField
 from pyxform import xls2json_backends
@@ -30,7 +35,11 @@ from kobo.apps.reports.report_data import build_formpack
 
 from kpi.constants import PERM_VIEW_SUBMISSIONS, PERM_PARTIAL_SUBMISSIONS
 from kpi.utils.log import logging
+<<<<<<< HEAD
 from kpi.utils.strings import to_str
+=======
+from kpi.utils.future import to_str
+>>>>>>> Fixed XLS imports
 from ..fields import KpiUidField
 from ..model_utils import create_assets, _load_library_content, \
     remove_string_prefix
@@ -120,7 +129,11 @@ class ImportExportTask(models.Model):
             self.status = self.COMPLETE
         except Exception as err:
             msgs['error_type'] = type(err).__name__
+<<<<<<< HEAD
             msgs['error'] = str(err)
+=======
+            msgs['error'] = text_type(err)
+>>>>>>> Fixed XLS imports
             self.status = self.ERROR
             logging.error(
                 'Failed to run %s: %s' % (self._meta.model_name, repr(err)),
