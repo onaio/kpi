@@ -273,6 +273,7 @@ export class FormMap extends React.Component {
       this.buildMarkers(map);
       this.buildHeatMap(map);
     }).fail((error)=>{
+      console.log('error: ' + error);//
       if (error.responseText)
         this.setState({error: error.responseText, loading: false});
       else if (error.statusText)
