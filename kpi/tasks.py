@@ -5,9 +5,9 @@ from django.core.management import call_command
 from kpi.models import ImportTask, ExportTask
 
 
-@shared_task
-def update_search_index():
-    call_command('update_index', using=['default',], remove=True)
+# @shared_task
+# def update_search_index():
+#     call_command('update_index', using=['default',], remove=True)
 
 
 @shared_task
