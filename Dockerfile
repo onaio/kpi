@@ -57,18 +57,8 @@ RUN apt -qq update && \
 # Install locales         #
 ###########################
 
-<<<<<<< HEAD
 RUN echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen
 RUN locale-gen && dpkg-reconfigure locales -f noninteractive
-=======
-COPY ./dependencies/pip/external_services.txt "${KPI_SRC_DIR}/dependencies/pip/"
-WORKDIR ${PIP_DIR}/
-
-# Only install if the current version of `dependencies/pip/external_services.txt` differs from the one used in the base image.
-RUN if ! diff "${KPI_SRC_DIR}/dependencies/pip/external_services.txt" /srv/tmp/base__external_services.txt; then \
-        pip-sync /srv/tmp/base_os_dependencies.txt "${KPI_SRC_DIR}/dependencies/pip/external_services.txt" 1>/dev/null \
-    ; fi
->>>>>>> - Updated PIP dependencies to use latest Formpack commit for Python 3
 
 ###########################
 # Copy KPI directory      #
@@ -94,8 +84,8 @@ RUN pip-sync /srv/tmp/pip_dependencies.txt 1>/dev/null && \
 
 WORKDIR ${KPI_SRC_DIR}/
 RUN rm -rf ${KPI_NODE_PATH} && \
-    npm install --quiet && \
     npm install -g check-dependencies && \
+    npm install --quiet && \
     npm cache clean --force
 
 ENV PATH $PATH:${KPI_NODE_PATH}/.bin
