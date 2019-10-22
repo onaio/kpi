@@ -30,7 +30,4 @@ class DefaultDatabaseRouter(object):
         if app_label == SHADOW_MODEL_APP_LABEL:
             return False
         return True
-Collapse
-
-
 
