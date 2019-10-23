@@ -334,16 +334,7 @@ class FormSummary extends React.Component {
     }
 
     if (!permAccess) {
-      return (
-        <bem.Loading>
-          <bem.Loading__inner>
-            <h3>
-              {t('Access Denied')}
-            </h3>
-            {t('You do not have permission to view this page.')}
-          </bem.Loading__inner>
-        </bem.Loading>
-      );
+      return (<AccessDeniedMessage/>);
     }
 
     return (
