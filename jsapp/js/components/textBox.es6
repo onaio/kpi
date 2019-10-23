@@ -16,8 +16,7 @@
 
 import React from 'react';
 import autoBind from 'react-autobind';
-import TextareaAutosize from 'react-autosize-textarea';
-import bem from '../bem';
+import {bem} from '../bem';
 
 /*
 Properties:

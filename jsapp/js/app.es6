@@ -23,10 +23,10 @@ import {
   Router
 } from 'react-router';
 import moment from 'moment';
-import actions from './actions';
-import stores from './stores';
+import {actions} from './actions';
+import {stores} from './stores';
 import {dataInterface} from './dataInterface';
-import bem from './bem';
+import {bem} from './bem';
 import ui from './ui';
 import mixins from './mixins';
 import MainHeader from './components/header';
@@ -49,8 +49,11 @@ import {
   assign,
   currentLang
 } from './utils';
-import keymap from './keymap';
+import {keymap} from './keymap';
 import { ShortcutManager, Shortcuts } from 'react-shortcuts';
+import LibrarySearchableList from './lists/library';
+import FormsSearchableList from './lists/forms';
+
 const shortcutManager = new ShortcutManager(keymap);
 
 import {getZebraLoginUrl} from './config';
@@ -220,9 +223,6 @@ class FormXform extends React.Component {
   }
 }
 
-var LibrarySearchableList = require('./lists/library');
-var FormsSearchableList = require('./lists/forms');
-
 class FormNotFound extends React.Component {
   render () {
     return (
@@ -323,7 +323,7 @@ hashHistory.listen(function() {
   }
 });
 
-class RunRoutes extends React.Component {
+export default class RunRoutes extends React.Component {
   componentDidMount(){
     // when hot reloading, componentWillReceiveProps whines about changing the routes prop so this shuts that up
     this.router.componentWillReceiveProps = function(){};
@@ -335,6 +335,7 @@ class RunRoutes extends React.Component {
     );
   }
 }
+<<<<<<< HEAD
 
 export default RunRoutes;
 
@@ -342,3 +343,5 @@ export default RunRoutes;
 var RedirectToOna = function() {
   window.location = getZebraLoginUrl()
 }
+=======
+>>>>>>> update exports

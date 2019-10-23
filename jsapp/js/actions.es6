@@ -13,7 +13,8 @@ import alertify from 'alertifyjs';
 import Reflux from 'reflux';
 import RefluxPromise from './libs/reflux-promise';
 import {dataInterface} from './dataInterface';
-import permissionsActions from './actions/permissions';
+import {permissionsActions} from './actions/permissions';
+import {helpActions} from './actions/help';
 import {
   log,
   t,
@@ -26,7 +27,7 @@ import {
 // Configure Reflux
 Reflux.use(RefluxPromise(window.Promise));
 
-const actions = {
+export const actions = {
   permissions: permissionsActions,
   help: helpActions
 };
@@ -885,5 +886,3 @@ actions.hooks.retryLogs.completed.listen((response) => {
 actions.hooks.retryLogs.failed.listen((response) => {
   notify(t('Retrying all submissions failed'), 'error');
 });
-
-module.exports = actions;

@@ -7,7 +7,7 @@ import _ from 'underscore';
 import DocumentTitle from 'react-document-title';
 import Checkbox from '../components/checkbox';
 import SurveyScope from '../models/surveyScope';
-import cascadeMixin from './cascadeMixin';
+import {cascadeMixin} from './cascadeMixin';
 import AssetNavigator from './assetNavigator';
 import {hashHistory} from 'react-router';
 import alertify from 'alertifyjs';
@@ -32,9 +32,9 @@ import {
   NAME_MAX_LENGTH
 } from '../constants';
 import ui from '../ui';
-import bem from '../bem';
-import stores from '../stores';
-import actions from '../actions';
+import {bem} from '../bem';
+import {stores} from '../stores';
+import {actions} from '../actions';
 import dkobo_xlform from '../../xlform/src/_xlform.init';
 import {dataInterface} from '../dataInterface';
 
