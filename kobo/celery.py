@@ -6,8 +6,6 @@ import celery
 from django.apps import apps
 from django.conf import settings
 
-# http://celery.readthedocs.org/en/latest/django/first-steps-with-django.html
-
 # Attempt to determine the project name from the directory containing this file
 PROJECT_NAME = os.path.basename(os.path.dirname(__file__))
 

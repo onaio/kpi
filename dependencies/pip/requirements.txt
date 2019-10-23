@@ -98,6 +98,7 @@ tabulate==0.8.5           # via -r dependencies/pip/requirements.in
 traceback2==1.4.0         # via unittest2
 unicodecsv==0.14.1        # via -r dependencies/pip/requirements.in, pyxform
 unittest2==1.1.0          # via pyxform
+<<<<<<< HEAD
 urllib3==1.25.7           # via botocore, requests
 uwsgi==2.0.18             # via -r dependencies/pip/requirements.in
 vine==1.3.0               # via amqp, celery
@@ -105,6 +106,16 @@ xlrd==1.2.0               # via -r dependencies/pip/requirements.in, pyxform
 xlsxwriter==1.2.5         # via -r dependencies/pip/requirements.in, formpack
 xlwt==1.3.0               # via -r dependencies/pip/requirements.in
 zipp==0.6.0               # via importlib-metadata
+=======
+urllib3==1.24.1           # via botocore, requests
+uwsgi==2.0.17
+whitenoise==3.3.1
+whoosh==2.7.4
+xlrd==1.1.0
+xlsxwriter==1.1.2
+xlwt==1.3.0
+zipp==0.3.3               # via importlib-metadata
+>>>>>>> Install lower version of celery and include previous files with celery imports
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
