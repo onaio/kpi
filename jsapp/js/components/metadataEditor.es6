@@ -13,8 +13,6 @@ import {bem} from 'js/bem';
 
 const AUDIT_HELP_URL = 'http://support.kobotoolbox.org/en/articles/2648050-audit-logging-meta-question-type';
 
-const AUDIT_HELP_URL = 'http://support.kobotoolbox.org/en/articles/2648050-audit-logging-meta-question-type';
-
 /**
  * @prop {object} survey
  * @prop {function} onChange

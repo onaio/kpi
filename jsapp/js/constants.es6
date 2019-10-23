@@ -139,13 +139,13 @@ export const ASSET_TYPES = {
   }
 };
 
-const ASSET_KINDS = new Map();
+export const ASSET_KINDS = new Map();
 new Set([
   'asset',
   'collection'
 ]).forEach((kind) => {ASSET_KINDS.set(kind, kind);});
 
-const QUESTION_TYPES = new Map([
+export const QUESTION_TYPES = new Map([
   [
     'select_one',
     {
@@ -332,7 +332,7 @@ const QUESTION_TYPES = new Map([
   ]
 ]);
 
-const META_QUESTION_TYPES = new Map();
+export const META_QUESTION_TYPES = new Map();
 new Set([
   'start',
   'end',
