@@ -763,13 +763,9 @@ class ProjectSettings extends React.Component {
   }
 
   renderStepProjectDetails() {
-<<<<<<< HEAD
-    const sectors = stores.session.environment.available_sectors;
-    const countries = stores.session.environment.available_countries;
-=======
     const sectors = stores.session.currentAccount.available_sectors;
     const countries = stores.session.currentAccount.available_countries;
->>>>>>> linter fixes and saving config
+    const isSelfOwned = this.userIsOwner(this.state.formAsset);
 
     return (
       <bem.FormModal__form
@@ -919,7 +915,7 @@ class ProjectSettings extends React.Component {
             </bem.FormModal__item>
           }
 
-          {this.props.context === PROJECT_SETTINGS_CONTEXTS.EXISTING &&
+          {isSelfOwned && this.props.context === PROJECT_SETTINGS_CONTEXTS.EXISTING &&
             <bem.FormModal__item>
               <button
                 type='button'
@@ -987,6 +983,7 @@ class ProjectSettings extends React.Component {
 }
 
 reactMixin(ProjectSettings.prototype, Reflux.ListenerMixin);
+reactMixin(ProjectSettings.prototype, mixins.permissions);
 reactMixin(ProjectSettings.prototype, mixins.droppable);
 reactMixin(ProjectSettings.prototype, mixins.dmix);
 
