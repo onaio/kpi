@@ -355,10 +355,7 @@ export default class RunRoutes extends React.Component {
     );
   }
 }
-<<<<<<< HEAD
 
 var RedirectToOna = function() {
   window.location = getZebraLoginUrl()
 }
-=======
->>>>>>> update exports
