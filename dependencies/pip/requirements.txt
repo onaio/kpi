@@ -28109,6 +28109,7 @@ urllib3==1.25.7           # via botocore, requests
 uwsgi==2.0.18             # via -r dependencies/pip/requirements.in
 vine==1.3.0               # via amqp, celery
 <<<<<<< HEAD
+<<<<<<< HEAD
 xlrd==1.2.0               # via -r dependencies/pip/requirements.in, pyxform
 xlsxwriter==1.2.5         # via -r dependencies/pip/requirements.in, formpack
 xlwt==1.3.0               # via -r dependencies/pip/requirements.in
@@ -28119,6 +28120,8 @@ zipp==0.6.0               # via importlib-metadata
 # setuptools
 =======
 whitenoise==4.1.4
+=======
+>>>>>>> Removed whitenoise dependency
 whoosh==2.7.4
 xlrd==1.2.0
 xlsxwriter==1.2.2
