@@ -126,7 +126,7 @@ from .utils.ss_structure_to_mdtable import ss_structure_to_mdtable
 from ona.authentication import (
     JWTAuthentication, encode_payload, decode_payload
 )
-
+from .model_utils import grant_default_model_level_perms
 
 
 def home(request):
@@ -370,6 +370,19 @@ class CurrentUserViewSet(viewsets.ModelViewSet):
 
     def get_object(self):
         return self.request.user
+
+    @detail_route(methods=['POST'], renderer_classes=[renderers.JSONRenderer])
+    def grant_default_model_level_perms(self, request, *args, **kwargs):
+        user = self.get_object()
+        grant_default_model_level_perms(user)
+
+        return Response(
+            data={
+                "detail": ("Successfully granted default model level "
+                           "perms to user %s." % user.username)
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 
 class AuthorizedApplicationUserViewSet(mixins.CreateModelMixin,
