@@ -104,6 +104,9 @@ urlpatterns = [
         'get': 'retrieve',
         'patch': 'partial_update',
     }), name='currentuser-detail'),
+    url(r'^grant-default-model-level-perms$', CurrentUserViewSet.as_view({
+        'post': 'grant_default_model_level_perms',
+    }), name='currentuser-detail'),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
