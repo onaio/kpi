@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import React from 'react';
 import reactMixin from 'react-mixin';
 import autoBind from 'react-autobind';
@@ -12,6 +13,7 @@ import Select from 'react-select';
 import TextBox from './textBox';
 import Checkbox from './checkbox';
 import ApiTokenDisplay from './apiTokenDisplay';
+import {hashHistory} from 'react-router';
 import ui from '../ui';
 import {
   t,
@@ -20,11 +22,13 @@ import {
 import {ROOT_URL} from 'js/constants';
 
 import {WEB_PAGE_TITLE} from '../config';
+const UNSAVED_CHANGES_WARNING = t('You have unsaved changes. Leave settings without saving?');
 
 export class AccountSettings extends React.Component {
   constructor(props){
     super(props);
     let state = {
+      isPristine: true,
       requireAuth: false,
       fieldsErrors: {}
     };
@@ -46,8 +50,19 @@ export class AccountSettings extends React.Component {
   }
 
   componentDidMount() {
+    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
     this.listenTo(stores.session, this.rebuildState);
     this.rebuildState();
+  }
+
+  componentWillUnmount () {
+    this.unpreventClosingTab();
+  }
+
+  routerWillLeave() {
+    if (!this.state.isPristine) {
+      return UNSAVED_CHANGES_WARNING;
+    }
   }
 
   setStateFromSession(currentAccount, environment) {
@@ -95,6 +110,39 @@ export class AccountSettings extends React.Component {
     });
   }
 
+  /**
+   * returns to where you came from
+   */
+  safeClose() {
+    if (this.state.isPristine) {
+      hashHistory.goBack();
+    } else {
+      let dialog = alertify.dialog('confirm');
+      let opts = {
+        title: UNSAVED_CHANGES_WARNING,
+        message: '',
+        labels: {ok: t('Yes, leave settings'), cancel: t('Cancel')},
+        onok: () => {
+          this.setState({isPristine: true});
+          this.unpreventClosingTab();
+          hashHistory.goBack();
+        },
+        oncancel: dialog.destroy
+      };
+      dialog.set(opts).show();
+    }
+  }
+
+  preventClosingTab() {
+    $(window).on('beforeunload.noclosetab', () => {
+      return UNSAVED_CHANGES_WARNING;
+    });
+  }
+
+  unpreventClosingTab() {
+    $(window).off('beforeunload.noclosetab');
+  }
+
   updateProfile() {
     actions.misc.updateProfile(
       {
@@ -126,7 +174,11 @@ export class AccountSettings extends React.Component {
   }
 
   onUpdateComplete() {
-    this.setState({fieldsErrors: {}});
+    this.unpreventClosingTab();
+    this.setState({
+      isPristine: true,
+      fieldsErrors: {}
+    });
   }
 
   onUpdateFail(data) {
@@ -145,7 +197,11 @@ export class AccountSettings extends React.Component {
       // react-select, TextBox and Checkbox just passes a value
       val = evt;
     }
-    this.setState({[attr]: val});
+    this.preventClosingTab();
+    this.setState({
+      isPristine: false,
+      [attr]: val
+    });
   }
   nameChange (e) {this.handleChange(e, 'name');}
   emailChange (e) {this.handleChange(e, 'email');}
@@ -203,6 +259,14 @@ export class AccountSettings extends React.Component {
                 className='mdl-button mdl-button--raised mdl-button--colored'
               >
                 {t('Save Changes')}
+                {!this.state.isPristine && ' *'}
+              </button>
+
+              <button
+                onClick={this.safeClose}
+                className='mdl-button mdl-button--icon'
+              >
+                <i className='k-icon k-icon-close'/>
               </button>
             </bem.AccountSettings__item>
 
