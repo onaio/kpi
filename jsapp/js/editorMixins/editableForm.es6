@@ -537,16 +537,6 @@ export default assign({
     return (
       <bem.FormBuilderHeader>
         <bem.FormBuilderHeader__row m='primary'>
-          <bem.FormBuilderHeader__cell
-            m={'logo'}
-            data-tip={t('Return to list')}
-            className='left-tooltip'
-            tabIndex='0'
-            onClick={this.safeNavigateToList}
-          >
-            <i className='k-icon-kobo' />
-          </bem.FormBuilderHeader__cell>
-
           <bem.FormBuilderHeader__cell m={'name'} >
             <bem.FormModal__item>
               {nameFieldLabel &&
