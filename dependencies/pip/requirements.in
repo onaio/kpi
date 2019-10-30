@@ -67,10 +67,6 @@ static3
 tabulate
 unicodecsv
 uWSGI
-<<<<<<< HEAD
-=======
-Whoosh==2.7.4
->>>>>>> Removed whitenoise dependency
 xlrd
 xlwt
 XlsxWriter
