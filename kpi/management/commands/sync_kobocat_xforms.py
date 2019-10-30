@@ -19,13 +19,13 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import models, transaction
 from django.utils.six import iteritems
-from django.utils.six.moves import cStringIO as StringIO
 from pyxform import xls2json_backends
 from rest_framework.authtoken.models import Token
 
 from formpack.utils.xls_to_ss_structure import xls_to_dicts
 from kpi.constants import PERM_FROM_KC_ONLY
 from kpi.utils.log import logging
+from kpi.utils.future import ObjectIO
 from .import_survey_drafts_from_dkobo import _set_auto_field_update
 from ...deployment_backends.kobocat_backend import KobocatDeploymentBackend
 from ...deployment_backends.kc_access.shadow_models import (
@@ -48,12 +48,16 @@ FROM_KC_ONLY_PERMISSION = Permission.objects.get(
 XFORM_CT = ShadowModel.get_content_type_for_model(ReadOnlyKobocatXForm)
 # Replace codenames with Permission PKs, remembering the codenames
 KPI_CODENAMES = {}
-for kc_codename, kpi_codename in PERMISSIONS_MAP.items():
+
+permission_map_copy = dict(PERMISSIONS_MAP)
+for kc_codename, kpi_codename in permission_map_copy.items():
     kc_perm_pk = KobocatPermission.objects.get(
         content_type=XFORM_CT, codename=kc_codename).pk
     kpi_perm_pk = Permission.objects.get(
         content_type=ASSET_CT, codename=kpi_codename).pk
+
     del PERMISSIONS_MAP[kc_codename]
+
     PERMISSIONS_MAP[kc_perm_pk] = kpi_perm_pk
     KPI_CODENAMES[kpi_perm_pk] = kpi_codename
 
@@ -67,13 +71,7 @@ class SyncKCXFormsWarning(Exception):
 
 
 def _add_contents_to_sheet(sheet, contents):
-<<<<<<< HEAD
-    """
-    Copied from dkobo/koboform/pyxform_utils.py
-    """
-=======
     """ Copied from dkobo/koboform/pyxform_utils.py """
->>>>>>> - Fixed `sync_kobocat_xform` management command
     cols = []
     for row in contents:
         for key in row.keys():
@@ -89,13 +87,7 @@ def _add_contents_to_sheet(sheet, contents):
 
 
 def _convert_dict_to_xls(ss_dict):
-<<<<<<< HEAD
-    """
-    Copied from dkobo/koboform/pyxform_utils.py
-    """
-=======
     """ Copied from dkobo/koboform/pyxform_utils.py """
->>>>>>> - Fixed `sync_kobocat_xform` management command
     workbook = xlwt.Workbook()
     for sheet_name in ss_dict.keys():
         # pyxform.xls2json_backends adds "_header" items for each sheet.....
@@ -136,11 +128,7 @@ def _kc_forms_api_request(token, xform_pk, xlsform=False):
         settings.KOBOCAT_INTERNAL_URL, xform_pk)
     if xlsform:
         url += '/form.xls'
-<<<<<<< HEAD
-    headers = {'Authorization':'Token ' + token.key}
-=======
     headers = {u'Authorization': 'Token ' + token.key}
->>>>>>> - Fixed `sync_kobocat_xform` management command
     return requests.get(url, headers=headers)
 
 
@@ -203,15 +191,8 @@ def _get_kc_backend_response(xform):
 
 
 def _sync_form_content(asset, xform, changes):
-<<<<<<< HEAD
-    """
-    Returns `True` and appends to `changes` if it modifies `asset`; does
-    not save anything
-    """
-=======
     """ Returns `True` and appends to `changes` if it modifies `asset`; does
     not save anything """
->>>>>>> - Fixed `sync_kobocat_xform` management command
     if not asset.has_deployment:
         # A brand-new asset
         asset.content = _xform_to_asset_content(xform)
@@ -260,17 +241,9 @@ def _sync_form_content(asset, xform, changes):
 
 
 def _sync_form_metadata(asset, xform, changes):
-<<<<<<< HEAD
-    """
-    Returns `True` and appends to `changes` if it modifies `asset`. If
-    `asset` has no primary key, it will be saved to allow permissions to be
-    assigned to it
-    """
-=======
     """ Returns `True` and appends to `changes` if it modifies `asset`. If
     `asset` has no primary key, it will be saved to allow permissions to be
     assigned to it """
->>>>>>> - Fixed `sync_kobocat_xform` management command
     user = xform.user
     if not asset.has_deployment:
         # A brand-new asset
@@ -438,23 +411,6 @@ def _sync_permissions(asset, xform):
 
 
 class Command(BaseCommand):
-<<<<<<< HEAD
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--username',
-            action='store',
-            dest='username',
-            default=False,
-            help="Import only a specific user's forms"
-        )
-        parser.add_argument(
-            '--quiet',
-            action='store_true',
-            dest='quiet',
-            default=False,
-            help='Do not output status messages'
-        )
-=======
     option_list = BaseCommand.option_list + (
         make_option('--all-users',
                     action='store_true',
@@ -477,7 +433,6 @@ class Command(BaseCommand):
                     default=False,
                     help='Populate XForm `kpi_asset_uid` field')
     )
->>>>>>> - Fixed `sync_kobocat_xform` management command
 
     def _print_str(self, string):
         if not self._quiet:
