@@ -68,4 +68,6 @@ echo 'KoBoForm initialization completed.'
 echo 'Cleaning up Celery PIDs...'
 rm -rf /tmp/celery*.pid
 
+echo 'KoBoForm initialization completed.'
+
 exec /usr/bin/runsvdir /etc/service
