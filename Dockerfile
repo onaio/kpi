@@ -86,6 +86,7 @@ WORKDIR ${KPI_SRC_DIR}/
 RUN rm -rf ${KPI_NODE_PATH} && \
     npm install -g check-dependencies && \
     npm install --quiet && \
+    npm install -g check-dependencies && \
     npm cache clean --force
 
 ENV PATH $PATH:${KPI_NODE_PATH}/.bin
