@@ -96,8 +96,6 @@ export class FormMap extends React.Component {
   }
 
   componentDidMount () {
-    // if (!this.state.hasGeoPoint)
-    //   return false;
 
     var fields = [];
     let fieldTypes = ['select_one', 'select_multiple', 'integer', 'decimal', 'text'];
@@ -262,7 +260,7 @@ export class FormMap extends React.Component {
       this.buildMarkers(map);
       this.buildHeatMap(map);
     }).fail((error)=>{
-      console.log('error: ' + error);//
+      console.log('error: ' + error);
       if (error.responseText)
         this.setState({error: error.responseText, loading: false});
       else if (error.statusText)
@@ -404,7 +402,6 @@ export class FormMap extends React.Component {
       markers.on('click', this.launchSubmissionModal).addTo(map);
 
       if (prepPoints.length > 0 && (!viewby || !this.state.componentRefreshed)) {
-        console.log('getBounds: ' + Object.values(markers.getBounds()));
         map.fitBounds(markers.getBounds());
     }
       if(prepPoints == 0) {
@@ -626,17 +623,6 @@ export class FormMap extends React.Component {
   }
 
   render () {
-    // if (!this.state.hasGeoPoint) {
-    //   return (
-    //     <ui.Panel>
-    //       <bem.Loading>
-    //         <bem.Loading__inner>
-    //           {t('The map is not available because this form does not have a "geopoint" field.')}
-    //         </bem.Loading__inner>
-    //       </bem.Loading>
-    //     </ui.Panel>
-    //   );
-    // }
 
     if (this.state.error) {
       return (
@@ -669,7 +655,6 @@ export class FormMap extends React.Component {
     } else if (!this.state.hasGeoPoint) {
       label = `${t('The map does not show data because this form does not have a "geopoint" field.')}`
     }
-    console.log('noData: ' + this.state.noData);
 
     const formViewModifiers = ['map'];
     if (this.state.isFullscreen) {
@@ -734,7 +719,7 @@ export class FormMap extends React.Component {
             <bem.PopoverMenu__link key={'all'} onClick={this.filterMap} className={!viewby ? 'active see-all': 'see-all'}>
               {t('-- See all data --')}
             </bem.PopoverMenu__link>
-            {fields.map((f)=>{//
+            {fields.map((f)=>{
               const name = f.name || f.$autoname;
               const label = f.label ? f.label[langIndex] ? f.label[langIndex] : <em>{t('untranslated: ') + name}</em> : t('Question label not set');
               return (
