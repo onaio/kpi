@@ -22,6 +22,10 @@ from django.utils.six import iteritems
 from pyxform import xls2json_backends
 from rest_framework.authtoken.models import Token
 
+from formpack.utils.xls_to_ss_structure import xls_to_dicts
+from kpi.constants import PERM_FROM_KC_ONLY
+from kpi.utils.log import logging
+from .import_survey_drafts_from_dkobo import _set_auto_field_update
 from ...deployment_backends.kc_access.shadow_models import (
     KobocatPermission,
     KobocatUserObjectPermission,
@@ -50,15 +54,8 @@ FROM_KC_ONLY_PERMISSION = Permission.objects.get(
 XFORM_CT = ShadowModel.get_content_type_for_model(ReadOnlyKobocatXForm)
 ANONYMOUS_USER = get_anonymous_user()
 # Replace codenames with Permission PKs, remembering the codenames
-<<<<<<< HEAD
-KPI_CODENAMES = {}
-
-permission_map_copy = dict(PERMISSIONS_MAP)
-for kc_codename, kpi_codename in permission_map_copy.items():
-=======
 KPI_PKS_TO_CODENAMES = {}
 for kc_codename, kpi_codename in PERMISSIONS_MAP.items():
->>>>>>> Preserve anonymous perms in `sync_kobocat_xforms`
     kc_perm_pk = KobocatPermission.objects.get(
         content_type=XFORM_CT, codename=kc_codename).pk
     kpi_perm_pk = Permission.objects.get(
@@ -108,10 +105,11 @@ def _convert_dict_to_xls(ss_dict):
                 continue
             cur_sheet = workbook.add_sheet(sheet_name)
             _add_contents_to_sheet(cur_sheet, ss_dict[sheet_name])
-    string_io = StringIO()
-    workbook.save(string_io)
-    string_io.seek(0)
-    return string_io
+
+    obj = io.BytesIO()
+    workbook.save(obj)
+    obj.seek(0)
+    return obj
 
 
 def _xlsform_to_kpi_content_schema(xlsform):

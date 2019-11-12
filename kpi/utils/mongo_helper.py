@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from django.utils.six import string_types
 
 from kpi.constants import NESTED_MONGO_RESERVED_ATTRIBUTES
-from kpi.utils.future import base64_encodestring
+from kpi.utils.strings import base64_encodestring
 
 
 class MongoHelper(object):

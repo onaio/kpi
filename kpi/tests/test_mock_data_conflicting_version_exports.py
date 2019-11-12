@@ -13,6 +13,7 @@ from django.utils.six import text_type
 from kobo.apps.reports import report_data
 from kpi.constants import PERM_VIEW_SUBMISSIONS
 from kpi.models import Asset, ExportTask
+from kpi.utils.strings import to_str
 
 
 class ConflictingVersionsMockDataExports(TestCase):
