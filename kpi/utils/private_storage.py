@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
-from rest_framework.request import Request as DRFRequest
-from rest_framework.settings import api_settings
-
-
+# coding: utf-8
 def superuser_or_username_matches_prefix(private_file):
     """
     You can create a custom function, and use that instead. The function

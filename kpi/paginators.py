@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+# coding: utf-8
 from django.conf import settings
 from rest_framework.serializers import SerializerMethodField
 from rest_framework.pagination import (

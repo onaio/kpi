@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
+# coding: utf-8
+import responses
 from django.conf import settings
 from django.core import mail
 from django_celery_beat.models import PeriodicTask
