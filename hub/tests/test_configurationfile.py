@@ -9,8 +9,7 @@ from django.template import Template, RequestContext
 
 from hub.models import ConfigurationFile
 
-
-sample_svg = '''<svg xmlns="http://www.w3.org/2000/svg"
+sample_svg = b'''<svg xmlns="http://www.w3.org/2000/svg"
 xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 420 666">
 <path style="fill:#000000" d="M 0,665.24357 C 19.10304,616.60207
 43.791193,570.34321 65.172372,522.7213 78.325582,455.25301 90.425024,387.52616
