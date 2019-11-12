@@ -12,7 +12,6 @@ from django.db import ProgrammingError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import python_2_unicode_compatible
 from jsonfield import JSONField
 
 from kpi.constants import SHADOW_MODEL_APP_LABEL
@@ -140,7 +139,6 @@ class KobocatContentType(ShadowModel):
         return self.model
 
 
-@python_2_unicode_compatible
 class KobocatPermission(ShadowModel):
     """
     Minimal representation of Django 1.8's contrib.auth.models.Permission
