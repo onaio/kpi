@@ -6,7 +6,6 @@ import requests
 import responses
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.utils.six import text_type
 from rest_framework import status
 
 from kobo.apps.hook.constants import SUBMISSION_PLACEHOLDER 
@@ -241,7 +240,7 @@ class ApiHookTestCase(HookTestCase):
         def request_callback(request):
             payload = json.loads(request.body)
             resp_body = payload
-            headers = {'request-id': text_type(instance_id)}
+            headers = {'request-id': str(instance_id)}
             return 200, headers, json.dumps(resp_body)
 
         responses.add_callback(

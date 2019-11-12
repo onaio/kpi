@@ -5,7 +5,6 @@ from optparse import make_option
 import time
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
-from django.utils.six.moves import range
 from reversion.models import Version
 
 from kpi.model_utils import disable_auto_field_update

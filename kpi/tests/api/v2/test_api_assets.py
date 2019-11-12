@@ -2,11 +2,10 @@
 import copy
 import json
 from hashlib import md5
+from io import StringIO
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.utils.six.moves import cStringIO as StringIO
-from formpack.utils.expand_content import SCHEMA_VERSION
 from rest_framework import status
 
 from kpi.constants import (

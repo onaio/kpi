@@ -2,11 +2,11 @@
 import json
 import posixpath
 import re
+from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six import text_type
 from rest_framework import status, serializers
@@ -117,7 +117,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         except requests.exceptions.RequestException as e:
             # Failed to access the KC API
             # TODO: clarify that the user cannot correct this
-            raise KobocatDeploymentException(detail=text_type(e))
+            raise KobocatDeploymentException(detail=str(e))
 
         # If it's a no-content success, return immediately
         if response.status_code == expected_status_code == 204:
@@ -130,7 +130,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             # Unparseable KC API output
             # TODO: clarify that the user cannot correct this
             raise KobocatDeploymentException(
-                detail=text_type(e), response=response)
+                detail=str(e), response=response)
 
         # Check for failure
         if response.status_code != expected_status_code or (

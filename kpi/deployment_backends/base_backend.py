@@ -81,7 +81,7 @@ class BaseDeploymentBackend(object):
         # possible. TODO: Should this validation be in (or called directly by)
         # the view code? Does DRF have a validator for GET params?
 
-        if isinstance(query, basestring):
+        if isinstance(query, str):
             try:
                 query = json.loads(query, object_hook=json_util.object_hook)
             except ValueError:
@@ -109,7 +109,7 @@ class BaseDeploymentBackend(object):
                 'permission_filters': permission_filters
             }
 
-        if isinstance(sort, basestring):
+        if isinstance(sort, str):
             try:
                 sort = json.loads(sort, object_hook=json_util.object_hook)
             except ValueError:
@@ -131,7 +131,7 @@ class BaseDeploymentBackend(object):
                 {'limit': _('A positive integer is required.')}
             )
 
-        if isinstance(fields, basestring):
+        if isinstance(fields, str):
             try:
                 fields = json.loads(fields, object_hook=json_util.object_hook)
             except ValueError:
