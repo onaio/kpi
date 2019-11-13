@@ -76,16 +76,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     def to_representation(self, obj):
         if obj.is_anonymous():
             return {'message': 'user is not logged in'}
-        rep = super(CurrentUserSerializer, self).to_representation(obj)
-        if settings.UPCOMING_DOWNTIME:
-            # setting is in the format:
-            # [dateutil.parser.parse('6pm edt').isoformat(), countdown_msg]
-            rep['upcoming_downtime'] = settings.UPCOMING_DOWNTIME
-        # TODO: Find a better location for SECTORS and COUNTRIES
-        # as the functionality develops. (possibly in tags?)
-        rep['available_sectors'] = SECTORS
-        rep['available_countries'] = COUNTRIES
-        rep['all_languages'] = LANGUAGES
+        rep = super().to_representation(obj)
         if not rep['extra_details']:
             rep['extra_details'] = {}
         # `require_auth` needs to be read from KC every time
@@ -125,5 +116,5 @@ class CurrentUserSerializer(serializers.ModelSerializer):
                 'current_password and new_password must both be sent ' \
                 'together; one or the other cannot be sent individually.'
             )
-        return super(CurrentUserSerializer, self).update(
+        return super().update(
             instance, validated_data)
