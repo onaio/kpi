@@ -33,7 +33,7 @@ class AssetOwnerFilterBackend(filters.BaseFilterBackend):
         return queryset.filter(**fields)
 
 
-class KpiObjectPermissionsFilter(object):
+class KpiObjectPermissionsFilter:
     perm_format = '%(app_label)s.view_%(model_name)s'
 
     def filter_queryset(self, request, queryset, view):
