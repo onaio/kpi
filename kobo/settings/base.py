@@ -7,7 +7,7 @@ from celery.schedules import crontab
 import django.conf.locale
 from django.conf import global_settings
 from django.conf.global_settings import LOGIN_URL
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.utils.translation import get_language_info
 import dj_database_url
 from pymongo import MongoClient
@@ -115,8 +115,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'hub.middleware.UsernameInResponseHeaderMiddleware',
-    'django_userforeignkey.middleware.UserForeignKeyMiddleware',
-    'django_request_cache.middleware.RequestCacheMiddleware',
+    # 'django_userforeignkey.middleware.UserForeignKeyMiddleware',
+    # 'django_request_cache.middleware.RequestCacheMiddleware',
 ]
 
 if DEBUG is True:

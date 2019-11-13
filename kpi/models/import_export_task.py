@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.urlresolvers import Resolver404, resolve
+from django.urls import Resolver404, resolve
 from django.db import models, transaction
 from jsonfield import JSONField
 from private_storage.fields import PrivateFileField
