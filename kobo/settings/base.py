@@ -73,7 +73,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'reversion',
-    'debug_toolbar',
     'mptt',
     'haystack',
     'private_storage',
@@ -118,10 +117,6 @@ MIDDLEWARE = [
     # 'django_userforeignkey.middleware.UserForeignKeyMiddleware',
     # 'django_request_cache.middleware.RequestCacheMiddleware',
 ]
-
-if DEBUG is True:
-    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
-
 
 if os.environ.get('DEFAULT_FROM_EMAIL'):
     DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
