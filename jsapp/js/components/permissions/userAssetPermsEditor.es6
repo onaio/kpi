@@ -8,7 +8,7 @@ import TextBox from 'js/components/textBox';
 import {stores} from 'js/stores';
 import {actions} from 'js/actions';
 import {bem} from 'js/bem';
-import classNames from 'classnames';
+import {classNames} from 'classnames';
 import {permParser} from './permParser';
 import permConfig from './permConfig';
 import {
@@ -331,7 +331,9 @@ class UserAssetPermsEditor extends React.Component {
       !this.state.isEditingUsername &&
       !this.state.isAddingPartialUsernames &&
       this.state.username.length > 0 &&
-      this.state.usernamesBeingChecked.size === 0
+      this.state.usernamesBeingChecked.size === 0 &&
+      // we don't allow manual setting anonymous user permissions through UI
+      this.state.username !== ANON_USERNAME
     );
   }
 
