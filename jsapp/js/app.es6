@@ -51,7 +51,7 @@ import {
   assign,
   currentLang
 } from './utils';
-import {keymap} from './keymap';
+import keymap from './keymap';
 import { ShortcutManager, Shortcuts } from 'react-shortcuts';
 const shortcutManager = new ShortcutManager(keymap);
 import LibrarySearchableList from './lists/library';
