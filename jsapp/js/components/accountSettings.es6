@@ -252,24 +252,24 @@ export class AccountSettings extends React.Component {
       <DocumentTitle title={`${accountName} | ${WEB_PAGE_TITLE}`}>
       <ui.Panel>
         <bem.AccountSettings>
+          <bem.AccountSettings__actions>
+            <button
+              onClick={this.updateProfile}
+              className='mdl-button mdl-button--raised mdl-button--colored'
+            >
+              {t('Save Changes')}
+              {!this.state.isPristine && ' *'}
+            </button>
+
+            <button
+              onClick={this.safeClose}
+              className='account-settings-close mdl-button mdl-button--icon'
+            >
+              <i className='k-icon k-icon-close'/>
+            </button>
+          </bem.AccountSettings__actions>
+
           <bem.AccountSettings__item m={'column'}>
-            <bem.AccountSettings__item m='actions'>
-              <button
-                onClick={this.updateProfile}
-                className='mdl-button mdl-button--raised mdl-button--colored'
-              >
-                {t('Save Changes')}
-                {!this.state.isPristine && ' *'}
-              </button>
-
-              <button
-                onClick={this.safeClose}
-                className='mdl-button mdl-button--icon'
-              >
-                <i className='k-icon k-icon-close'/>
-              </button>
-            </bem.AccountSettings__item>
-
             <bem.AccountSettings__item m='username'>
               <bem.AccountBox__initials style={initialsStyle}>
                 {accountName.charAt(0)}
