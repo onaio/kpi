@@ -338,7 +338,7 @@ export var dataInterface;
     },
     subscribeCollection ({uid}) {
       return $ajax({
-        url: `${ROOT_URL}/collection_subscriptions/`,
+        url: `${ROOT_URL}/asset_subscriptions/`,
         data: {
           collection: `${ROOT_URL}/api/v2/collections/${uid}/`,
         },
@@ -347,7 +347,7 @@ export var dataInterface;
     },
     unsubscribeCollection ({uid}) {
       return $ajax({
-        url: `${ROOT_URL}/collection_subscriptions/`,
+        url: `${ROOT_URL}/asset_subscriptions/`,
         data: {
           collection__uid: uid
         },
