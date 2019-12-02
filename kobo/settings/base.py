@@ -210,6 +210,7 @@ ANONYMOUS_USER_ID = -1
 ALLOWED_ANONYMOUS_PERMISSIONS = (
     'kpi.view_collection',
     'kpi.view_asset',
+    'kpi.discover_asset',
     'kpi.view_submissions',
 )
 
