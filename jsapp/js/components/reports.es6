@@ -20,8 +20,8 @@ import ReportViewItem from './reportViewItem';
 import {
   assign,
   t,
-  ONA_TITLE,
 } from '../utils';
+import {WEB_PAGE_TITLE} from '../config';
 
 function labelVal(label, value) {
   return {label: t(label), value: (value || label.toLowerCase().replace(/\W+/g, '_'))};
@@ -1156,7 +1156,7 @@ class Reports extends React.Component {
     const hasGroupBy = this.state.groupBy.length !== 0;
 
     return (
-      <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
+      <DocumentTitle title={`${docTitle} | ${WEB_PAGE_TITLE}`}>
         <bem.FormView m={formViewModifiers}>
           <bem.ReportView>
             {this.renderReportButtons()}

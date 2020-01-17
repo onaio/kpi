@@ -17,11 +17,12 @@ import {
   unnullifyTranslations,
   assign,
   t,
-  koboMatrixParser, 
-  ONA_TITLE,
+  koboMatrixParser,
   checkCookieExists,
   redirectForAuthentication
 } from '../utils';
+
+import {WEB_PAGE_TITLE} from '../config';
 import {
   ASSET_TYPES,
   AVAILABLE_FORM_STYLES,
@@ -791,7 +792,6 @@ export default assign({
       this.state.asideLayoutSettingsVisible ||
       this.state.asideLibrarySearchVisible
     );
-
     return (
       <bem.FormBuilderAside m={isAsideVisible ? 'visible' : null}>
         { this.state.asideLayoutSettingsVisible &&
@@ -910,7 +910,7 @@ export default assign({
     var docTitle = this.state.name || t('Untitled');
 
     return (
-      <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
+      <DocumentTitle title={`${docTitle} | ${WEB_PAGE_TITLE}`}>
         <ui.Panel m={['transparent', 'fixed']}>
           {this.renderAside()}
 
