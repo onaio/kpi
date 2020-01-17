@@ -27,7 +27,7 @@ const newFormMixins = [
     Reflux.ListenerMixin,
     editableFormMixin
 ];
-import WEB_PAGE_TITLE from '../config';
+import {WEB_PAGE_TITLE} from '../config';
 
 export class ProjectDownloads extends React.Component {
   constructor(props){

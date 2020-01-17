@@ -21,7 +21,7 @@ import {
   assign,
   t,
 } from '../utils';
-import WEB_PAGE_TITLE from '../config';
+import {WEB_PAGE_TITLE} from '../config';
 
 function labelVal(label, value) {
   return {label: t(label), value: (value || label.toLowerCase().replace(/\W+/g, '_'))};
