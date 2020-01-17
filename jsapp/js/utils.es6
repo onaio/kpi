@@ -16,7 +16,6 @@ import {getAuthUrl} from './config';
 
 export const LANGUAGE_COOKIE_NAME = 'django_language';
 
-export const ONA_TITLE = 'Ona';
 
 export var assign = require('object-assign');
 
