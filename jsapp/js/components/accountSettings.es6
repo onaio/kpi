@@ -19,8 +19,8 @@ import {
   t,
   stringToColor,
 } from '../utils';
+import {WEB_PAGE_TITLE} from '../config'
 
-import {WEB_PAGE_TITLE} from '../config';
 const UNSAVED_CHANGES_WARNING = t('You have unsaved changes. Leave settings without saving?');
 
 export default class AccountSettings extends React.Component {
