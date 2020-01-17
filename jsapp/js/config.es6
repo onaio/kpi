@@ -7,3 +7,7 @@ export function getAuthUrl(url) {
 export function getZebraLoginUrl() {
   return ZEBRA_LOGIN_URL;
 }
+
+const SENTY_DSN = "{{kpi_raven_js_dsn}}";
+
+export const WEB_PAGE_TITLE = 'Ona';

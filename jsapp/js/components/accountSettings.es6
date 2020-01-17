@@ -17,13 +17,13 @@ import {hashHistory} from 'react-router';
 import ui from '../ui';
 import {
   t,
-  stringToColor,
-  ONA_TITLE,
+  log,
+  stringToColor
 } from '../utils';
 
-const UNSAVED_CHANGES_WARNING = t('You have unsaved changes. Leave settings without saving?');
+import WEB_PAGE_TITLE from '../config'
 
-export default class AccountSettings extends React.Component {
+export class AccountSettings extends React.Component {
   constructor(props){
     super(props);
     let state = {
@@ -248,7 +248,7 @@ export default class AccountSettings extends React.Component {
     };
 
     return (
-      <DocumentTitle title={`${accountName} | ${ONA_TITLE}`}>
+      <DocumentTitle title={`${accountName} | ${WEB_PAGE_TITLE}`}>
       <ui.Panel>
         <bem.AccountSettings>
           <bem.AccountSettings__actions>
