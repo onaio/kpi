@@ -223,10 +223,6 @@ class ReportViewItem extends React.Component {
         if (Array.isArray(val[1].percentage)) {
           itemPerc = val[1].percentage;
         }
-        if (Array.isArray(val[1].percentages)) {
-          itemPerc = val[1].percentages;
-        }
-
         item.data = itemPerc;
         allPercentages = [...new Set([...allPercentages, ...itemPerc])];
         item.backgroundColor = colors[i];
