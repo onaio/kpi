@@ -11,7 +11,7 @@ from itertools import chain
 import constance
 
 from django.conf import settings
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -123,9 +123,19 @@ from .tasks import import_in_background, export_in_background
 from .utils.kobo_to_xlsform import to_xlsform_structure
 from .utils.ss_structure_to_mdtable import ss_structure_to_mdtable
 
+from ona.authentication import (
+    JWTAuthentication, encode_payload, decode_payload
+)
+from .model_utils import grant_default_model_level_perms
 
-@login_required
+
 def home(request):
+    cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
+    if request.user.is_anonymous() and cookie_jwt:
+        auth_class = JWTAuthentication()
+        user, token = auth_class.authenticate(request)
+        user.backend = settings.AUTHENTICATION_BACKENDS[0]
+        login(request, user)
     return TemplateResponse(request, "index.html")
 
 
@@ -360,6 +370,19 @@ class CurrentUserViewSet(viewsets.ModelViewSet):
 
     def get_object(self):
         return self.request.user
+
+    @detail_route(methods=['POST'], renderer_classes=[renderers.JSONRenderer])
+    def grant_default_model_level_perms(self, request, *args, **kwargs):
+        user = self.get_object()
+        grant_default_model_level_perms(user)
+
+        return Response(
+            data={
+                "detail": ("Successfully granted default model level "
+                           "perms to user %s." % user.username)
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 
 class AuthorizedApplicationUserViewSet(mixins.CreateModelMixin,

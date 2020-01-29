@@ -64,6 +64,8 @@ import {
   currentLang
 } from './utils';
 
+import {getZebraLoginUrl} from './config';
+
 import keymap from './keymap'
 import { ShortcutManager, Shortcuts } from 'react-shortcuts'
 const shortcutManager = new ShortcutManager(keymap)
@@ -367,3 +369,8 @@ class RunRoutes extends React.Component {
 }
 
 export default RunRoutes;
+
+
+var RedirectToOna = function() {
+  window.location = getZebraLoginUrl()
+}

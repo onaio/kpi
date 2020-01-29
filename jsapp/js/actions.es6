@@ -17,6 +17,8 @@ import {
   t,
   notify,
   replaceSupportEmail,
+  redirectForAuthentication,
+  checkCookieExists,
 } from './utils';
 
 var Reflux = require('reflux');
@@ -359,20 +361,38 @@ actions.resources.listTags.completed.listen(function(results){
 });
 
 actions.resources.updateAsset.listen(function(uid, values, params={}) {
-  dataInterface.patchAsset(uid, values)
-    .done((asset) => {
-      actions.resources.updateAsset.completed(asset, uid, values);
-      if (typeof params.onComplete === 'function') {
-        params.onComplete(asset, uid, values);
-      }
-      notify(t('successfully updated'));
-    })
-    .fail(function(resp){
-      actions.resources.updateAsset.failed(resp);
-      if (params.onFailed) {
-        params.onFailed(resp);
-      }
-    });
+  if (checkCookieExists("__kpi_formbuilder")) {
+    redirectForAuthentication();
+} else {
+  return new Promise(function(resolve, reject){
+    dataInterface.patchAsset(uid, values)
+      .done(function(asset){
+        actions.resources.updateAsset.completed(asset);
+        resolve(asset);
+      })
+      .fail(function(...args){
+        reject(args)
+      });
+  }).then(function(asset) {
+    var has_deployment = asset.has_deployment;
+    dataInterface.deployAsset(asset, has_deployment)
+      .done((data) => {
+        if (has_deployment) {
+          notify(t('Successfully updated published form.'));
+        } else {
+          notify(t('Successfully published form.'));
+        }
+      })
+      .fail((data) => {
+        if (data.status === 500) {
+          alertify.error(t('Please add at least one question.'));
+        } else {
+          alertify.error(t(data.responseText));
+        }
+      });
+    return asset
+  })
+}
 });
 
 actions.resources.deployAsset.listen(function(asset, redeployment, params={}){

@@ -206,6 +206,12 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 raise Exception('The identifier is not properly formatted.')
 
         url = self.external_to_internal_url(u'{}/api/v1/forms'.format(server))
+        if not self.asset.has_deployment:
+            project = self.asset.settings.get('project')
+            if project:
+                url = self.external_to_internal_url(
+                    u'{}/api/v1/projects/{}/forms'.format(server, project)
+                )
         xls_io = self.asset.to_xls_io(
             versioned=True, append={
                 'settings': {
@@ -215,6 +221,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             }
         )
         payload = {
+            u'published_by_formbuilder': True,
             u"downloadable": active,
             u"has_kpi_hook": self.asset.has_active_hooks
         }
@@ -473,7 +480,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             raise BadFormatException(
                 "The format {} is not supported".format(format_type)
             )
-        return submissions
+        return submissions_kobocat_request
 
     def get_submission(self, pk, format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
         """

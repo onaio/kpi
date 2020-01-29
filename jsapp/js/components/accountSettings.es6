@@ -17,8 +17,10 @@ import {
   assign,
   t,
   log,
-  stringToColor,
+  stringToColor
 } from '../utils';
+
+import WEB_PAGE_TITLE from '../config'
 
 export class AccountSettings extends React.Component {
   constructor(props){
@@ -182,7 +184,7 @@ export class AccountSettings extends React.Component {
     };
 
     return (
-      <DocumentTitle title={`${accountName} | KoboToolbox`}>
+      <DocumentTitle title={`${accountName} | ${WEB_PAGE_TITLE}`}>
       <ui.Panel>
         <bem.AccountSettings>
           <bem.AccountSettings__item m={'column'}>
