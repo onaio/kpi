@@ -59,6 +59,7 @@ export class FormMap extends React.Component {
     super(props);
 
     let survey = props.asset.content.survey;
+    props.asset.map_styles.querylimit = QUERY_LIMIT_DEFAULT;
     var hasGeoPoint = false;
     survey.forEach(function(s) {
       if (s.type == 'geopoint')
@@ -84,7 +85,6 @@ export class FormMap extends React.Component {
       overridenStyles: false,
       clearDisaggregatedPopover: false,
       noData: false,
-      queryLimit: 5000
     };
 
     autoBind(this);
@@ -126,7 +126,7 @@ export class FormMap extends React.Component {
       }
     );
 
-    if(this.props.asset.deployment__submission_count > 5000) {
+    if(this.props.asset.deployment__submission_count > QUERY_LIMIT_DEFAULT) {
       notify(t('Map limited to the 5000 most recent submissions for performance reasons. Go to map settings to increase this limit.'));
     }
 
@@ -238,11 +238,15 @@ export class FormMap extends React.Component {
   requestData(map, nextViewBy = '') {
     // TODO: support area / line geodata questions
     let selectedQuestion = this.props.asset.map_styles.selectedQuestion || null;
+<<<<<<< HEAD
     this.props.asset.content.survey.forEach(function(row, i) {
       if (row.label != null && selectedQuestion === row.label[0] && row.type !== QUESTION_TYPES.get('geopoint').id) {
         selectedQuestion = null; //Ignore if not a geopoint question type
       }
     });
+=======
+    var queryLimit = this.props.asset.map_styles.querylimit || QUERY_LIMIT_DEFAULT;
+>>>>>>> WIP: making some requested changes from pr, removing magic numbers
     var fq = ['_id', '_geolocation'];
     if (selectedQuestion) fq.push(selectedQuestion);
     if (nextViewBy) fq.push(this.nameOfFieldInGroup(nextViewBy));
@@ -253,6 +257,7 @@ export class FormMap extends React.Component {
     }
 
     // TODO: handle forms with over 5000 results
+    console.log('query: ' + queryLimit);
     dataInterface.getSubmissions(this.props.asset.uid, queryLimit, 0, sort, fq).done((data) => {
       let results = data.results;
       if (selectedQuestion) {
@@ -551,7 +556,6 @@ export class FormMap extends React.Component {
     var map = this.state.map;
     map.removeLayer(this.state.markers);
     map.removeLayer(this.state.heatmap);
-    this.state.queryLimit = this.props.asset.map_styles.querylimit;
     return map;
   }
   launchSubmissionModal (evt) {
@@ -775,7 +779,7 @@ export class FormMap extends React.Component {
           </div>
          </div>
         }
-        
+
         {this.state.markerMap && this.state.markersVisible &&
           <bem.FormView__mapList className={this.state.showExpandedLegend ? 'expanded' : 'collapsed'}>
             <div className='maplist-contents'>
@@ -841,3 +845,4 @@ export class FormMap extends React.Component {
 reactMixin(FormMap.prototype, Reflux.ListenerMixin);
 
 export default FormMap;
+export const QUERY_LIMIT_DEFAULT = 5000;
