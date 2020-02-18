@@ -127,7 +127,7 @@ export class FormMap extends React.Component {
     );
 
     if(this.props.asset.deployment__submission_count > QUERY_LIMIT_DEFAULT) {
-      notify(t('Map limited to the 5000 most recent submissions for performance reasons. Go to map settings to increase this limit.'));
+      notify(t('Map limited to the ' + QUERY_LIMIT_DEFAULT + ' most recent submissions for performance reasons. Go to map settings to increase this limit.'));
     }
 
     this.requestData(map, this.props.viewby);
@@ -238,26 +238,12 @@ export class FormMap extends React.Component {
   requestData(map, nextViewBy = '') {
     // TODO: support area / line geodata questions
     let selectedQuestion = this.props.asset.map_styles.selectedQuestion || null;
-<<<<<<< HEAD
-    this.props.asset.content.survey.forEach(function(row, i) {
-      if (row.label != null && selectedQuestion === row.label[0] && row.type !== QUESTION_TYPES.get('geopoint').id) {
-        selectedQuestion = null; //Ignore if not a geopoint question type
-      }
-    });
-=======
     var queryLimit = this.props.asset.map_styles.querylimit || QUERY_LIMIT_DEFAULT;
->>>>>>> WIP: making some requested changes from pr, removing magic numbers
     var fq = ['_id', '_geolocation'];
     if (selectedQuestion) fq.push(selectedQuestion);
     if (nextViewBy) fq.push(this.nameOfFieldInGroup(nextViewBy));
     const sort = [{id: '_id', desc: true}];
 
-    if (fq.length > 3) {
-      queryLimit = 20000;
-    }
-
-    // TODO: handle forms with over 5000 results
-    console.log('query: ' + queryLimit);
     dataInterface.getSubmissions(this.props.asset.uid, queryLimit, 0, sort, fq).done((data) => {
       let results = data.results;
       if (selectedQuestion) {
@@ -633,10 +619,6 @@ export class FormMap extends React.Component {
   nameOfFieldInGroup(fieldName) {
     const flatPaths = getSurveyFlatPaths(this.props.asset.content.survey);
     return flatPaths[fieldName];
-  }
-
-  getSliderValue() {
-    return document.getElementById('range1').value;
   }
 
   setNewQueryLimit() {
