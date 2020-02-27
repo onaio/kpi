@@ -22,7 +22,7 @@ import {
   redirectForAuthentication
 } from '../utils';
 
-import WEB_PAGE_TITLE from '../config';
+import {WEB_PAGE_TITLE} from '../config';
 import {
   ASSET_TYPES,
   AVAILABLE_FORM_STYLES,
@@ -792,7 +792,6 @@ export default assign({
       this.state.asideLayoutSettingsVisible ||
       this.state.asideLibrarySearchVisible
     );
-
     return (
       <bem.FormBuilderAside m={isAsideVisible ? 'visible' : null}>
         { this.state.asideLayoutSettingsVisible &&

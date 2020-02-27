@@ -20,7 +20,7 @@ import {
   stringToColor
 } from '../utils';
 
-import WEB_PAGE_TITLE from '../config'
+import {WEB_PAGE_TITLE} from '../config';
 
 export class AccountSettings extends React.Component {
   constructor(props){

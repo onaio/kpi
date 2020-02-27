@@ -14,7 +14,7 @@ import $ from 'jquery';
 import Dropzone from 'react-dropzone';
 import {t, validFileTypes} from '../utils';
 import {ASSET_TYPES} from '../constants';
-import WEB_PAGE_TITLE from '../config';
+import {WEB_PAGE_TITLE} from '../config';
 
 class SearchCollectionList extends Reflux.Component {
   constructor(props) {
