@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 /**
  * Mixins to be used via react-mixin plugin. These extend components with the
  * methods defined within the given mixin, using the component as `this`.
@@ -12,8 +12,7 @@
  * https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html).
  */
 
-=======
->>>>>>> cleanup unused vars from mixins
+import _ from 'underscore';
 import React from 'react';
 import alertify from 'alertifyjs';
 import {hashHistory} from 'react-router';
@@ -516,6 +515,7 @@ mixins.clickAssets = {
           hashHistory.push(`/forms/${uid}/edit`);
       },
       delete: function(uid, name, callback) {
+        const safeName = _.escape(name);
         const asset = stores.selectedAsset.asset || stores.allAssets.byUid[uid];
         let assetTypeLabel = ASSET_TYPES[asset.asset_type].label;
 
@@ -564,7 +564,7 @@ mixins.clickAssets = {
           };
         }
         let opts = {
-          title: `${t('Delete')} ${assetTypeLabel} "${name}"`,
+          title: `${t('Delete')} ${assetTypeLabel} "${safeName}"`,
           message: msg,
           labels: {
             ok: t('Delete'),
