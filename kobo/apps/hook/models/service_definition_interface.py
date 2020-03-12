@@ -123,6 +123,15 @@ class ServiceDefinitionInterface(object):
                     f'{self._hook.endpoint} is not allowed')
             except Exception as e:
                 logging.error("service_json.ServiceDefinition.send - "
+                              "Hook #{} - Data #{} - {}".format(self._hook.uid,
+                                                                self._instance_id,
+                                                                str(e)),
+                              exc_info=True)
+                self.save_log(
+                    KOBO_INTERNAL_ERROR_STATUS_CODE,
+                    f'{self._hook.endpoint} is not allowed')
+            except Exception as e:
+                logging.error("service_json.ServiceDefinition.send - "
                               "Hook #{} - Data #{} - {}".format(
                     self._hook.uid, self._instance_id, str(e)), exc_info=True)
                 self.save_log(
