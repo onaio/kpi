@@ -237,8 +237,9 @@ export default assign({
     }
 
     let surveyJSON = surveyToValidJson(this.app.survey);
+    let surveyJSONWithMatrix = koboMatrixParser({source: surveyJSON}).source;
     if (this.state.asset) {
-      surveyJSON = unnullifyTranslations(surveyJSON, this.state.asset.content);
+      surveyJSON = unnullifyTranslations(surveyJSONWithMatrix, this.state.asset.content);
     }
     let params = {content: surveyJSON};
 
@@ -268,7 +269,6 @@ export default assign({
       params.settings = JSON.stringify(settings);
     }
 
-    params = koboMatrixParser(params);
     if (this.state.editorState === 'new') {
       // we're intentionally leaving after creating new asset,
       // so there is nothing unsaved here
@@ -282,11 +282,7 @@ export default assign({
       }
       actions.resources.createResource.triggerAsync(params)
         .then((asset) => {
-<<<<<<< HEAD
           hashHistory.push(`/library/${asset.uid}/edit`);
-=======
-          hashHistory.push('/library');
->>>>>>> linter fixes and saving config
         });
     } else {
       // update existing asset
