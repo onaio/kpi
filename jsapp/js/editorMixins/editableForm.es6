@@ -237,8 +237,8 @@ export default assign({
     }
 
     let surveyJSON = surveyToValidJson(this.app.survey);
-    let surveyJSONWithMatrix = koboMatrixParser({source: surveyJSON}).source;
     if (this.state.asset) {
+      let surveyJSONWithMatrix = koboMatrixParser({source: surveyJSON}).source;
       surveyJSON = unnullifyTranslations(surveyJSONWithMatrix, this.state.asset.content);
     }
     let params = {content: surveyJSON};
