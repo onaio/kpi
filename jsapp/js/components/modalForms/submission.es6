@@ -10,6 +10,7 @@ import {actions} from 'js/actions';
 import mixins from 'js/mixins';
 import {bem} from 'js/bem';
 import {t, notify, launchPrinting} from 'js/utils';
+import {getSubmissionDisplayData} from 'js/submissionUtils';
 import {stores} from 'js/stores';
 import ui from 'js/ui';
 import icons from '../../../xlform/src/view.icons';
@@ -400,6 +401,27 @@ class Submission extends React.Component {
       );
     });
   }
+
+  newRenderAllQuestions() {
+    // TODO use this when ready
+    // const displayData = getSubmissionDisplayData(
+    //   this.props.asset.content.survey,
+    //   this.state.translationIndex,
+    //   this.state.submission
+    // );
+
+    return (
+      <table>
+        <thead>
+          <tr><td>hed</td></tr>
+        </thead>
+        <tbody>
+          <tr><td>bod</td></tr>
+        </tbody>
+      </table>
+    );
+  }
+
   render () {
     if (this.state.loading) {
       return (
@@ -593,6 +615,8 @@ class Submission extends React.Component {
 
           </tbody>
         </table>
+
+        {this.newRenderAllQuestions()}
       </bem.FormModal>
     );
   }
