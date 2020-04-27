@@ -18,6 +18,7 @@ import {
   VALIDATION_STATUSES_LIST,
   MODAL_TYPES,
 } from 'js/constants';
+import SubmissionDataTable from 'js/components/submissionDataTable';
 
 const DETAIL_NOT_FOUND = '{\"detail\":\"Not found.\"}';
 
@@ -402,26 +403,6 @@ class Submission extends React.Component {
     });
   }
 
-  newRenderAllQuestions() {
-    // TODO use this when ready
-    // const displayData = getSubmissionDisplayData(
-    //   this.props.asset.content.survey,
-    //   this.state.translationIndex,
-    //   this.state.submission
-    // );
-
-    return (
-      <table>
-        <thead>
-          <tr><td>hed</td></tr>
-        </thead>
-        <tbody>
-          <tr><td>bod</td></tr>
-        </tbody>
-      </table>
-    );
-  }
-
   render () {
     if (this.state.loading) {
       return (
@@ -448,6 +429,13 @@ class Submission extends React.Component {
 
     const s = this.state.submission;
     let translationOptions = this.state.translationOptions;
+
+    const displayData = getSubmissionDisplayData(
+      this.props.asset.content.survey,
+      this.props.asset.content.choices,
+      this.state.translationIndex,
+      this.state.submission
+    );
 
     return (
       <bem.FormModal>
@@ -616,7 +604,7 @@ class Submission extends React.Component {
           </tbody>
         </table>
 
-        {this.newRenderAllQuestions()}
+        <SubmissionDataTable displayData={displayData}/>
       </bem.FormModal>
     );
   }
