@@ -380,21 +380,27 @@ actions.resources.updateAsset.listen(function(uid, values, params={}) {
       });
   }).then(function(asset) {
     var has_deployment = asset.has_deployment;
-    dataInterface.deployAsset(asset, has_deployment)
-      .done((data) => {
-        if (has_deployment) {
-          notify(t('Successfully updated published form.'));
-        } else {
-          notify(t('Successfully published form.'));
-        }
-      })
-      .fail((data) => {
-        if (data.status === 500) {
-          alertify.error(t('Please add at least one question.'));
-        } else {
-          alertify.error(t(data.responseText));
-        }
-      });
+    var asset_type = asset.asset_type;
+    if(asset_type === "survey") {
+      dataInterface.deployAsset(asset, has_deployment)
+        .done((data) => {
+          if (has_deployment) {
+            notify(t('Successfully updated published form.'));
+          } else {
+            notify(t('Successfully published form.'));
+          }
+        })
+        .fail((data) => {
+          if (data.status === 500) {
+            alertify.error(t('Please add at least one question.'));
+          } else {
+            alertify.error(t(data.responseText));
+          }
+        });
+    } else {
+      notify(t(`Successfully updated ${asset_type}.`));
+    }
+
     return asset
   })
 }
