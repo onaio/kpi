@@ -269,6 +269,7 @@ export default assign({
       params.settings = JSON.stringify(settings);
     }
 
+    params = koboMatrixParser(params);
     if (this.state.editorState === 'new') {
       // we're intentionally leaving after creating new asset,
       // so there is nothing unsaved here
@@ -281,8 +282,8 @@ export default assign({
         params.asset_type = 'block';
       }
       actions.resources.createResource.triggerAsync(params)
-        .then(() => {
-          hashHistory.push('/library');
+        .then((asset) => {
+          hashHistory.push(`/library/${asset.uid}/edit`);
         });
     } else {
       // update existing asset
