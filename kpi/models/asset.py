@@ -1357,16 +1357,6 @@ class AssetSnapshot(models.Model, XlsExportable, FormpackXLSFormUtils):
     def content(self):
         return self.source
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Before changing `self.source` to `JSONField(default=dict)`, it was
-        # nullable. It means, now it equals `{}` instead of `None`.
-        # If we want to make a difference between the 2 values, the lines below
-        # are required. If it does not matter, then remove this overload of `__init__`
-        # entirely and change the logic in `save()`
-        if self.source is None or self.source == {}:
-            self.source = kwargs.get('source', None)
-
     def save(self, *args, **kwargs):
         if self.asset is not None:
             # Previously, `self.source` was a nullable field. It must now
