@@ -106,8 +106,6 @@ class Submission extends React.Component {
       const betaQuestions = ['begin_kobomatrix'];
       const hasBetaQuestion = survey.find(q => betaQuestions.includes(q.type)) || false;
 
-      console.log('getSubmission response next', next);
-
       this.setState({
         submission: data,
         loading: false,
@@ -206,7 +204,6 @@ class Submission extends React.Component {
 
   switchSubmission(sid) {
     this.setState({ loading: true});
-    console.log('switchSubmission', sid);
     stores.pageState.showModal({
       type: MODAL_TYPES.SUBMISSION,
       sid: sid,
