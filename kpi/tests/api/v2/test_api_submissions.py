@@ -198,10 +198,10 @@ class SubmissionApiTests(BaseSubmissionTestCase):
     def test_list_submissions_anonymous_asset_publicly_shared(self):
         self.client.logout()
         anonymous_user = get_anonymous_user()
-        self.asset.assign_perm(anonymous_user, 'view_submissions')
+        self.asset.assign_perm(anonymous_user, PERM_VIEW_SUBMISSIONS)
         response = self.client.get(self.submission_url, {"format": "json"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.asset.remove_perm(anonymous_user, 'view_submissions')
+        self.asset.remove_perm(anonymous_user, PERM_VIEW_SUBMISSIONS)
 
     def test_list_submissions_authenticated_asset_publicly_shared(self):
         # https://github.com/kobotoolbox/kpi/issues/2698
@@ -212,10 +212,10 @@ class SubmissionApiTests(BaseSubmissionTestCase):
         Asset.objects.create(name='i own it', owner=self.anotheruser)
 
         anonymous_user = get_anonymous_user()
-        self.asset.assign_perm(anonymous_user, 'view_submissions')
+        self.asset.assign_perm(anonymous_user, PERM_VIEW_SUBMISSIONS)
         response = self.client.get(self.submission_url, {"format": "json"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.asset.remove_perm(anonymous_user, 'view_submissions')
+        self.asset.remove_perm(anonymous_user, PERM_VIEW_SUBMISSIONS)
 
     def test_retrieve_submission_owner(self):
         submission = self.submissions[0]
@@ -307,11 +307,11 @@ class SubmissionApiTests(BaseSubmissionTestCase):
                                       HTTP_ACCEPT="application/json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_delete_submission_shared_other_write(self):
-        self._other_user_login(True)
-        self.asset.assign_perm(self.anotheruser, "change_submissions")
-        submission = self.submissions[0]
-        url = self.asset.deployment.get_submission_detail_url(submission.get("id"))
+        # Give user `change_submissions` should not give permission to delete.
+        # Only owner can delete submissions on `kpi`. `delete_submissions` is
+        # a calculated permission and thus, can not be assigned.
+        # TODO Review this test when kpi#2282 is released.
+        self.asset.assign_perm(self.anotheruser, PERM_CHANGE_SUBMISSIONS)
         response = self.client.delete(url,
                                       content_type="application/json",
                                       HTTP_ACCEPT="application/json")
