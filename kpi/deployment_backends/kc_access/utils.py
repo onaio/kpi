@@ -11,8 +11,6 @@ import requests
 from django.core.exceptions import ImproperlyConfigured
 
 from kpi.exceptions import KobocatProfileException
-
-
 from kpi.utils.log import logging
 from .shadow_models import (
     safe_kc_read,
