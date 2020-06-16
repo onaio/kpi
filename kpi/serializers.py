@@ -971,6 +971,9 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         if settings.KOBOCAT_URL and settings.KOBOCAT_INTERNAL_URL:
             rep['extra_details']['require_auth'] = get_kc_profile_data(
                 obj.pk).get('require_auth', False)
+            rep['extra_details']['can_publicize_collection'] = obj.has_perm(
+                'kpi.publicize_collection'
+            )
 
         return rep
 
