@@ -57,6 +57,7 @@ const shortcutManager = new ShortcutManager(keymap);
 import LibrarySearchableList from './lists/library';
 import FormsSearchableList from './lists/forms';
 
+<<<<<<< HEAD
 import {getZebraLoginUrl} from './config';
 
 
@@ -69,6 +70,9 @@ function stringifyRoutes(contextRouter) {
   }), null, 4);
 }
 
+=======
+const shortcutManager = new ShortcutManager(keymap);
+>>>>>>> Update raven pip package
 
 class App extends React.Component {
   constructor(props) {
