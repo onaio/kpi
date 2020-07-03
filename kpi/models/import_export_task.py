@@ -258,7 +258,6 @@ class ImportTask(ImportExportTask):
             orm_obj.parent = parent_item
             orm_obj.save()
 
-
     def get_form_payload(self, form_id):
         '''
         Get form information via the API
