@@ -228,7 +228,7 @@ export class FormLanding extends React.Component {
           </bem.FormView__cell>
         }
       </bem.FormView__row>
-      );
+    );
   }
   renderCollectData () {
     var available_links = new Map([
