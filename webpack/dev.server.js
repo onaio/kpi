@@ -42,7 +42,6 @@ module.exports = WebpackCommon({
     clientLogLevel: 'none' // disables linter warnings appearing in DevTools
   },
   plugins: [
-    new BundleTracker({path: __dirname, filename: '../webpack-stats.json'}),
     new webpack.SourceMapDevToolPlugin({
       filename: '[file].map',
       exclude: /vendors.*.*/
