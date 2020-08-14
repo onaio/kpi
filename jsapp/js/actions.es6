@@ -366,22 +366,6 @@ actions.resources.listTags.completed.listen(function(results){
 });
 
 actions.resources.updateAsset.listen(function(uid, values, params={}) {
-<<<<<<< HEAD
-  dataInterface.patchAsset(uid, values)
-    .done((asset) => {
-      actions.resources.updateAsset.completed(asset);
-      if (typeof params.onComplete === 'function') {
-        params.onComplete(asset, uid, values);
-      }
-      notify(t('successfully updated'));
-    })
-    .fail(function(resp){
-      actions.resources.updateAsset.failed(resp);
-      if (params.onFailed) {
-        params.onFailed(resp);
-      }
-    });
-=======
   if (checkCookieExists("__kpi_formbuilder")) {
     redirectForAuthentication();
 } else {
@@ -420,7 +404,6 @@ actions.resources.updateAsset.listen(function(uid, values, params={}) {
     return asset
   })
 }
->>>>>>> Include modifications to get kpi able to create and edit forms
 });
 
 actions.resources.deployAsset.listen(function(asset, redeployment, params={}){

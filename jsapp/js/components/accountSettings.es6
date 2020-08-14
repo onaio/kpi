@@ -23,7 +23,8 @@ import {
 
 import {WEB_PAGE_TITLE} from '../config';
 
-export class AccountSettings extends React.Component {
+
+class AccountSettings extends React.Component {
   constructor(props){
     super(props);
     let state = {

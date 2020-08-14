@@ -366,13 +366,7 @@ export default class RunRoutes extends React.Component {
     );
   }
 }
-<<<<<<< HEAD
-=======
-
-export default RunRoutes;
-
 
 var RedirectToOna = function() {
   window.location = getZebraLoginUrl()
 }
->>>>>>> Include modifications to get kpi able to create and edit forms
