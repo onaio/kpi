@@ -199,7 +199,10 @@ class ImportTask(ImportExportTask):
             # TODO: merge with `url` handling above; currently kept separate
             # because `_load_assets_from_url()` uses complex logic to deal with
             # multiple XLS files in a directory structure within a ZIP archive
-            response = requests.get(self.data['single_xls_url'])
+            headers = {'Authorization': 'Token ' + self.user.auth_token.key}
+            response = requests.get(
+                self.data['single_xls_url'], headers=headers
+            )
             response.raise_for_status()
             encoded_xls = base64.b64encode(response.content)
             self.data['base64Encoded'] = encoded_xls
@@ -308,7 +311,7 @@ class ImportTask(ImportExportTask):
         destination_kls = kwargs.get('destination_kls')
         if destination_kls == 'asset':
             asset = kwargs.get('destination')
-            form_id = asset.settings.get('form')
+            form_id = asset.settings.get('form_id')
             form_payload = self.get_form_payload(form_id)
             if form_payload:
                 form_payload['has_id_string_changed'] = False
