@@ -199,7 +199,10 @@ class ImportTask(ImportExportTask):
             # TODO: merge with `url` handling above; currently kept separate
             # because `_load_assets_from_url()` uses complex logic to deal with
             # multiple XLS files in a directory structure within a ZIP archive
-            response = requests.get(self.data['single_xls_url'])
+            headers = {'Authorization': 'Token ' + self.user.auth_token.key}
+            response = requests.get(
+                self.data['single_xls_url'], headers=headers
+            )
             response.raise_for_status()
             encoded_xls = base64.b64encode(response.content)
             self.data['base64Encoded'] = encoded_xls
@@ -277,19 +280,21 @@ class ImportTask(ImportExportTask):
         for (orm_obj, parent_item) in collections_to_assign:
             orm_obj.parent = parent_item
             orm_obj.save()
-    
-    def get_form_information(self, survey_dict):
+
+    def get_form_payload(self, form_id):
         '''
         Get form information via the API
         '''
         url = '{}/api/v1/forms/{}'.format(
-            settings.KOBOCAT_INTERNAL_URL, self.data['filename'])
+            settings.KOBOCAT_INTERNAL_URL, form_id
+        )
         token, _ = Token.objects.get_or_create(user=self.user)
 
-        response = requests.get(url, headers={'Authorization': 'Token ' + token.key})
-
-        return response
-
+        response = requests.get(
+            url, headers={'Authorization': 'Token ' + token.key}
+        )
+        if response.status_code == 200:
+            return response.json()
 
     def _parse_b64_upload(self, base64_encoded_upload, messages, **kwargs):
         filename = kwargs.get('filename', False)
@@ -302,10 +307,14 @@ class ImportTask(ImportExportTask):
         survey_dict = _b64_xls_to_dict(base64_encoded_upload)
         survey_dict_keys = survey_dict.keys()
 
-        form_info = self.get_form_information(survey_dict)
-
-        json_response = form_info.json()
-        json_response['has_id_string_changed'] = False
+        form_payload = None
+        destination_kls = kwargs.get('destination_kls')
+        if destination_kls == 'asset':
+            asset = kwargs.get('destination')
+            form_id = asset.settings.get('form_id')
+            form_payload = self.get_form_payload(form_id)
+            if form_payload:
+                form_payload['has_id_string_changed'] = False
 
 
         destination = kwargs.get('destination', False)
@@ -357,21 +366,23 @@ class ImportTask(ImportExportTask):
             else:
                 asset = destination
                 asset.content = survey_dict
-                server = settings.KOBOCAT_URL
+
+                # what if owner is an organization
                 username = asset.owner.username
-                id_string = asset.name
-                identifier = '{server}/{username}/forms/{id_string}'.format(
-                        server=server,
-                        username=username,
-                        id_string=id_string,
+                if form_payload:
+                    id_string = form_payload.get('id_string')
+                    identifier = '{}/{}/forms/{}'.format(
+                        settings.KOBOCAT_URL,
+                        username,
+                        id_string,
                     )
-                asset._deployment_data.update({
-                'backend': 'kobocat',
-                'identifier': identifier,
-                'active': json_response['downloadable'],
-                'backend_response': json_response,
-                'version': asset.version_id,
-                })
+                    asset._deployment_data.update({
+                        'backend': 'kobocat',
+                        'identifier': identifier,
+                        'active': form_payload['downloadable'],
+                        'backend_response': form_payload,
+                        'version': asset.version_id,
+                    })
                 asset.save()
                 msg_key = 'updated'
 
