@@ -28033,7 +28033,7 @@ future==0.18.1            # via django-ses
 geojson-rewind==0.2.0
 >>>>>>> - JS: Read CSRF cookie each time a new ajax call is made
 idna==2.8                 # via requests
-importlib-metadata==0.23  # via jsonschema, kombu, path.py
+importlib-metadata==1.7.0  # via jsonschema, kombu, path.py
 jmespath==0.9.4           # via boto3, botocore
 jsonfield==2.0.2          # via -r dependencies/pip/requirements.in
 jsonschema==3.1.1         # via formpack
