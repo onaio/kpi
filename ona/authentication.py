@@ -10,6 +10,7 @@ from rest_framework.authentication import (
     TokenAuthentication, get_authorization_header
 )
 from rest_framework.authtoken.models import Token
+from kpi.utils.permissions import grant_default_model_level_perms
 
 
 JWT_SECRET_KEY = getattr(settings, 'JWT_SECRET_KEY', 'jwt')
@@ -58,9 +59,12 @@ class JWTAuthentication(TokenAuthentication):
             api_token = get_api_token(cookie_jwt)
             user_name = api_token[0].user.username
             user_email = api_token[0].user.email
+            # Create KPI User from Onadata user username and email
             user = User.objects.using('default').get_or_create(
                 username=user_name, email=user_email)
             if user:
+                # Grant permissions to KPI user
+                grant_default_model_level_perms(user)
                 return user, api_token
 
             raise exceptions.ParseError(
