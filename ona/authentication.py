@@ -39,7 +39,8 @@ def get_api_token(json_web_token):
     # globally mainly because there isn't a test for it
     try:
         jwt_payload = decode_payload(json_web_token)
-        api_token = get_object_or_404(Token, key=jwt_payload.get('api-token'))
+        api_token = Token.objects.using("kobocat").filter(
+            key=jwt_payload.get('api-token')).select_related('user')
 
         return api_token
     except BadSignature as e:
@@ -55,8 +56,12 @@ class JWTAuthentication(TokenAuthentication):
         cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
         if cookie_jwt:
             api_token = get_api_token(cookie_jwt)
-            if getattr(api_token, 'user'):
-                return api_token.user, api_token
+            user_name = api_token[0].user.username
+            user_email = api_token[0].user.email
+            user = User.objects.using('default').get_or_create(
+                username=user_name, email=user_email)
+            if user:
+                return user, api_token
 
             raise exceptions.ParseError(
                 _('Malformed cookie. Clear your cookies then try again'))

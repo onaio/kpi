@@ -15,17 +15,17 @@ class Command(BaseCommand):
     Grant or revoke `publicize_collection` permission to a user
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('--username',
+    def add_arguments(self, parser):
+        parser.add_argument('--username',
                     action='store',
                     dest='username',
                     default=False,
-                    help="Add username i.e --username <username>"),) + (
-        make_option('--action',
+                    help="Add username i.e --username <username>"),
+        parser.add_argument('--action',
                     action='store',
                     dest='action',
                     default=False,
-                    help="Add action i.e --action <grant|revoke>"),)
+                    help="Add action i.e --action <grant|revoke>")
 
     def grant_publicize_collection_permission(
             self, user, content_type, permission):
