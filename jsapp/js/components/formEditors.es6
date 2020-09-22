@@ -232,11 +232,7 @@ export class ProjectDownloads extends React.Component {
     let dvcount = this.props.asset.deployed_versions.count;
     var docTitle = this.props.asset.name || t('Untitled');
     return (
-<<<<<<< HEAD
       <DocumentTitle title={`${docTitle} | ${WEB_PAGE_TITLE}`}>
-=======
-      <DocumentTitle title={`${docTitle} | ${ONA_TITLE}`}>
->>>>>>> Include modifications to get kpi able to create and edit forms
         <bem.FormView m='form-data-downloads'>
           <bem.FormView__row>
               <bem.FormView__cell m='label'>

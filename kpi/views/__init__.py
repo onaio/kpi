@@ -28,7 +28,7 @@ from kpi.serializers import AuthorizedApplicationUserSerializer
 
 def home(request):
     cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
-    if request.user.is_anonymous() and cookie_jwt:
+    if request.user.is_anonymous and cookie_jwt:
         auth_class = JWTAuthentication()
         user, token = auth_class.authenticate(request)
         user.backend = settings.AUTHENTICATION_BACKENDS[0]

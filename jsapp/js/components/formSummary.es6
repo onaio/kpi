@@ -8,7 +8,7 @@ import {dataInterface} from '../dataInterface';
 import {stores} from '../stores';
 import mixins from '../mixins';
 import {bem} from '../bem';
-import {ui} from 'js/ui';
+import ui from 'js/ui';
 import DocumentTitle from 'react-document-title';
 import moment from 'moment';
 import Chart from 'chart.js';

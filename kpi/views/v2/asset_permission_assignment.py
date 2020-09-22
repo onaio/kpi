@@ -3,7 +3,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from rest_framework import exceptions, viewsets, status, renderers
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, \
     DestroyModelMixin, ListModelMixin
 from rest_framework.response import Response
@@ -162,7 +162,7 @@ class AssetPermissionAssignmentViewSet(AssetNestedObjectViewsetMixin,
     permission_classes = (AssetNestedObjectPermission,)
     pagination_class = None
 
-    @list_route(methods=['POST'], renderer_classes=[renderers.JSONRenderer],
+    @action(detail=False, methods=['POST'], renderer_classes=[renderers.JSONRenderer],
                 url_path='bulk')
     def bulk_assignments(self, request, *args, **kwargs):
         """
@@ -203,7 +203,7 @@ class AssetPermissionAssignmentViewSet(AssetNestedObjectViewsetMixin,
             # see all permissions.
             return self.list(request, *args, **kwargs)
 
-    @list_route(methods=['PATCH'], renderer_classes=[renderers.JSONRenderer])
+    @action(detail=False, methods=['PATCH'], renderer_classes=[renderers.JSONRenderer])
     def clone(self, request, *args, **kwargs):
 
         source_asset_uid = self.request.data[CLONE_ARG_NAME]

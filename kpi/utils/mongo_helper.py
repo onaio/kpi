@@ -67,13 +67,6 @@ class MongoHelper:
     def get_count(
             cls, mongo_userform_id, hide_deleted=True, query=None, instances_ids=None,
             permission_filters=None):
-<<<<<<< HEAD
-        cursor = cls._get_cursor(mongo_userform_id, hide_deleted=hide_deleted,
-                                 fields={'_id': 1}, query=query,
-                                 instances_ids=instances_ids,
-                                 permission_filters=permission_filters)
-=======
->>>>>>> Merge branch '2319-update-data-api-call' into 2385-partial-submission-permissions-fixes-tmp
 
         _, total_count = cls._get_cursor_and_count(
             mongo_userform_id,
@@ -91,12 +84,6 @@ class MongoHelper:
             sort=None, fields=None, query=None, instances_ids=None,
             permission_filters=None
     ):
-<<<<<<< HEAD
-        cursor = cls._get_cursor(mongo_userform_id, hide_deleted=hide_deleted,
-                                 fields=fields, query=query,
-                                 instances_ids=instances_ids,
-                                 permission_filters=permission_filters)
-=======
         cursor, total_count = cls._get_cursor_and_count(
             mongo_userform_id,
             hide_deleted=hide_deleted,
@@ -104,7 +91,6 @@ class MongoHelper:
             query=query,
             instance_ids=instance_ids,
             permission_filters=permission_filters)
->>>>>>> Merge branch '2319-update-data-api-call' into 2385-partial-submission-permissions-fixes-tmp
 
         cursor.skip(start)
         if limit is not None:
@@ -294,14 +280,9 @@ class MongoHelper:
         }
 
     @classmethod
-<<<<<<< HEAD
-    def _get_cursor(cls, mongo_userform_id, hide_deleted=True, fields=None,
-                   query=None, instances_ids=None, permission_filters=None):
-=======
     def _get_cursor_and_count(cls, mongo_userform_id, hide_deleted=True,
                               fields=None, query=None, instance_ids=None,
                               permission_filters=None):
->>>>>>> Merge branch '2319-update-data-api-call' into 2385-partial-submission-permissions-fixes-tmp
         # check if query contains an _id and if its a valid ObjectID
         if '_uuid' in query:
             if ObjectId.is_valid(query.get('_uuid')):

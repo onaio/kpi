@@ -1,7 +1,6 @@
 # coding: utf-8
 from django.http import Http404
 from rest_framework import exceptions, permissions
-from six import add_metaclass
 
 from kpi.models.asset import Asset
 from kpi.models.collection import Collection
@@ -34,7 +33,6 @@ def get_perm_name(perm_name_prefix, model_instance):
     return perm_name
 
 
-@add_metaclass(ABCMeta)
 class AbstractParentObjectNestedObjectPermission(permissions.BasePermission):
     """
     Main abstract class for Asset/Collection and related objects permissions
@@ -45,10 +43,8 @@ class AbstractParentObjectNestedObjectPermission(permissions.BasePermission):
     def perms_map(self):
         raise NotImplementedError
 
-    @abstractmethod
     def has_permission(self, request, view):
-        # This method should be overridden in subclasses
-        return False
+        raise NotImplementedError
 
     def has_object_permission(self, request, view, obj):
         # Because authentication checks have already executed via has_permission,
@@ -170,7 +166,7 @@ class AssetNestedObjectPermission(BaseAssetNestedObjectPermission):
         parent_object = self._get_parent_object(view)
 
         user = request.user
-        if user.is_anonymous():
+        if user.is_anonymous:
             user = get_anonymous_user()
 
         user_permissions = self._get_user_permissions(parent_object, user)
@@ -269,7 +265,7 @@ class SubmissionPermission(AssetNestedObjectPermission):
     Permissions for submissions.
     """
 
-    MODEL_NAME = "submissions"  # Hardcode model_name to match permissions
+    MODEL_NAME = "submissions"  # Hard-code `model_name` to match permissions
 
     perms_map = {
         'GET': ['%(app_label)s.view_%(model_name)s'],

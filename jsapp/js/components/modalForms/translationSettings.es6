@@ -10,6 +10,8 @@ import {actions} from 'js/actions';
 import {MODAL_TYPES} from 'js/constants';
 import {t, getLangString, notify} from 'utils';
 
+const LANGUAGE_SUPPORT_URL = 'language_dashboard.html';
+
 export class TranslationSettings extends React.Component {
   constructor(props){
     super(props);
@@ -264,9 +266,13 @@ export class TranslationSettings extends React.Component {
                 {' ' + t('official language code') + ' '}
               </a>
               {t('(e.g. "English (en)" or "Rohingya (rhg)").')}
-              <a target='_blank' href='http://support.kobotoolbox.org/creating-forms/adding-another-language-to-your-form-in-the-project-dashboard'>
-                {' ' + t('Read more.')}
-              </a>
+
+              { stores.serverEnvironment &&
+                stores.serverEnvironment.state.support_url &&
+                <a target='_blank' href={stores.serverEnvironment.state.support_url + LANGUAGE_SUPPORT_URL}>
+                  {' ' + t('Read more.')}
+                </a>
+              }
             </p>
           </bem.FormView__cell>
           <bem.FormView__cell m='translation'>
@@ -371,13 +377,13 @@ export class TranslationSettings extends React.Component {
           })}
           {!this.state.showAddLanguageForm &&
             <bem.FormView__cell m='add-language'>
-              <button
-                className='mdl-button mdl-button--raised mdl-button--colored'
+              <bem.KoboButton
+                m='blue'
                 onClick={this.showAddLanguageForm}
                 disabled={!this.canAddLanguages()}
               >
                 {t('Add language')}
-              </button>
+              </bem.KoboButton>
             </bem.FormView__cell>
           }
           {this.state.showAddLanguageForm &&
@@ -417,149 +423,3 @@ export class TranslationSettings extends React.Component {
 reactMixin(TranslationSettings.prototype, Reflux.ListenerMixin);
 
 export default TranslationSettings;
-
-/*
-Properties:
-- langString <string>: follows pattern "NAME (CODE)"
-- langIndex <string>
-- onLanguageChange <function>: required
-- existingLanguages <langString[]>: for validation purposes
-*/
-class LanguageForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      name: '',
-      nameError: null,
-      code: '',
-      codeError: null
-    }
-
-    if (this.props.langString) {
-      const lang = getLangAsObject(this.props.langString);
-
-      if (lang) {
-        this.state = {
-          name: lang.name || '',
-          code: lang.code || ''
-        }
-      } else {
-        // if language isn't in "English (en)" format, assume it is a simple language name string
-        this.state = {
-          name: this.props.langString,
-          code: ''
-        }
-      }
-    }
-    autoBind(this);
-  }
-  isLanguageNameValid() {
-    if (this.props.existingLanguages) {
-      let isNameUnique = true;
-      this.props.existingLanguages.forEach((langString) => {
-        if (this.props.langString && langString === this.props.langString) {
-          // skip comparing to itself (editing language context)
-        } else if (langString !== null) {
-          const langObj = getLangAsObject(langString);
-          if (langObj && langObj.name === this.state.name) {
-            isNameUnique = false;
-          }
-        }
-      });
-      return isNameUnique;
-    } else {
-      return true;
-    }
-  }
-  isLanguageCodeValid() {
-    if (this.props.existingLanguages) {
-      let isCodeUnique = true;
-      this.props.existingLanguages.forEach((langString) => {
-        if (this.props.langString && langString === this.props.langString) {
-          // skip comparing to itself (editing language context)
-        } else if (langString !== null) {
-          const langObj = getLangAsObject(langString);
-          if (langObj && langObj.code === this.state.code) {
-            isCodeUnique = false;
-          }
-        }
-      });
-      return isCodeUnique;
-    } else {
-      return true;
-    }
-  }
-  onSubmit(evt) {
-    evt.preventDefault();
-
-    const isNameValid = this.isLanguageNameValid();
-    if (!isNameValid) {
-      this.setState({nameError: t('Name must be unique!')});
-    } else {
-      this.setState({nameError: null});
-    }
-
-    const isCodeValid = this.isLanguageCodeValid();
-    if (!isCodeValid) {
-      this.setState({codeError: t('Code must be unique!')});
-    } else {
-      this.setState({codeError: null});
-    }
-
-    if (isNameValid && isCodeValid) {
-      let langIndex = -1;
-      if (this.props.langIndex !== undefined) {
-        langIndex = this.props.langIndex;
-      }
-      this.props.onLanguageChange({
-        name: this.state.name,
-        code: this.state.code
-      }, langIndex);
-    }
-  }
-  onNameChange (newName) {
-    this.setState({name: newName.trim()});
-  }
-  onCodeChange (newCode) {
-    this.setState({code: newCode.trim()});
-  }
-  render () {
-    let isAnyFieldEmpty = this.state.name.length === 0 || this.state.code.length === 0;
-
-    return (
-      <bem.FormView__form m='add-language-fields'>
-        <bem.FormView__cell m='lang-name'>
-          <bem.FormModal__item>
-            <label>{t('Language name')}</label>
-            <TextBox
-              value={this.state.name}
-              onChange={this.onNameChange}
-              errors={this.state.nameError}
-            />
-          </bem.FormModal__item>
-        </bem.FormView__cell>
-
-        <bem.FormView__cell m='lang-code'>
-          <bem.FormModal__item>
-            <label>{t('Language code')}</label>
-            <TextBox
-              value={this.state.code}
-              onChange={this.onCodeChange}
-              errors={this.state.codeError}
-            />
-          </bem.FormModal__item>
-        </bem.FormView__cell>
-
-        <bem.FormView__cell m='submit-button'>
-          <button
-            className='mdl-button mdl-button--raised mdl-button--colored'
-            onClick={this.onSubmit} type='submit'
-            disabled={isAnyFieldEmpty}
-          >
-            {this.props.langIndex !== undefined ? t('Update') : t('Add')}
-          </button>
-        </bem.FormView__cell>
-      </bem.FormView__form>
-      );
-  }
-};

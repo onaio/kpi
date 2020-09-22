@@ -56,23 +56,8 @@ import { ShortcutManager, Shortcuts } from 'react-shortcuts';
 const shortcutManager = new ShortcutManager(keymap);
 import LibrarySearchableList from './lists/library';
 import FormsSearchableList from './lists/forms';
-
-<<<<<<< HEAD
 import {getZebraLoginUrl} from './config';
 
-
-function stringifyRoutes(contextRouter) {
-  return JSON.stringify(contextRouter.getCurrentRoutes().map(function(r){
-    return {
-      name: r.name,
-      href: r.path
-    };
-  }), null, 4);
-}
-
-=======
-const shortcutManager = new ShortcutManager(keymap);
->>>>>>> Update raven pip package
 
 class App extends React.Component {
   constructor(props) {

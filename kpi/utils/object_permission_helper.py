@@ -55,7 +55,7 @@ class ObjectPermissionHelper:
 
         # Filtering is done in `get_queryset` instead of FilteredBackend class
         # because it's specific to `ObjectPermission`.
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             queryset = queryset.filter(user_id=affected_object.owner_id)
         elif not cls.user_can_share(affected_object, user):
             # Display only users' permissions if they are not allowed to modify

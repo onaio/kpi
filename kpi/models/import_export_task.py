@@ -344,7 +344,6 @@ class ImportTask(ImportExportTask):
             else:
                 asset = destination
                 asset.content = survey_dict
-<<<<<<< HEAD
 
                 # what if owner is an organization
                 username = asset.owner.username
@@ -362,23 +361,6 @@ class ImportTask(ImportExportTask):
                         'backend_response': form_payload,
                         'version': asset.version_id,
                     })
-=======
-                server = settings.KOBOCAT_URL
-                username = asset.owner.username
-                id_string = asset.name
-                identifier = '{server}/{username}/forms/{id_string}'.format(
-                        server=server,
-                        username=username,
-                        id_string=id_string,
-                    )
-                asset._deployment_data.update({
-                'backend': 'kobocat',
-                'identifier': identifier,
-                'active': json_response['downloadable'],
-                'backend_response': json_response,
-                'version': asset.version_id,
-                })
->>>>>>> Create deployment for asset when importing xls data into empty asset
                 asset.save()
                 msg_key = 'updated'
 

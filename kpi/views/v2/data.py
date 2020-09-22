@@ -3,7 +3,7 @@ from django.conf import settings
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import renderers, serializers, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.pagination import _positive_int as positive_int
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
@@ -219,7 +219,7 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
                 _('The specified asset has not been deployed'))
         return self.asset.deployment
 
-    @list_route(methods=['DELETE'], renderer_classes=[renderers.JSONRenderer])
+    @action(detail=False, methods=['DELETE'], renderer_classes=[renderers.JSONRenderer])
     def bulk(self, request, *args, **kwargs):
         deployment = self._get_deployment()
         json_response = deployment.delete_submissions(request.data,
@@ -232,7 +232,7 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         json_response = deployment.delete_submission(pk, user=request.user)
         return Response(**json_response)
 
-    @detail_route(methods=['GET'], renderer_classes=[renderers.JSONRenderer],
+    @action(detail=True, methods=['GET'], renderer_classes=[renderers.JSONRenderer],
                   permission_classes=[EditSubmissionPermission])
     def edit(self, request, pk, *args, **kwargs):
         deployment = self._get_deployment()
@@ -290,7 +290,7 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
                 raise Http404
         return Response(submission)
 
-    @detail_route(methods=['GET', 'PATCH', 'DELETE'],
+    @action(detail=True, methods=['GET', 'PATCH', 'DELETE'],
                   renderer_classes=[renderers.JSONRenderer],
                   permission_classes=[SubmissionValidationStatusPermission])
     def validation_status(self, request, pk, *args, **kwargs):
@@ -309,7 +309,7 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
 
         return Response(**json_response)
 
-    @list_route(methods=['PATCH', 'DELETE'],
+    @action(detail=False, methods=['PATCH', 'DELETE'],
                 renderer_classes=[renderers.JSONRenderer],
                 permission_classes=[SubmissionValidationStatusPermission])
     def validation_statuses(self, request, *args, **kwargs):

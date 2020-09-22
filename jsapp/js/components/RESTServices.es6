@@ -5,15 +5,9 @@ import {bem} from '../bem';
 import {stores} from '../stores';
 import mixins from 'js/mixins';
 import {PERMISSIONS_CODENAMES} from 'js/constants';
-<<<<<<< HEAD
-import {AccessDeniedMessage} from 'js/ui';
-import RESTServicesList from './RESTServices/RESTServicesList'
-import RESTServiceLogs from './RESTServices/RESTServiceLogs'
-=======
 import ui from 'js/ui';
 import RESTServicesList from './RESTServices/RESTServicesList';
 import RESTServiceLogs from './RESTServices/RESTServiceLogs';
->>>>>>> fix AccessDenied import usage - consistent with other ui.es6 ones
 import {t} from '../utils';
 
 export default class RESTServices extends React.Component {

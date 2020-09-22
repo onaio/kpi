@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from rest_framework import viewsets, status
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
@@ -166,7 +166,7 @@ class HookViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
     def perform_create(self, serializer):
         serializer.save(asset=self.asset)
 
-    @detail_route(methods=["PATCH"])
+    @action(detail=True, methods=["PATCH"])
     def retry(self, request, uid=None, *args, **kwargs):
         hook = self.get_object()
         response = {"detail": _("Task successfully scheduled")}
