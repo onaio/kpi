@@ -24,6 +24,7 @@ from rest_framework.response import Response
 from kpi.models import AuthorizedApplication, OneTimeAuthenticationKey
 from kpi.models.authorized_application import ApplicationTokenAuthentication
 from kpi.serializers import AuthorizedApplicationUserSerializer
+from ona.authentication import JWTAuthentication
 
 
 def home(request):
