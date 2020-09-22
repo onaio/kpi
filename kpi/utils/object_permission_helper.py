@@ -86,7 +86,7 @@ class ObjectPermissionHelper:
         user_permission_assignments = []
         filtered_user_ids = None
 
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             filtered_user_ids = [affected_object.owner_id]
         elif not cls.user_can_share(affected_object, user):
             # Display only users' permissions if they are not allowed to modify

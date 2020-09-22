@@ -25,7 +25,7 @@ class AssetPermissionAssignmentSerializer(serializers.ModelSerializer):
         style={'base_template': 'input.html'}  # Render as a simple text box
     )
     permission = RelativePrefixHyperlinkedRelatedField(
-        view_name='permission-detail',
+        'api_v2:permission-detail',
         lookup_field='codename',
         queryset=Permission.objects.all(),
         style={'base_template': 'input.html'}  # Render as a simple text box
@@ -79,7 +79,7 @@ class AssetPermissionAssignmentSerializer(serializers.ModelSerializer):
 
     def get_url(self, object_permission):
         asset_uid = self.context.get('asset_uid')
-        return reverse('asset-permission-assignment-detail',
+        return reverse('api_v2:asset-permission-assignment-detail',
                        args=(asset_uid, object_permission.uid),
                        request=self.context.get('request', None))
 
@@ -229,7 +229,7 @@ class AssetPermissionAssignmentSerializer(serializers.ModelSerializer):
         :param codename: str
         :return: str. url
         """
-        return reverse('permission-detail',
+        return reverse('api_v2:permission-detail',
                        args=(codename,),
                        request=self.context.get('request', None))
 

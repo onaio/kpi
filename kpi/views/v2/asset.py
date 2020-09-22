@@ -364,7 +364,7 @@ class AssetViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
         :return: JSON
         """
         user = self.request.user
-        if user.is_anonymous():
+        if user.is_anonymous:
             raise exceptions.NotAuthenticated()
         else:
             accessible_assets = get_objects_for_user(

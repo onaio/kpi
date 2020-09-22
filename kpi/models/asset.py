@@ -791,7 +791,7 @@ class Asset(ObjectPermissionMixin,
             #   * we don't need them for list views.
             'content', 'report_styles'
         ).select_related(
-            'owner__username',
+            'owner',
         ).prefetch_related(
             # We previously prefetched `permissions__content_object`, but that
             # actually pulled the entirety of each permission's linked asset

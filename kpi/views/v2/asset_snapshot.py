@@ -43,7 +43,7 @@ class AssetSnapshotViewSet(NoUpdateModelViewSet):
         else:
             user = self.request.user
             owned_snapshots = queryset.none()
-            if not user.is_anonymous():
+            if not user.is_anonymous:
                 owned_snapshots = queryset.filter(owner=user)
             return owned_snapshots | RelatedAssetPermissionsFilter(
                 ).filter_queryset(self.request, queryset, view=self)
