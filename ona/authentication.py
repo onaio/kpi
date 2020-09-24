@@ -38,14 +38,19 @@ def get_api_token(json_web_token):
     # globally mainly because there isn't a test for it
     try:
         jwt_payload = decode_payload(json_web_token)
-        api_token = Token.objects.using("kobocat").select_related(
-            'user').get(key=jwt_payload.get('api-token'))
+        try:
+            api_token = Token.objects.using(
+                "kobocat").select_related('user').get(
+                    key=jwt_payload.get('api-token'))
+        except Token.DoesNotExist:
+            raise exceptions.AuthenticationFailed(
+                f'No Token retrieved.')
 
         return api_token
     except BadSignature as e:
-        raise exceptions.AuthenticationFailed(_(u'Bad Signature: %s' % e))
+        raise exceptions.AuthenticationFailed(_(f'Bad Signature: {e}'))
     except jwt.DecodeError as e:
-        raise exceptions.AuthenticationFailed(_(u'JWT DecodeError: %s' % e))
+        raise exceptions.AuthenticationFailed(_(f'JWT DecodeError: {e}'))
 
 
 class JWTAuthentication(BaseAuthentication):
