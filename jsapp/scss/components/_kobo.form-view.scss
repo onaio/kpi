@@ -297,6 +297,10 @@ $z-form-view-fullscreen: 101;
       width: calc(100% - 48px);
     }
   }
+
+  &.form-view__cell--translation-modal-warning {
+    margin-bottom: 20px;
+  }
 }
 
 .form-view__icon-button {
