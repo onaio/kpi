@@ -13,7 +13,7 @@ from kpi.models.collection import Collection
 class PermissionSerializer(serializers.ModelSerializer):
 
     url = HyperlinkedIdentityField(
-        lookup_field='codename', view_name='permission-detail')
+        lookup_field='codename', view_name='api_v2:permission-detail')
     implied = serializers.SerializerMethodField()
     contradictory = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
@@ -113,11 +113,11 @@ class PermissionSerializer(serializers.ModelSerializer):
 
         for codename, codenames in mapped_perms_dict.items():
             hyperlinked_permissions[codename] = [
-                reverse(viewname='permission-detail',
-                        kwargs={'codename': codename_},
-                        request=self.context.get('request', None))
-                for codename_ in codenames
-            ]
+            reverse('api_v2:permission-detail',
+                    kwargs={'codename': codename_},
+                    request=self.context.get('request', None))
+            for codename_ in codenames
+        ]
 
         return hyperlinked_permissions
 
