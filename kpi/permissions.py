@@ -313,4 +313,3 @@ class SubmissionValidationStatusPermission(SubmissionPermission):
         'PATCH': ['%(app_label)s.validate_%(model_name)s'],
         'DELETE': ['%(app_label)s.validate_%(model_name)s'],
     }
-
