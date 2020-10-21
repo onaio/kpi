@@ -59,7 +59,7 @@ SESSION_COOKIE_AGE = 604800
 SESSION_COOKIE_AGE = 604800
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = (os.environ.get('DJANGO_DEBUG', 'True') == 'True')
+DEBUG = (os.environ.get('DJANGO_DEBUG', 'False') == 'True')
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(' ')
 
@@ -353,7 +353,7 @@ TEMPLATES = [
                 'kpi.context_processors.sitewide_messages',
                 'kpi.context_processors.config',
             ],
-            'debug': os.environ.get('TEMPLATE_DEBUG', 'True') == 'True',
+            'debug': os.environ.get('TEMPLATE_DEBUG', 'False') == 'True',
         },
     },
 ]
