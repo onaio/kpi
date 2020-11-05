@@ -298,7 +298,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 return self.connect(self.identifier, active)
             raise
 
-        self.set_asset_uid()
+        # self.set_asset_uid()
 
     def set_active(self, active):
         """
