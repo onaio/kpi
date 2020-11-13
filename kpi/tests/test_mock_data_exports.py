@@ -18,7 +18,12 @@ from kpi.constants import PERM_PARTIAL_SUBMISSIONS, PERM_VIEW_SUBMISSIONS
 from kpi.models import Asset, ExportTask
 
 
-class MockDataExports(TestCase):
+class MockDataExportsBase(TestCase):
+    """
+    Creates self.asset, deploys it using the mock backend, and makes some
+    submissions to it
+    """
+
     fixtures = ['test_data']
 
     form_content = {
@@ -180,7 +185,6 @@ class MockDataExports(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username='someuser')
-        self.anotheruser = User.objects.get(username='anotheruser')
         self.asset = Asset.objects.create(
             name='Identificación de animales',
             content=self.form_content,
@@ -188,11 +192,6 @@ class MockDataExports(TestCase):
         )
         self.asset.deploy(backend='mock', active=True)
         self.asset.save()
-        partial_perms = {
-            PERM_VIEW_SUBMISSIONS: [{'_submitted_by': self.anotheruser.username}]
-        }
-        self.asset.assign_perm(self.anotheruser, PERM_PARTIAL_SUBMISSIONS,
-                               partial_perms=partial_perms)
 
         v_uid = self.asset.latest_deployed_version.uid
         for submission in self.submissions:
@@ -200,10 +199,29 @@ class MockDataExports(TestCase):
                 '__version__': v_uid
             })
         self.asset.deployment.mock_submissions(self.submissions)
+
+
+class MockDataExports(MockDataExportsBase):
+    def setUp(self):
+        super().setUp()
+
+        self.anotheruser = User.objects.get(username='anotheruser')
+        partial_perms = {
+            PERM_VIEW_SUBMISSIONS: [
+                {'_submitted_by': self.anotheruser.username}
+            ]
+        }
+        self.asset.assign_perm(
+            self.anotheruser,
+            PERM_PARTIAL_SUBMISSIONS,
+            partial_perms=partial_perms,
+        )
+
         self.formpack, self.submission_stream = report_data.build_formpack(
             self.asset,
             submission_stream=self.asset.deployment.get_submissions(
-                self.asset.owner.id)
+                self.asset.owner.id
+            ),
         )
 
     def run_csv_export_test(
