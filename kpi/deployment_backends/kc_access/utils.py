@@ -30,7 +30,8 @@ def _trigger_kc_profile_creation(user):
     UserProfile if none exists already
     """
     url = settings.KOBOCAT_URL + '/api/v1/user'
-    token = Token.objects.using('kobocat').get(user=user)
+    kobo_user = User.objects.using('kobocat').get(username=user.username)
+    token = Token.objects.using('kobocat').get(user=kobo_user)
     response = requests.get(
         url, headers={'Authorization': 'Token ' + token.key})
     if not response.status_code == 200:
