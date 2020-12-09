@@ -43,18 +43,17 @@ def save_kobocat_user(sender, instance, created, raw, **kwargs):
     grant all KoBoCAT model-level permissions for the content types listed in
     `settings.KOBOCAT_DEFAULT_PERMISSION_CONTENT_TYPES`
     """
-    if False:
-        if not settings.TESTING:
-            KobocatUser.sync(instance)
+    if not settings.TESTING:
+        KobocatUser.sync(instance)
 
-            if created:
-                # FIXME: If this fails, the next attempt results in
-                #   IntegrityError: duplicate key value violates unique constraint
-                #   "auth_user_username_key"
-                # and decorating this function with `transaction.atomic` doesn't
-                # seem to help. We should roll back the KC user creation if
-                # assigning model-level permissions fails
-                grant_kc_model_level_perms(instance)
+        if created:
+            # FIXME: If this fails, the next attempt results in
+            #   IntegrityError: duplicate key value violates unique constraint
+            #   "auth_user_username_key"
+            # and decorating this function with `transaction.atomic` doesn't
+            # seem to help. We should roll back the KC user creation if
+            # assigning model-level permissions fails
+            grant_kc_model_level_perms(instance)
 
 
 @receiver(post_save, sender=Token)
@@ -62,9 +61,8 @@ def save_kobocat_token(sender, instance, **kwargs):
     """
     Sync AuthToken table between KPI and KC
     """
-    if False:
-        if not settings.TESTING:
-            KobocatToken.sync(instance)
+    if not settings.TESTING:
+        KobocatToken.sync(instance)
 
 
 @receiver(post_delete, sender=Token)
@@ -72,12 +70,11 @@ def delete_kobocat_token(sender, instance, **kwargs):
     """
     Delete corresponding record from KC AuthToken table
     """
-    if False:
-        if not settings.TESTING:
-            try:
-                KobocatToken.objects.get(pk=instance.pk).delete()
-            except KobocatToken.DoesNotExist:
-                pass
+    if not settings.TESTING:
+        try:
+            KobocatToken.objects.get(pk=instance.pk).delete()
+        except KobocatToken.DoesNotExist:
+            pass
 
 
 @receiver(post_save, sender=Tag)
