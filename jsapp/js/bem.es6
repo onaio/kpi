@@ -67,6 +67,7 @@ bem.Search__summary = bem.Search.__('summary');
 
 bem.LibNav = BEM('lib-nav');
 bem.LibNav__content = bem.LibNav.__('content');
+bem.LibNav__helperContainer = bem.LibNav.__('helperContainer');
 bem.LibNav__header = bem.LibNav.__('header');
 bem.LibNav__footer = bem.LibNav.__('footer');
 bem.LibNav__search = bem.LibNav.__('search');
