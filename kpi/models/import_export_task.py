@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
+from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django.core.files.base import ContentFile
 from django.urls import Resolver404, resolve
@@ -176,7 +177,10 @@ class ImportTask(ImportExportTask):
             # TODO: merge with `url` handling above; currently kept separate
             # because `_load_assets_from_url()` uses complex logic to deal with
             # multiple XLS files in a directory structure within a ZIP archive
-            headers = {'Authorization': 'Token ' + self.user.auth_token.key}
+            username = self.user.username
+            token = User.objects.using("kobocat").select_related("auth_token").get(
+                username=username).auth_token.key
+            headers = {'Authorization': 'Token ' + token}
             response = requests.get(
                 self.data['single_xls_url'], headers=headers
             )
@@ -265,7 +269,9 @@ class ImportTask(ImportExportTask):
         url = '{}/api/v1/forms/{}'.format(
             settings.KOBOCAT_INTERNAL_URL, form_id
         )
-        token, _ = Token.objects.get_or_create(user=self.user)
+        username=self.user.username
+        token = User.objects.using("kobocat").select_related("auth_token").get(
+                username=username).auth_token
 
         response = requests.get(
             url, headers={'Authorization': 'Token ' + token.key}

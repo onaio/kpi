@@ -6,11 +6,12 @@ from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext_lazy as _
 from django.utils.six import text_type
+from django.contrib.auth.models import User
 from rest_framework import status, serializers
 from rest_framework.authtoken.models import Token
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext_lazy as _
 
 from kpi.constants import INSTANCE_FORMAT_TYPE_JSON, INSTANCE_FORMAT_TYPE_XML
 from kpi.utils.log import logging
@@ -735,7 +736,8 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         :return: requests.models.Response
         """
         if not user.is_anonymous and user.pk != settings.ANONYMOUS_USER_ID:
-            token, created = Token.objects.get_or_create(user=user)
+            token = User.objects.using("kobocat").select_related("auth_token").get(
+                username=user.username).auth_token
             kc_request.headers['Authorization'] = 'Token %s' % token.key
         session = requests.Session()
         return session.send(kc_request.prepare())
