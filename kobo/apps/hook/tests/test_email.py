@@ -53,6 +53,7 @@ class EmailTestCase(HookTestCase):
             "assets": {
                 self.asset.uid: {
                     "name": self.asset.name,
+                    "hook_uid": self.hook.uid,
                     "max_length": len(self.hook.name),
                     "logs": [{
                         "hook_name": self.hook.name,
