@@ -1,3 +1,4 @@
+# coding: utf-8
 import datetime
 import re
 
@@ -6,6 +7,7 @@ from django.core.files.storage import get_storage_class
 from django.http import HttpResponse, StreamingHttpResponse, Http404
 
 from .tasks import generate_user_report
+
 
 def _base_filename_to_full_filename(base_filename, username):
     return '__'.join([
@@ -31,6 +33,7 @@ def user_report(request):
         '</body></html>'
     ).format(base_filename)
     return HttpResponse(template_ish)
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def retrieve_user_report(request, base_filename):

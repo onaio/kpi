@@ -3,35 +3,45 @@ import PropTypes from 'prop-types';
 import reactMixin from 'react-mixin';
 import autoBind from 'react-autobind';
 import Reflux from 'reflux';
-import _ from 'underscore';
 import { Link } from 'react-router';
-import actions from '../actions';
-import bem from '../bem';
-import stores from '../stores';
-import Select from 'react-select';
+import {bem} from '../bem';
+import {dataInterface} from '../dataInterface';
+import {stores} from '../stores';
 import ui from '../ui';
 import mixins from '../mixins';
+import {actions} from '../actions';
 import DocumentTitle from 'react-document-title';
 import CopyToClipboard from 'react-copy-to-clipboard';
-
 import {MODAL_TYPES} from '../constants';
-
 import {
   formatTime,
-  currentLang,
-  assign,
   t,
-  log,
   notify
 } from '../utils';
+
+const DVCOUNT_LIMIT_MINIMUM = 20;
 
 export class FormLanding extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      selectedCollectMethod: 'offline_url'
+      selectedCollectMethod: 'offline_url',
+      DVCOUNT_LIMIT: DVCOUNT_LIMIT_MINIMUM,
+      nextPageUrl: null,
+      nextPagesVersions: []
     };
     autoBind(this);
+  }
+  componentDidMount () {
+    // reset loaded versions when new one is deployed
+    this.listenTo(actions.resources.deployAsset.completed, this.resetLoadedVersions);
+  }
+  resetLoadedVersions() {
+    this.setState({
+      DVCOUNT_LIMIT: DVCOUNT_LIMIT_MINIMUM,
+      nextPageUrl: null,
+      nextPagesVersions: []
+    });
   }
   enketoPreviewModal (evt) {
     evt.preventDefault();
@@ -40,13 +50,12 @@ export class FormLanding extends React.Component {
       assetid: this.state.uid
     });
   }
-  callUnarchiveAsset(evt) {
+  callUnarchiveAsset() {
     this.unarchiveAsset();
   }
   renderFormInfo (userCanEdit) {
     var dvcount = this.state.deployed_versions.count;
-    var undeployedVersion = undefined;
-
+    var undeployedVersion;
     if (!this.isCurrentVersionDeployed()) {
       undeployedVersion = `(${t('undeployed')})`;
       dvcount = dvcount + 1;
@@ -118,8 +127,8 @@ export class FormLanding extends React.Component {
       this.state.deployed_version_id
     ) {
       const deployed_version = this.state.deployed_versions.results.find(
-        (version) => {return version.uid === this.state.deployed_version_id}
-      )
+        (version) => {return version.uid === this.state.deployed_version_id;}
+      );
       return deployed_version.content_hash === this.state.version__content_hash;
     }
     return false;
@@ -137,8 +146,32 @@ export class FormLanding extends React.Component {
       asset: this.state
     });
   }
+  loadMoreVersions() {
+    if (this.state.DVCOUNT_LIMIT + DVCOUNT_LIMIT_MINIMUM <= this.state.deployed_versions.count + DVCOUNT_LIMIT_MINIMUM) {
+      this.setState({ DVCOUNT_LIMIT: this.state.DVCOUNT_LIMIT + DVCOUNT_LIMIT_MINIMUM });
+    }
+    let urlToLoad = null;
+    if(this.state.nextPageUrl) {
+      urlToLoad = this.state.nextPageUrl;
+    } else if (this.state.deployed_versions.next) {
+      urlToLoad = this.state.deployed_versions.next;
+    }
+    if (urlToLoad !== null) {
+      dataInterface.loadNextPageUrl(urlToLoad).done((data) => {
+        this.setState({nextPageUrl: data.deployed_versions.next});
+        const newNextPagesVersions = this.state.nextPagesVersions;
+        Object.values(data.deployed_versions.results).forEach((item) => {
+          newNextPagesVersions.push(item);
+        });
+        this.setState({nextPagesVersions: newNextPagesVersions});
+      });
+    }
+  }
   renderHistory () {
     var dvcount = this.state.deployed_versions.count;
+    const versionsToDisplay = this.state.deployed_versions.results.concat(
+      this.state.nextPagesVersions
+    );
     return (
       <bem.FormView__row className={this.state.historyExpanded ? 'historyExpanded' : 'historyHidden'}>
         <bem.FormView__cell m={['columns', 'history-label']}>
@@ -153,30 +186,32 @@ export class FormLanding extends React.Component {
               <bem.FormView__label m='date'>{t('Last Modified')}</bem.FormView__label>
               <bem.FormView__label m='clone'>{t('Clone')}</bem.FormView__label>
             </bem.FormView__group>
-            {this.state.deployed_versions.results.map((item, n) => {
-              return (
-                <bem.FormView__group m='items' key={n} >
-                  <bem.FormView__label m='version'>
-                    {`v${dvcount-n}`}
-                    {item.uid === this.state.deployed_version_id && this.state.deployment__active &&
-                      <bem.FormView__cell m='deployed'>
-                        {t('Deployed')}
-                      </bem.FormView__cell>
-                    }
-                  </bem.FormView__label>
-                  <bem.FormView__label m='date'>
-                    {formatTime(item.date_deployed)}
-                  </bem.FormView__label>
-                  <bem.FormView__label m='clone' className='right-tooltip'>
-                      <bem.FormView__link m='clone'
-                          data-version-id={item.uid}
-                          data-tip={t('Clone this version as a new project')}
-                          onClick={this.saveCloneAs}>
-                        <i className='k-icon-clone' />
-                      </bem.FormView__link>
-                  </bem.FormView__label>
-                </bem.FormView__group>
-              );
+            {versionsToDisplay.map((item, n) => {
+              if (dvcount - n > 0) {
+                return (
+                  <bem.FormView__group m='items' key={n} className={n >= this.state.DVCOUNT_LIMIT ? 'hidden' : ''} >
+                    <bem.FormView__label m='version'>
+                      {`v${dvcount - n}`}
+                      {item.uid === this.state.deployed_version_id && this.state.deployment__active &&
+                        <bem.FormView__cell m='deployed'>
+                          {t('Deployed')}
+                        </bem.FormView__cell>
+                      }
+                    </bem.FormView__label>
+                    <bem.FormView__label m='date'>
+                      {formatTime(item.date_deployed)}
+                    </bem.FormView__label>
+                    <bem.FormView__label m='clone' className='right-tooltip'>
+                        <bem.FormView__link m='clone'
+                            data-version-id={item.uid}
+                            data-tip={t('Clone this version as a new project')}
+                            onClick={this.saveCloneAs}>
+                          <i className='k-icon-clone' />
+                        </bem.FormView__link>
+                    </bem.FormView__label>
+                  </bem.FormView__group>
+                );
+              }
             })}
           </bem.FormView__group>
         </bem.FormView__cell>
@@ -185,14 +220,17 @@ export class FormLanding extends React.Component {
             <button className='mdl-button mdl-button--colored' onClick={this.toggleDeploymentHistory}>
               {this.state.historyExpanded ? t('Hide full history') : t('Show full history')}
             </button>
+            {(this.state.historyExpanded && this.state.DVCOUNT_LIMIT < dvcount) &&
+              <button className='mdl-button mdl-button--colored' onClick={this.loadMoreVersions}>
+                {t('Load more')}
+              </button>
+            }
           </bem.FormView__cell>
         }
       </bem.FormView__row>
       );
   }
   renderCollectData () {
-    var deployment__links = this.state.deployment__links;
-
     var available_links = new Map([
         ['offline_url', {
           label: t('Online-Offline (multiple submission)'),
@@ -205,6 +243,10 @@ export class FormLanding extends React.Component {
         ['single_url', {
           label: t('Online-Only (single submission)'),
           desc: t('This allows a single submission, and can be paired with the "returnURL" parameter to redirect the user to a URL of your choice after the form has been submitted.')
+        }],
+        ['single_once_url', {
+          label: t('Online-only (once per respondent)'),
+          desc: t('This allows your web form to only be submitted once per user, using basic protection to prevent the same user (on the same browser & device) from submitting more than once.')
         }],
         ['iframe_url', {
           label: t('Embeddable web form code'),
@@ -234,6 +276,9 @@ export class FormLanding extends React.Component {
     var chosenMethod = this.state.selectedCollectMethod;
 
     var kc_server = document.createElement('a');
+    console.log(">>> START - this.state: ")
+    console.log(this.state)
+    console.log(">>> STOP - this.state: ")
     kc_server.href = this.state.deployment__identifier;
     var kobocollect_url = kc_server.origin;
 
@@ -248,7 +293,7 @@ export class FormLanding extends React.Component {
           <bem.FormView__cell m={['columns', 'padding']}>
             <bem.FormView__cell>
               <ui.PopoverMenu type='collectData-menu' triggerLabel={available_links.get(chosenMethod).label}>
-                {deployment__links_list.map((c)=>{
+                {deployment__links_list.map((c) => {
                   return (
                     <bem.PopoverMenu__link
                       m={['collect-row']}
@@ -264,7 +309,7 @@ export class FormLanding extends React.Component {
               </ui.PopoverMenu>
             </bem.FormView__cell>
             <bem.FormView__cell>
-              {chosenMethod != 'iframe_url' && chosenMethod != 'android' &&
+              {chosenMethod !== 'iframe_url' && chosenMethod !== 'android' &&
                this.state.deployment__links[chosenMethod] &&
                 <CopyToClipboard text={this.state.deployment__links[chosenMethod]}
                   onCopy={() => notify(t('copied to clipboard'))}
@@ -275,21 +320,21 @@ export class FormLanding extends React.Component {
                   </button>
                 </CopyToClipboard>
               }
-              {chosenMethod != 'iframe_url' && chosenMethod != 'android' &&
+              {chosenMethod !== 'iframe_url' && chosenMethod !== 'android' &&
                 <a className='collect-link mdl-button mdl-button--colored'
                   target='_blank'
                   href={this.state.deployment__links[chosenMethod]}>
                   {t('Open')}
                 </a>
               }
-              { chosenMethod == 'android' &&
+              { chosenMethod === 'android' &&
                 <a className='collect-link mdl-button mdl-button--colored'
                   target='_blank'
                   href='https://play.google.com/store/apps/details?id=org.koboc.collect.android&hl=en'>
                   {t('Download KoboCollect')}
                 </a>
               }
-              {chosenMethod == 'iframe_url' &&
+              {chosenMethod === 'iframe_url' &&
                 <CopyToClipboard
                   text={`<iframe src=${this.state.deployment__links[chosenMethod]} width="800" height="600"></iframe>`}
                   onCopy={() => notify(t('copied to clipboard'))}
@@ -303,17 +348,17 @@ export class FormLanding extends React.Component {
             </bem.FormView__cell>
           </bem.FormView__cell>
           <bem.FormView__cell m={['padding', 'bordertop', 'collect-meta']}>
-            {chosenMethod != 'android' &&
+            {chosenMethod !== 'android' &&
               available_links.get(chosenMethod).desc
             }
 
-            {chosenMethod == 'iframe_url' &&
+            {chosenMethod === 'iframe_url' &&
               <pre>
-                {`<iframe src=${this.state.deployment__links[chosenMethod]} width="800" height="600"></iframe>`}
+                {`<iframe src="${this.state.deployment__links[chosenMethod]}" width="800" height="600"></iframe>`}
               </pre>
             }
 
-            {chosenMethod == 'android' &&
+            {chosenMethod === 'android' &&
               <ol>
                 <li>
                   {t('Install')}
@@ -342,11 +387,8 @@ export class FormLanding extends React.Component {
     this.setState({selectedCollectMethod: evt.currentTarget.dataset.method});
   }
   renderButtons (userCanEdit) {
-    let translations = this.state.content.translations;
-    var downloadable = false;
     var downloads = [];
     if (this.state.downloads) {
-      downloadable = !!this.state.downloads[0];
       downloads = this.state.downloads;
     }
 
@@ -387,7 +429,7 @@ export class FormLanding extends React.Component {
           triggerLabel={<i className='k-icon-more' />}
           triggerTip={t('More Actions')}
         >
-          {downloads.map((dl)=>{
+          {downloads.map((dl) => {
             return (
                 <bem.PopoverMenu__link m={`dl-${dl.format}`} href={dl.url}
                     key={`dl-${dl.format}`}>
@@ -447,7 +489,7 @@ export class FormLanding extends React.Component {
           }
           {this.hasLanguagesDefined(translations) &&
             <ul>
-              {translations.map((langString, n)=>{
+              {translations.map((langString, n) => {
                 return (
                   <li key={n}>
                     {langString || t('Unnamed language')}
@@ -474,7 +516,7 @@ export class FormLanding extends React.Component {
     var docTitle = this.state.name || t('Untitled');
     const userCanEdit = this.userCan('change_asset', this.state);
 
-    if (this.state.uid == undefined) {
+    if (this.state.uid === undefined) {
       return (
         <ui.Panel>
           <bem.Loading>
@@ -522,8 +564,7 @@ export class FormLanding extends React.Component {
       </DocumentTitle>
       );
   }
-
-};
+}
 
 reactMixin(FormLanding.prototype, mixins.permissions);
 reactMixin(FormLanding.prototype, mixins.dmix);

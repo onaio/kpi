@@ -3,13 +3,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.signing import BadSignature
 from django.utils.translation import ugettext as _
-from django.utils import timezone
-from django.shortcuts import get_object_or_404
 from rest_framework import exceptions
 from rest_framework.authentication import (
-    TokenAuthentication, get_authorization_header
+    BaseAuthentication
 )
 from rest_framework.authtoken.models import Token
+from kpi.utils.permissions import grant_default_model_level_perms
 
 
 JWT_SECRET_KEY = getattr(settings, 'JWT_SECRET_KEY', 'jwt')
@@ -39,30 +38,37 @@ def get_api_token(json_web_token):
     # globally mainly because there isn't a test for it
     try:
         jwt_payload = decode_payload(json_web_token)
-        api_token = get_object_or_404(Token, key=jwt_payload.get('api-token'))
+        try:
+            api_token = Token.objects.using(
+                "kobocat").select_related('user').get(
+                    key=jwt_payload.get('api-token'))
+        except Token.DoesNotExist:
+            raise exceptions.AuthenticationFailed(
+                f'No Token retrieved.')
 
         return api_token
     except BadSignature as e:
-        raise exceptions.AuthenticationFailed(_(u'Bad Signature: %s' % e))
+        raise exceptions.AuthenticationFailed(_(f'Bad Signature: {e}'))
     except jwt.DecodeError as e:
-        raise exceptions.AuthenticationFailed(_(u'JWT DecodeError: %s' % e))
+        raise exceptions.AuthenticationFailed(_(f'JWT DecodeError: {e}'))
 
 
-class JWTAuthentication(TokenAuthentication):
+class JWTAuthentication(BaseAuthentication):
     model = Token
 
     def authenticate(self, request):
         cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
-        if cookie_jwt:
-            api_token = get_api_token(cookie_jwt)
-            if getattr(api_token, 'user'):
-                return api_token.user, api_token
 
-            raise exceptions.ParseError(
-                _('Malformed cookie. Clear your cookies then try again'))
-
-    def get_user(self, user_id):
-        try:
-            return User.objects.get(pk=user_id)
-        except User.DoesNotExist:
+        if not cookie_jwt:
             return None
+
+        api_token = get_api_token(cookie_jwt)
+
+        # Create KPI User from Onadata user username and email
+        user, created = User.objects.using('default').get_or_create(
+            username=api_token.user.username,
+            email=api_token.user.email
+            )
+        if created:
+            grant_default_model_level_perms(user)
+        return (user, None)

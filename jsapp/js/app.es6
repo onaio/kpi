@@ -10,32 +10,23 @@ window.$ = $;
 require('jquery-ui/ui/widgets/sortable');
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import DocumentTitle from 'react-document-title';
 import reactMixin from 'react-mixin';
 import autoBind from 'react-autobind';
 import Reflux from 'reflux';
-
 import {
   IndexRoute,
   IndexRedirect,
-  Link,
   Route,
   hashHistory,
   Router
 } from 'react-router';
-
-import Select from 'react-select';
 import moment from 'moment';
-
-import actions from './actions';
-
-import stores from './stores';
+import {actions} from './actions';
+import {stores} from './stores';
 import {dataInterface} from './dataInterface';
-import bem from './bem';
+import {bem} from './bem';
 import ui from './ui';
 import mixins from './mixins';
 import MainHeader from './components/header';
@@ -45,46 +36,35 @@ import {
   FormPage,
   LibraryPage
 } from './components/formEditors';
-
 import Reports from './components/reports';
 import FormLanding from './components/formLanding';
 import FormSummary from './components/formSummary';
 import FormSubScreens from './components/formSubScreens';
 import FormViewTabs from './components/formViewTabs';
 import IntercomHandler from './components/intercomHandler';
+import PermValidator from './components/permissions/permValidator';
 import Modal from './components/modal';
-import {ChangePassword, AccountSettings} from './components/accountSettings';
-
+import AccountSettings from './components/accountSettings';
+import ChangePassword from './components/changePassword';
 import {
-  getAnonymousUserPermission,
-  anonUsername,
-  log,
   t,
   assign,
   currentLang
 } from './utils';
-
+import {keymap} from './keymap';
+import { ShortcutManager, Shortcuts } from 'react-shortcuts';
+const shortcutManager = new ShortcutManager(keymap);
+import LibrarySearchableList from './lists/library';
+import FormsSearchableList from './lists/forms';
 import {getZebraLoginUrl} from './config';
 
-import keymap from './keymap'
-import { ShortcutManager, Shortcuts } from 'react-shortcuts'
-const shortcutManager = new ShortcutManager(keymap)
-
-
-function stringifyRoutes(contextRouter) {
-  return JSON.stringify(contextRouter.getCurrentRoutes().map(function(r){
-    return {
-      name: r.name,
-      href: r.path
-    };
-  }), null, 4);
-}
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     moment.locale(currentLang());
     this.state = assign({
+      isConfigReady: false,
       pageState: stores.pageState.state
     });
   }
@@ -97,27 +77,38 @@ class App extends React.Component {
       stores.pageState.hideModal();
   }
   componentDidMount () {
-    actions.misc.getServerEnvironment();
+    this.listenTo(actions.permissions.getConfig.completed, this.onGetConfigCompleted);
 
-    // TODO: this operation should be removed after March 1, 2019
-    // To avoid issues with localStorage limits, delete user.history from browser's localStorage
-    // user.history was an unusued store, it was removed in https://github.com/kobotoolbox/kpi/pull/1878
-    if (localStorage && localStorage['user.history']) {
-      localStorage.removeItem('user.history');
-    }
+    actions.misc.getServerEnvironment();
+    actions.permissions.getConfig();
+  }
+  onGetConfigCompleted() {
+    this.setState({isConfigReady: true});
   }
   _handleShortcuts(action) {
     switch (action) {
       case 'EDGE':
-        document.body.classList.toggle('hide-edge')
-        break
+        document.body.classList.toggle('hide-edge');
+        break;
     }
   }
   getChildContext() {
-    return { shortcuts: shortcutManager }
+    return { shortcuts: shortcutManager };
   }
   render() {
     var assetid = this.props.params.assetid || null;
+
+    if (!this.state.isConfigReady) {
+      return (
+        <bem.Loading>
+          <bem.Loading__inner>
+            <i />
+            {t('loading...')}
+          </bem.Loading__inner>
+        </bem.Loading>
+      );
+    }
+
     return (
       <DocumentTitle title='KoBoToolbox'>
         <Shortcuts
@@ -127,6 +118,7 @@ class App extends React.Component {
           global
           isolate>
 
+        <PermValidator/>
         <IntercomHandler/>
 
           { !this.isFormBuilder() &&
@@ -169,7 +161,7 @@ App.contextTypes = {
 
 App.childContextTypes = {
   shortcuts: PropTypes.object.isRequired
-}
+};
 
 reactMixin(App.prototype, Reflux.connect(stores.pageState, 'pageState'));
 reactMixin(App.prototype, mixins.contextRouter);
@@ -207,7 +199,7 @@ class FormJson extends React.Component {
         </ui.Panel>
       );
   }
-};
+}
 
 reactMixin(FormJson.prototype, Reflux.ListenerMixin);
 
@@ -219,7 +211,7 @@ class FormXform extends React.Component {
     };
   }
   componentDidMount () {
-    dataInterface.getAssetXformView(this.props.params.assetid).done((content)=>{
+    dataInterface.getAssetXformView(this.props.params.assetid).done((content) => {
       this.setState({
         xformLoaded: true,
         xformHtml: {
@@ -250,10 +242,7 @@ class FormXform extends React.Component {
         );
     }
   }
-};
-
-var LibrarySearchableList = require('./lists/library');
-var FormsSearchableList = require('./lists/forms');
+}
 
 class FormNotFound extends React.Component {
   render () {
@@ -267,7 +256,7 @@ class FormNotFound extends React.Component {
         </ui.Panel>
       );
   }
-};
+}
 
 class SectionNotFound extends React.Component {
   render () {
@@ -278,7 +267,7 @@ class SectionNotFound extends React.Component {
         </ui.Panel>
       );
   }
-};
+}
 
 export var routes = (
   <Route name='home' path='/' component={App}>
@@ -349,16 +338,16 @@ export var routes = (
 );
 
 /* Send a pageview to Google Analytics for every change in routes */
-hashHistory.listen(function(loc) {
-  if (typeof ga == 'function') {
+hashHistory.listen(function() {
+  if (typeof ga === 'function') {
     ga('send', 'pageview', window.location.hash);
   }
 });
 
-class RunRoutes extends React.Component {
+export default class RunRoutes extends React.Component {
   componentDidMount(){
     // when hot reloading, componentWillReceiveProps whines about changing the routes prop so this shuts that up
-    this.router.componentWillReceiveProps = function(){}
+    this.router.componentWillReceiveProps = function(){};
   }
 
   render() {
@@ -367,9 +356,6 @@ class RunRoutes extends React.Component {
     );
   }
 }
-
-export default RunRoutes;
-
 
 var RedirectToOna = function() {
   window.location = getZebraLoginUrl()

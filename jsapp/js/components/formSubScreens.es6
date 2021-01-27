@@ -3,21 +3,21 @@ import PropTypes from 'prop-types';
 import reactMixin from 'react-mixin';
 import autoBind from 'react-autobind';
 import Reflux from 'reflux';
-import actions from '../actions';
-import bem from '../bem';
-import stores from '../stores';
+import {actions} from '../actions';
+import {bem} from '../bem';
+import {stores} from '../stores';
 import mixins from '../mixins';
 import DocumentTitle from 'react-document-title';
-import SharingForm from '../components/modalForms/sharingForm';
-import ProjectSettings from '../components/modalForms/projectSettings';
-import DataTable from '../components/table';
-
-import {ProjectDownloads} from '../components/formEditors';
+import SharingForm from './permissions/sharingForm';
+import ProjectSettings from './modalForms/projectSettings';
+import DataTable from './table';
+import ui from '../ui';
+import {ProjectDownloads} from './formEditors';
 
 import {PROJECT_SETTINGS_CONTEXTS} from '../constants';
 
-import FormMap from '../components/map';
-import RESTServices from '../components/RESTServices';
+import FormMap from './map';
+import RESTServices from './RESTServices';
 
 import {
   t
@@ -41,17 +41,23 @@ export class FormSubScreens extends React.Component {
     }
   }
   render () {
+    let permAccess = this.userCan('view_submissions', this.state) || this.userCan('partial_submissions', this.state);
+
     if (!this.state.permissions)
       return false;
 
-    if (this.props.location.pathname != `/forms/${this.state.uid}/settings` &&
-        !this.userCan('view_submissions', this.state)) {
-      return this.renderDenied();
-    }
-
     if (this.props.location.pathname == `/forms/${this.state.uid}/settings` &&
         !this.userCan('change_asset', this.state)) {
-      return this.renderDenied();
+      return (<ui.AccessDeniedMessage/>);
+    }
+
+    if (this.props.location.pathname == `/forms/${this.state.uid}/settings/rest` && !permAccess) {
+      return (<ui.AccessDeniedMessage/>);
+    }
+
+    //TODO:Remove owner only access to settings/media after we remove KC iframe: https://github.com/kobotoolbox/kpi/issues/2647#issuecomment-624301693
+    if (this.props.location.pathname == `/forms/${this.state.uid}/settings/media` && !this.userIsOwner(this.state)) {
+      return (<ui.AccessDeniedMessage/>);
     }
 
     var iframeUrl = '';
@@ -60,6 +66,7 @@ export class FormSubScreens extends React.Component {
 
     if (this.state.uid != undefined) {
       if (this.state.deployment__identifier != undefined) {
+        console.log(">>>> deployment__identifier is missing.")
         deployment__identifier = this.state.deployment__identifier;
         report__base = deployment__identifier.replace('/forms/', '/reports/');
       }
@@ -148,20 +155,6 @@ export class FormSubScreens extends React.Component {
           {t('loading...')}
         </bem.Loading__inner>
       </bem.Loading>
-    );
-  }
-  renderDenied() {
-    return (
-      <bem.FormView>
-        <bem.Loading>
-          <bem.Loading__inner>
-            <h3>
-              {t('Access Denied')}
-            </h3>
-            {t('You do not have permission to view this page.')}
-          </bem.Loading__inner>
-        </bem.Loading>
-      </bem.FormView>
     );
   }
 }

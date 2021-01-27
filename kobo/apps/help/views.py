@@ -1,5 +1,4 @@
 # coding: utf-8
-
 import datetime
 
 from django.db.models import Q
@@ -29,6 +28,7 @@ class InAppMessageFileContentView(PrivateStorageView):
     """
     model = InAppMessageFile
     model_file_field = 'content'
+
     def can_access_file(self, private_file):
         return private_file.request.user.is_authenticated()
 

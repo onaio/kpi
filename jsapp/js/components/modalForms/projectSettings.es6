@@ -8,13 +8,13 @@ import Select from 'react-select';
 import Dropzone from 'react-dropzone';
 import TextBox from 'js/components/textBox';
 import Checkbox from 'js/components/checkbox';
-import bem from 'js/bem';
+import {bem} from 'js/bem';
 import TextareaAutosize from 'react-autosize-textarea';
-import stores from 'js/stores';
+import {stores} from 'js/stores';
 import {hashHistory} from 'react-router';
 import mixins from 'js/mixins';
 import TemplatesList from 'js/components/templatesList';
-import actions from 'js/actions';
+import {actions} from 'js/actions';
 import {dataInterface} from 'js/dataInterface';
 import {
   t,
@@ -22,7 +22,10 @@ import {
   isAValidUrl,
   escapeHtml
 } from 'js/utils';
-import {PROJECT_SETTINGS_CONTEXTS} from 'js/constants';
+import {
+  NAME_MAX_LENGTH,
+  PROJECT_SETTINGS_CONTEXTS
+} from 'js/constants';
 
 const formViaUrlHelpLink = 'http://help.kobotoolbox.org/creating-forms/importing-an-xlsform-via-url';
 
@@ -493,10 +496,15 @@ class ProjectSettings extends React.Component {
                   // when replacing, we omit PROJECT_DETAILS step
                   this.goToFormLanding();
                 } else {
+                  // TODO: allow serializers to take care of file names to
+                  // remove this bandaid fix for "Untitled" filenames
+                  var assetName = finalAsset.name;
+                  if (assetName === 'Untitled') {
+                    assetName = this.getFilenameFromURI(importUrl);
+                  }
                   this.setState({
                     formAsset: finalAsset,
-                    // try proposing something more meaningful than "Untitled"
-                    name: this.getFilenameFromURI(importUrl),
+                    name: assetName,
                     description: finalAsset.settings.description,
                     sector: finalAsset.settings.sector,
                     country: finalAsset.settings.country,
@@ -551,11 +559,15 @@ class ProjectSettings extends React.Component {
                   // when replacing, we omit PROJECT_DETAILS step
                   this.goToFormLanding();
                 } else {
-                  // try proposing something more meaningful than "Untitled"
-                  const newName = files[0].name.split('.')[0];
+                  // TODO: allow serializers to take care of file names to
+                  // remove this bandaid fix for "Untitled" filenames
+                  var assetName = finalAsset.name;
+                  if (assetName === 'Untitled') {
+                    assetName = files[0].name.split('.xlsx')[0];
+                  }
                   this.setState({
                     formAsset: finalAsset,
-                    name: newName,
+                    name: assetName,
                     description: finalAsset.settings.description,
                     sector: finalAsset.settings.sector,
                     country: finalAsset.settings.country,
@@ -570,6 +582,7 @@ class ProjectSettings extends React.Component {
               });
             },
             (response) => {
+              this.setState({isUploadFilePending: false});
               const errLines = [];
               errLines.push(t('Import Failed!'));
               if (files[0].name) {
@@ -611,6 +624,14 @@ class ProjectSettings extends React.Component {
   /*
    * rendering
    */
+
+  getNameInputLabel(nameVal) {
+    let label = t('Project Name');
+    if (nameVal.length >= NAME_MAX_LENGTH - 99) {
+      label += ` (${t('##count## characters left').replace('##count##', NAME_MAX_LENGTH - nameVal.length)})`;
+    }
+    return label;
+  }
 
   renderChooseTemplateButton() {
     return (
@@ -673,7 +694,6 @@ class ProjectSettings extends React.Component {
             type='submit'
             onClick={this.applyTemplate}
             disabled={!this.state.chosenTemplateUid || this.state.isApplyTemplatePending}
-            className='mdl-js-button'
           >
             {this.state.applyTemplateButton}
           </bem.Modal__footerButton>
@@ -743,7 +763,6 @@ class ProjectSettings extends React.Component {
             type='submit'
             onClick={this.importFromURL}
             disabled={!this.state.importUrlButtonEnabled}
-            className='mdl-js-button'
           >
             {this.state.importUrlButton}
           </bem.Modal__footerButton>
@@ -753,8 +772,9 @@ class ProjectSettings extends React.Component {
   }
 
   renderStepProjectDetails() {
-    const sectors = stores.session.environment.available_sectors;
-    const countries = stores.session.environment.available_countries;
+    const sectors = stores.session.currentAccount.available_sectors;
+    const countries = stores.session.currentAccount.available_countries;
+    const isSelfOwned = this.userIsOwner(this.state.formAsset);
 
     return (
       <bem.FormModal__form
@@ -772,7 +792,6 @@ class ProjectSettings extends React.Component {
               type='submit'
               m='primary'
               onClick={this.handleSubmit}
-              className='mdl-js-button'
             >
               {t('Save Changes')}
             </bem.Modal__footerButton>
@@ -784,9 +803,11 @@ class ProjectSettings extends React.Component {
           {this.props.context !== PROJECT_SETTINGS_CONTEXTS.BUILDER &&
             <bem.FormModal__item>
               <label htmlFor='name'>
-                {t('Project Name')}
+                {this.getNameInputLabel(this.state.name)}
               </label>
-              <input type='text'
+              <input
+                type='text'
+                maxLength={NAME_MAX_LENGTH}
                 id='name'
                 placeholder={t('Enter title of project here')}
                 value={this.state.name}
@@ -864,7 +885,6 @@ class ProjectSettings extends React.Component {
                 m='primary'
                 type='submit'
                 onClick={this.handleSubmit}
-                className='mdl-js-button'
                 disabled={this.state.isSubmitPending}
               >
                 {this.state.isSubmitPending && t('Please wait…')}
@@ -904,7 +924,7 @@ class ProjectSettings extends React.Component {
             </bem.FormModal__item>
           }
 
-          {this.props.context === PROJECT_SETTINGS_CONTEXTS.EXISTING &&
+          {isSelfOwned && this.props.context === PROJECT_SETTINGS_CONTEXTS.EXISTING &&
             <bem.FormModal__item>
               <button
                 type='button'
@@ -972,6 +992,7 @@ class ProjectSettings extends React.Component {
 }
 
 reactMixin(ProjectSettings.prototype, Reflux.ListenerMixin);
+reactMixin(ProjectSettings.prototype, mixins.permissions);
 reactMixin(ProjectSettings.prototype, mixins.droppable);
 reactMixin(ProjectSettings.prototype, mixins.dmix);
 

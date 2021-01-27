@@ -1,3 +1,4 @@
+# coding: utf-8
 import constance
 from django.conf import settings
 
@@ -43,7 +44,7 @@ def sitewide_messages(request):
     return {}
 
 
-class CombinedConfig(object):
+class CombinedConfig:
     '''
     An object that gets its attributes from both a dictionary (`extra_config`)
     AND a django-constance LazyConfig object

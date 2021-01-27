@@ -131,7 +131,7 @@ from .model_utils import grant_default_model_level_perms
 
 def home(request):
     cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
-    if request.user.is_anonymous() and cookie_jwt:
+    if request.user.is_anonymous and cookie_jwt:
         auth_class = JWTAuthentication()
         user, token = auth_class.authenticate(request)
         user.backend = settings.AUTHENTICATION_BACKENDS[0]
@@ -313,7 +313,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
         # Check if the user is anonymous. The
         # django.contrib.auth.models.AnonymousUser object doesn't work for
         # queries.
-        if user.is_anonymous():
+        if user.is_anonymous:
             user = get_anonymous_user()
 
         def _get_tags_on_items(content_type_name, avail_items):
@@ -505,14 +505,14 @@ class ImportTaskViewSet(viewsets.ReadOnlyModelViewSet):
             return ImportTaskSerializer
 
     def get_queryset(self, *args, **kwargs):
-        if self.request.user.is_anonymous():
+        if self.request.user.is_anonymous:
             return ImportTask.objects.none()
         else:
             return ImportTask.objects.filter(
                         user=self.request.user).order_by('date_created')
 
     def create(self, request, *args, **kwargs):
-        if self.request.user.is_anonymous():
+        if self.request.user.is_anonymous:
             raise exceptions.NotAuthenticated()
         itask_data = {
             'library': request.POST.get('library') not in ['false', False],
@@ -551,7 +551,7 @@ class ExportTaskViewSet(NoUpdateModelViewSet):
     lookup_field = 'uid'
 
     def get_queryset(self, *args, **kwargs):
-        if self.request.user.is_anonymous():
+        if self.request.user.is_anonymous:
             return ExportTask.objects.none()
 
         queryset = ExportTask.objects.filter(
@@ -581,7 +581,7 @@ class ExportTaskViewSet(NoUpdateModelViewSet):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        if self.request.user.is_anonymous():
+        if self.request.user.is_anonymous:
             raise exceptions.NotAuthenticated()
 
         # Read valid options from POST data
@@ -648,7 +648,7 @@ class AssetSnapshotViewSet(NoUpdateModelViewSet):
         else:
             user = self.request.user
             owned_snapshots = queryset.none()
-            if not user.is_anonymous():
+            if not user.is_anonymous:
                 owned_snapshots = queryset.filter(owner=user)
             return owned_snapshots | RelatedAssetPermissionsFilter(
                 ).filter_queryset(self.request, queryset, view=self)
@@ -1343,7 +1343,7 @@ class AssetViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
         :return: JSON
         """
         user = self.request.user
-        if user.is_anonymous():
+        if user.is_anonymous:
             raise exceptions.NotAuthenticated()
         else:
             accessible_assets = get_objects_for_user(
@@ -1516,7 +1516,7 @@ class AssetViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
         # django.contrib.auth.models.AnonymousUser object doesn't work for
         # queries.
         user = self.request.user
-        if user.is_anonymous():
+        if user.is_anonymous:
             user = get_anonymous_user()
         serializer.save(owner=user)
 
@@ -1579,7 +1579,7 @@ class UserCollectionSubscriptionViewSet(viewsets.ModelViewSet):
         # Check if the user is anonymous. The
         # django.contrib.auth.models.AnonymousUser object doesn't work for
         # queries.
-        if user.is_anonymous():
+        if user.is_anonymous:
             user = get_anonymous_user()
         criteria = {'user': user}
         if 'collection__uid' in self.request.query_params:
@@ -1597,7 +1597,7 @@ class TokenView(APIView):
         Determine the user from `request`, allowing superusers to specify
         another user by passing the `username` query parameter
         '''
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             raise exceptions.NotAuthenticated()
 
         if 'username' in request.query_params:

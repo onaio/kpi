@@ -13,6 +13,8 @@ import moment from 'moment';
 import alertify from 'alertifyjs';
 import {Cookies} from 'react-cookie';
 import {getAuthUrl} from './config';
+// imporitng whole constants, as we override ROOT_URL in tests
+import constants from 'js/constants';
 
 export const LANGUAGE_COOKIE_NAME = 'django_language';
 
@@ -53,13 +55,12 @@ export function formatDate(timeStr) {
   return _m.format('ll');
 }
 
-export var anonUsername = 'AnonymousUser';
 export function getAnonymousUserPermission(permissions) {
   return permissions.filter(function(perm){
     if (perm.user__username === undefined) {
       perm.user__username = perm.user.match(/\/users\/(.*)\//)[1];
     }
-    return perm.user__username === anonUsername;
+    return perm.user__username === constants.ANON_USERNAME;
   })[0];
 }
 
@@ -112,6 +113,12 @@ export function unnullifyTranslations(surveyDataJSON, assetContent) {
       surveyData.survey.forEach((surveyRow) => {
         translatedProps.forEach((translatedProp) => {
           if (typeof surveyRow[translatedProp] !== 'undefined') {
+            if (typeof surveyData.settings[0] !== 'undefined'
+                && typeof surveyData.settings[0].style === 'string'
+                && surveyData.settings[0].style.includes('theme-grid')
+                && surveyRow.type === 'begin_group') {
+              delete surveyRow[translatedProp];
+            }
             surveyRow[`${translatedProp}::${defaultLang}`] = surveyRow[translatedProp];
             delete surveyRow[translatedProp];
           }
@@ -216,6 +223,19 @@ export function redirectTo(href) {
   window.location.href = href;
 }
 
+// works universally for v1 and v2 urls
+export function getUsernameFromUrl(userUrl) {
+  return userUrl.match(/\/users\/(.*)\//)[1];
+}
+
+export function buildUserUrl(username) {
+  if (username.startsWith(window.location.protocol)) {
+    console.error("buildUserUrl() called with URL instead of username (incomplete v2 migration)");
+    return username;
+  }
+  return `${constants.ROOT_URL}/api/v2/users/${username}/`;
+}
+
 export function parsePermissions(owner, permissions) {
   var users = [];
   var perms = {};
@@ -224,9 +244,14 @@ export function parsePermissions(owner, permissions) {
   }
   permissions.map((perm) => {
     perm.user__username = perm.user.match(/\/users\/(.*)\//)[1];
+    const codename = perm.permission.match(/\/permissions\/(.+)\//);
+    if (codename !== null) {
+      console.error("parsePermissions(): converting new-style permission URL to codename (incomplete v2 migration)");
+      perm.permission = codename[1];
+    }
     return perm;
   }).filter((perm)=> {
-    return ( perm.user__username !== owner && perm.user__username !== anonUsername);
+    return ( perm.user__username !== owner && perm.user__username !== constants.ANON_USERNAME);
   }).forEach((perm)=> {
     if(users.indexOf(perm.user__username) === -1) {
       users.push(perm.user__username);
@@ -267,16 +292,12 @@ var __strings = [];
 
 
 /*a global gettext function*/
-let _gettext;
-if (window.gettext) {
-  _gettext = window.gettext;
-} else {
-  _gettext = function(s){
-    return s;
-  };
-}
 export function t(str) {
-  return _gettext(str);
+  if (window.gettext) {
+    return window.gettext(str);
+  } else {
+    return str;
+  }
 }
 
 
@@ -509,4 +530,16 @@ export function writeParameters(obj) {
     }
   });
   return params.join(';');
+}
+
+export function renderCheckbox(id, label, isImportant) {
+  let additionalClass = '';
+  if (isImportant) {
+    additionalClass += 'alertify-toggle-important';
+  }
+  return `<div class="alertify-toggle checkbox ${additionalClass}"><label class="checkbox__wrapper"><input type="checkbox" class="checkbox__input" id="${id}"><span class="checkbox__label">${label}</span></label></div>`;
+};
+
+export function launchPrinting() {
+  window.print();
 }
