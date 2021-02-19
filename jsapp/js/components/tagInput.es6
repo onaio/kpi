@@ -30,6 +30,10 @@ class TagInput extends React.Component {
     this.setState({tag})
   }
 
+  pasteSplit(data) {
+    return data.split(',').map((tag) => {return tag.trim();});
+  }
+
   render() {
     var inputProps = {
       placeholder: t('Add tag(s)')
@@ -43,6 +47,8 @@ class TagInput extends React.Component {
         onChangeInput={this.handleChangeInput.bind(this)}
         onlyUnique
         addOnBlur
+        addOnPaste
+        pasteSplit={this.pasteSplit}
       />
     )
   }
