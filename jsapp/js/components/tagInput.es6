@@ -41,6 +41,8 @@ class TagInput extends React.Component {
         inputValue={this.state.tag}
         inputProps={inputProps}
         onChangeInput={this.handleChangeInput.bind(this)}
+        onlyUnique
+        addOnBlur
       />
     )
   }
