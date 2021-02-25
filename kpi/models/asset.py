@@ -806,6 +806,21 @@ class Asset(ObjectPermissionMixin,
             '-date_modified')
 
     @property
+    def version_number_and_date(self):
+        # Returns the count of all deployed version + a version
+        # if the most recent version is undeployed and the date
+        # the asset was last modified
+        asset_versions = AssetVersion.objects.filter(
+            asset=self.pk).order_by('-date_modified')
+        latest_version = asset_versions.first()
+        count = self.deployed_versions.count()
+
+        if latest_version.deployed is False:
+            count = count + 1
+
+        return f'{count} {self.date_modified:(%m-%d-%Y %H:%M:%S)}'
+
+    @property
     def discoverable_when_public(self):
         # This property is only needed when `self` is a collection.
         # We want to make a distinction between a collection which is not
