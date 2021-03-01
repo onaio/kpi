@@ -8,6 +8,7 @@ from rest_framework.reverse import reverse
 from kpi.constants import PERM_PARTIAL_SUBMISSIONS, PERM_VIEW_SUBMISSIONS
 from kpi.fields import RelativePrefixHyperlinkedRelatedField, WritableJSONField, \
     PaginatedApiField
+from django.core.exceptions import ValidationError
 from kpi.models import Asset, AssetVersion, Collection
 from kpi.models.asset import ASSET_TYPES
 from kpi.models.object_permission import get_anonymous_user
@@ -135,7 +136,10 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
             except ValueError as err:
                 raise serializers.ValidationError(str(err))
             validated_data['content'] = asset_content
-        return super().update(asset, validated_data)
+        try:
+            return super().update(asset, validated_data)
+        except ValidationError as e:
+            raise serializers.ValidationError(str(e))
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
