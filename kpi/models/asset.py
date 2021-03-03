@@ -8,7 +8,6 @@ from io import BytesIO
 
 import six
 import xlsxwriter
-from rest_framework import status
 from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
@@ -399,7 +398,7 @@ class FormpackXLSFormUtils:
                 if row['default'] and bool(re.search(
                         r'[<|>|&]', row['default'])):
                     raise ValidationError(
-                        'XForm may contain entries with malicious content')
+                        'XForm questions settings may contain malicious content')
             except KeyError:
                 pass
 
