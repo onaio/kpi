@@ -432,6 +432,18 @@ class AssetSettingsTests(AssetsTestCase):
         self.assertTrue('form_title' not in settings)
         self.assertEqual(a1.name, 'abcxyz')
 
+    def test_validate_asset_settings(self):
+        unsanitized_html_str = "<h1>HTML Injection testing</h1>"
+        _content = self._content()
+        _content['survey'][0]['default'] = unsanitized_html_str
+
+        def _create_asset():
+            Asset.objects.create(
+                content=_content,
+                owner=self.user,
+                asset_type='survey')
+        self.assertRaises(ValidationError, _create_asset)
+
 
 class AssetScoreTestCase(TestCase):
     fixtures = ['test_data']

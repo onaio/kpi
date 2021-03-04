@@ -380,6 +380,7 @@ actions.resources.updateAsset.listen(function(uid, values, params={}) {
           reject(args)
         } else {
           alertify.error(t(args.responseText));
+          reject(args)
         }
       });
   }).then(function(asset) {
