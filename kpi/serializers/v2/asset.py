@@ -139,7 +139,7 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         try:
             return super().update(asset, validated_data)
         except ValidationError as e:
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError(e.message) from e
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)

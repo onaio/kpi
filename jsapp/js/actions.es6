@@ -379,7 +379,7 @@ actions.resources.updateAsset.listen(function(uid, values, params={}) {
         if (args.status === 500) {
           reject(args)
         } else {
-          alertify.error(t(args.responseText));
+          alertify.error(t(args.responseJSON[0]));
           reject(args)
         }
       });
