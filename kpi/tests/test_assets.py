@@ -444,6 +444,18 @@ class AssetSettingsTests(AssetsTestCase):
                 asset_type='survey')
         self.assertRaises(ValidationError, _create_asset)
 
+        # Test error message received.
+        msg = "XForm questions settings may contain malicious content"
+        self.assertRaisesMessage(ValidationError, msg, _create_asset)
+
+        # Test that asset with no malicious content
+        # are created successfully
+        clean_content = self._content()
+        a1 = Asset.objects.create(content=clean_content, owner=self.user,
+                                  asset_type='block')
+        self.assertEqual(a1.asset_type, 'block')
+        self.assertEqual(len(a1.content['survey']), 2)
+
 
 class AssetScoreTestCase(TestCase):
     fixtures = ['test_data']
