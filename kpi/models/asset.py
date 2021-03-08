@@ -1,5 +1,6 @@
 # coding: utf-8
 # 😬
+import re
 import copy
 import sys
 from collections import OrderedDict
@@ -395,6 +396,16 @@ class FormpackXLSFormUtils:
             raise ValueError('Duplicate translation: {}'.format(_to))
         _ts[_ts.index(_from)] = _to
 
+    def _contains_invalid_chars(self, content):
+        for row in content['survey']:
+            try:
+                if row['default'] and bool(re.search(
+                        r'[<|>|&]', row['default'])):
+                    raise ValidationError(
+                        'XForm questions settings may contain malicious content')
+            except KeyError:
+                pass
+
 
 class XlsExportable:
     def ordered_xlsform_content(self,
@@ -701,6 +712,7 @@ class Asset(ObjectPermissionMixin,
         self._autoname(self.content)
         self._unlink_list_items(self.content)
         self._remove_empty_expressions(self.content)
+        self._contains_invalid_chars(self.content)
 
         settings = self.content['settings']
         _title = settings.pop('form_title', None)
