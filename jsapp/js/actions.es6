@@ -375,8 +375,13 @@ actions.resources.updateAsset.listen(function(uid, values, params={}) {
         actions.resources.updateAsset.completed(asset);
         resolve(asset);
       })
-      .fail(function(...args){
-        reject(args)
+      .fail((args) => {
+        if (args.status === 500) {
+          reject(args)
+        } else {
+          alertify.error(t(args.responseJSON[0]));
+          reject(args)
+        }
       });
   }).then(function(asset) {
     var has_deployment = asset.has_deployment;
