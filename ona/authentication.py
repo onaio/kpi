@@ -64,11 +64,9 @@ class JWTAuthentication(BaseAuthentication):
 
         api_token = get_api_token(cookie_jwt)
 
-        # Create KPI User from Onadata user username and email
+        # Create KPI User from Onadata user username
         user, created = User.objects.using('default').get_or_create(
-            username=api_token.user.username,
-            email=api_token.user.email
-            )
+            username=api_token.user.username)
         if created:
             grant_default_model_level_perms(user)
         return (user, None)
