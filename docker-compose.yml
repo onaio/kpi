@@ -1,0 +1,37 @@
+version: '2.2'
+
+services:
+  kpi_db:
+    image: postgis/postgis:9.6-3.0
+    environment:
+      - POSTGRES_PASSWORD=kpi
+      - POSTGRES_USER=kpi
+      - POSTGRES_DB=kpi
+    volumes:
+      # One level above the code to prevent having to move or delete
+      # it everytime we rebuild.
+      - /var/lib/postgresql/data
+  onadata_db:
+    image: postgis/postgis:9.6-3.0
+    environment:
+      - POSTGRES_PASSWORD=onadata
+      - POSTGRES_USER=onadata
+      - POSTGRES_DB=onadata
+    volumes:
+      # One level above the code to prevent having to move or delete
+      # it everytime we rebuild.
+      - /var/lib/postgresql/data
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kpi:latest
+    ports:
+      - "8000:8000"
+    depends_on:
+      - kpi_db
+      - onadata_db
+    environment:
+      - DATABASE_URL=postgres://db:5432/kpi
+    volumes:
+      - .:/srv/src/kpi 

@@ -73,7 +73,7 @@ COPY . "${KPI_SRC_DIR}"
 RUN virtualenv "$VIRTUAL_ENV"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install  --quiet --upgrade pip && \
-    pip install  --quiet pip-tools
+    pip install  --quiet pip-tools && pip install jwt
 COPY ./dependencies/pip/external_services.txt /srv/tmp/pip_dependencies.txt
 RUN pip-sync /srv/tmp/pip_dependencies.txt 1>/dev/null && \
     rm -rf ~/.cache/pip
