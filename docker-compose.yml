@@ -10,7 +10,7 @@ services:
     volumes:
       # One level above the code to prevent having to move or delete
       # it everytime we rebuild.
-      - /var/lib/postgresql/data
+      - ../.kpi_db:/var/lib/postgresql/data
   onadata_db:
     image: postgis/postgis:9.6-3.0
     environment:
@@ -20,7 +20,7 @@ services:
     volumes:
       # One level above the code to prevent having to move or delete
       # it everytime we rebuild.
-      - /var/lib/postgresql/data
+      - ../.onadata_db:/var/lib/postgresql/data
   web:
     build:
       context: .
@@ -32,6 +32,10 @@ services:
       - kpi_db
       - onadata_db
     environment:
-      - DATABASE_URL=postgres://db:5432/kpi
+      - DATABASE_URL=postgres://kpi_db:5432/kpi
+      - DJANGO_SETTINGS_MODULE=kobo.settings.local_settings
+      - KPI_SRC_DIR=/srv/src/kpi
+      - KPI_LOGS_DIR=/srv/logs
+      - KPI_PREFIX=kpi
     volumes:
-      - .:/srv/src/kpi 
+      - .:/srv/src/kpi

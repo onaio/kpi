@@ -1,4 +1,5 @@
 FROM nikolaik/python-nodejs:python3.8-nodejs10
+ARG additional_pip_packages=pyjwt
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=en_US.UTF-8
@@ -73,9 +74,10 @@ COPY . "${KPI_SRC_DIR}"
 RUN virtualenv "$VIRTUAL_ENV"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install  --quiet --upgrade pip && \
-    pip install  --quiet pip-tools && pip install jwt
+    pip install  --quiet pip-tools
 COPY ./dependencies/pip/external_services.txt /srv/tmp/pip_dependencies.txt
 RUN pip-sync /srv/tmp/pip_dependencies.txt 1>/dev/null && \
+    pip install ${additional_pip_packages} && \
     rm -rf ~/.cache/pip
 
 ###########################

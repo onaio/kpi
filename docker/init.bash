@@ -3,6 +3,9 @@ set -e
 
 source /etc/profile
 
+# Have web service wait until db services are ready to accept connections
+sleep 1
+
 echo 'KoBoForm initializing...'
 
 cd "${KPI_SRC_DIR}"
@@ -15,10 +18,13 @@ fi
 
 
 # Wait for databases to be up & running before going further
-# /bin/bash "${INIT_PATH}/wait_for_mongo.bash"
-# /bin/bash "${INIT_PATH}/wait_for_postgres.bash"
+/bin/bash "${INIT_PATH}/wait_for_mongo.bash"
+/bin/bash "${INIT_PATH}/wait_for_postgres.bash"
+
 
 echo 'Running migrations...'
+python manage.py makemigrations --merge --noinput
+python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 
 echo 'Creating superuser...'
@@ -64,5 +70,10 @@ echo 'Cleaning up Celery PIDs...'
 rm -rf /tmp/celery*.pid
 
 echo 'KoBoForm initialization completed.'
+
+# Have kpi service accessible on the browser
+source /opt/venv/bin/activate
+cd /srv/src/kpi
+python manage.py runserver 0.0.0.0:8000
 
 exec /usr/bin/runsvdir /etc/service
