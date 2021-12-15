@@ -19,7 +19,7 @@ class CollectionPermissionAssignmentSerializer(serializers.ModelSerializer):
         style={'base_template': 'input.html'}  # Render as a simple text box
     )
     permission = RelativePrefixHyperlinkedRelatedField(
-        view_name='permission-detail',
+        view_name='api_v2:permission-detail',
         lookup_field='codename',
         queryset=Permission.objects.all(),
         style={'base_template': 'input.html'}  # Render as a simple text box
@@ -46,7 +46,7 @@ class CollectionPermissionAssignmentSerializer(serializers.ModelSerializer):
 
     def get_url(self, object_permission):
         collection_uid = self.context.get('collection_uid')
-        return reverse('collection-permission-assignment-detail',
+        return reverse('api_v2:collection-permission-assignment-detail',
                        args=(collection_uid, object_permission.uid),
                        request=self.context.get('request', None))
 
@@ -78,7 +78,7 @@ class CollectionPermissionAssignmentSerializer(serializers.ModelSerializer):
         :param codename: str
         :return: str. url
         """
-        return reverse('permission-detail',
+        return reverse('api_v2:permission-detail',
                        args=(codename,),
                        request=self.context.get('request', None))
 
