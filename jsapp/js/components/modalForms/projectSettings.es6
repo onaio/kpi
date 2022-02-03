@@ -26,6 +26,7 @@ import {
   NAME_MAX_LENGTH,
   PROJECT_SETTINGS_CONTEXTS
 } from 'js/constants';
+import { WEB_PAGE_TITLE } from '../../config.es6';
 
 const formViaUrlHelpLink = 'http://help.kobotoolbox.org/creating-forms/importing-an-xlsform-via-url';
 
@@ -870,7 +871,7 @@ class ProjectSettings extends React.Component {
             <Checkbox
               checked={this.state['share-metadata']}
               onChange={this.onShareMetadataChange}
-              label={t('Help KoboToolbox improve this product by sharing the sector and country where this project will be deployed.') + ' ' + t('All the information is submitted anonymously, and will not include the project name or description listed above.')}
+              label={t('Help KoboToolbox improve this product by sharing the sector and country where this project will be deployed.').replace('KoboToolbox', WEB_PAGE_TITLE) + ' ' + t('All the information is submitted anonymously, and will not include the project name or description listed above.')}
             />
           </bem.FormModal__item>
 
