@@ -11,3 +11,5 @@ export function getZebraLoginUrl() {
 const SENTY_DSN = "{{kpi_raven_js_dsn}}";
 
 export const WEB_PAGE_TITLE = 'Ona';
+
+export const DISABLE_LIBRARY_TOGGLE = false; // set default value to false
