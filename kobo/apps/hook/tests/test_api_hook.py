@@ -1,4 +1,5 @@
 # coding: utf-8
+<<<<<<< HEAD
 import json
 
 import constance
@@ -16,6 +17,18 @@ from kpi.constants import (
     PERM_CHANGE_ASSET
 )
 from .hook_test_case import HookTestCase, MockSSRFProtect
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+
+import constance
+import responses
+from django.core.urlresolvers import reverse
+from rest_framework import status
+
+from kpi.constants import INSTANCE_FORMAT_TYPE_JSON
+from .hook_test_case import HookTestCase
+>>>>>>> Added __future__ imports to all files
 
 
 class ApiHookTestCase(HookTestCase):
@@ -50,8 +63,11 @@ class ApiHookTestCase(HookTestCase):
     def test_create_hook(self):
         self._create_hook()
 
+<<<<<<< HEAD
     @patch('ssrf_protect.ssrf_protect.SSRFProtect._get_ip_address',
            new=MockSSRFProtect._get_ip_address)
+=======
+>>>>>>> Fixed XLS imports
     @responses.activate
     def test_data_submission(self):
         # Create first hook
@@ -64,6 +80,7 @@ class ApiHookTestCase(HookTestCase):
         hook_signal_url = reverse("hook-signal-list", kwargs={"parent_lookup_asset": self.asset.uid})
 
         submissions = self.asset.deployment.get_submissions(self.asset.owner.id)
+
         data = {"instance_id": submissions[0].get(
             self.asset.deployment.INSTANCE_ID_FIELDNAME)}
         response = self.client.post(hook_signal_url, data=data, format='json')

@@ -18,7 +18,12 @@ from kpi.constants import PERM_PARTIAL_SUBMISSIONS, PERM_VIEW_SUBMISSIONS
 from kpi.models import Asset, ExportTask
 
 
-class MockDataExports(TestCase):
+class MockDataExportsBase(TestCase):
+    """
+    Creates self.asset, deploys it using the mock backend, and makes some
+    submissions to it
+    """
+
     fixtures = ['test_data']
 
     form_content = {
@@ -180,7 +185,6 @@ class MockDataExports(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username='someuser')
-        self.anotheruser = User.objects.get(username='anotheruser')
         self.asset = Asset.objects.create(
             name='Identificación de animales',
             content=self.form_content,
@@ -188,11 +192,6 @@ class MockDataExports(TestCase):
         )
         self.asset.deploy(backend='mock', active=True)
         self.asset.save()
-        partial_perms = {
-            PERM_VIEW_SUBMISSIONS: [{'_submitted_by': self.anotheruser.username}]
-        }
-        self.asset.assign_perm(self.anotheruser, PERM_PARTIAL_SUBMISSIONS,
-                               partial_perms=partial_perms)
 
         v_uid = self.asset.latest_deployed_version.uid
         for submission in self.submissions:
@@ -200,10 +199,29 @@ class MockDataExports(TestCase):
                 '__version__': v_uid
             })
         self.asset.deployment.mock_submissions(self.submissions)
+
+
+class MockDataExports(MockDataExportsBase):
+    def setUp(self):
+        super().setUp()
+
+        self.anotheruser = User.objects.get(username='anotheruser')
+        partial_perms = {
+            PERM_VIEW_SUBMISSIONS: [
+                {'_submitted_by': self.anotheruser.username}
+            ]
+        }
+        self.asset.assign_perm(
+            self.anotheruser,
+            PERM_PARTIAL_SUBMISSIONS,
+            partial_perms=partial_perms,
+        )
+
         self.formpack, self.submission_stream = report_data.build_formpack(
             self.asset,
             submission_stream=self.asset.deployment.get_submissions(
-                self.asset.owner.id)
+                self.asset.owner.id
+            ),
         )
 
     def run_csv_export_test(
@@ -355,6 +373,16 @@ class MockDataExports(TestCase):
         ]
         self.run_csv_export_test(expected_lines, export_options)
 
+    def test_csv_export_filter_fields(self):
+        export_options = {'fields': '["start", "end", "Do_you_descend_from_unicellular_organism"]'}
+        expected_lines = [
+            '"start";"end";"Do you descend from an ancestral unicellular organism?";"_index"',
+            '"2017-10-23T05:40:39.000-04:00";"2017-10-23T05:41:13.000-04:00";"No";"1"',
+            '"2017-10-23T05:41:14.000-04:00";"2017-10-23T05:41:32.000-04:00";"No";"2"',
+            '"2017-10-23T05:41:32.000-04:00";"2017-10-23T05:42:05.000-04:00";"Yes";"3"',
+        ]
+        self.run_csv_export_test(expected_lines, export_options)
+
     def test_xls_export_english_labels(self):
         export_options = {'lang': 'English'}
         expected_rows = [
@@ -375,6 +403,49 @@ class MockDataExports(TestCase):
         ]
         self.run_xls_export_test(expected_rows, export_options,
                                  user=self.anotheruser)
+
+    def test_xls_export_multiple_select_both(self):
+        export_options = {'lang': 'English', 'multiple_select': 'both'}
+        expected_rows = [
+            ['start', 'end', 'What kind of symmetry do you have?', 'What kind of symmetry do you have?/Spherical', 'What kind of symmetry do you have?/Radial', 'What kind of symmetry do you have?/Bilateral', 'How many segments does your body have?', 'Do you have body fluids that occupy intracellular space?', 'Do you descend from an ancestral unicellular organism?', '_id','_uuid','_submission_time','_validation_status','_notes', '_status',  '_submitted_by', '_tags', '_index'],
+            ['', '', '#symmetry', '', '', '', '#segments', '#fluids', '', '', '', '', '', '', '', '', '', ''],
+            ['2017-10-23T05:40:39.000-04:00', '2017-10-23T05:41:13.000-04:00', 'Spherical Radial Bilateral', '1', '1', '1', '6', 'Yes, and some extracellular space', 'No', 61.0, '48583952-1892-4931-8d9c-869e7b49bafb', '2017-10-23T09:41:19', '', '[]', 'submitted_via_web', '', '', 1.0],
+            ['2017-10-23T05:41:14.000-04:00', '2017-10-23T05:41:32.000-04:00', 'Radial', '0', '1', '0', '3', 'Yes', 'No', 62.0, '317ba7b7-bea4-4a8c-8620-a483c3079c4b', '2017-10-23T09:41:38', '', '[]', 'submitted_via_web', '', '', 2.0],
+            ['2017-10-23T05:41:32.000-04:00', '2017-10-23T05:42:05.000-04:00', 'Bilateral', '0', '0', '1', '2', 'No / Unsure', 'Yes', 63.0, '3f15cdfe-3eab-4678-8352-7806febf158d', '2017-10-23T09:42:11', '', '[]', 'submitted_via_web', 'anotheruser', '', 3.0]
+        ]
+        self.run_xls_export_test(expected_rows, export_options)
+
+    def test_xls_export_multiple_select_summary(self):
+        export_options = {'lang': 'English', 'multiple_select': 'summary'}
+        expected_rows = [
+            ['start', 'end', 'What kind of symmetry do you have?', 'How many segments does your body have?', 'Do you have body fluids that occupy intracellular space?', 'Do you descend from an ancestral unicellular organism?', '_id', '_uuid', '_submission_time', '_validation_status', '_notes', '_status', '_submitted_by', '_tags', '_index'],
+            ['', '', '#symmetry', '#segments', '#fluids', '', '', '', '', '', '', '', '', '', ''],
+            ['2017-10-23T05:40:39.000-04:00', '2017-10-23T05:41:13.000-04:00', 'Spherical Radial Bilateral', '6', 'Yes, and some extracellular space', 'No', 61.0, '48583952-1892-4931-8d9c-869e7b49bafb', '2017-10-23T09:41:19', '', '[]', 'submitted_via_web', '', '', 1.0],
+            ['2017-10-23T05:41:14.000-04:00', '2017-10-23T05:41:32.000-04:00', 'Radial', '3', 'Yes', 'No', 62.0, '317ba7b7-bea4-4a8c-8620-a483c3079c4b', '2017-10-23T09:41:38', '', '[]', 'submitted_via_web', '', '', 2.0],
+            ['2017-10-23T05:41:32.000-04:00', '2017-10-23T05:42:05.000-04:00', 'Bilateral', '2', 'No / Unsure', 'Yes', 63.0, '3f15cdfe-3eab-4678-8352-7806febf158d', '2017-10-23T09:42:11', '', '[]', 'submitted_via_web', 'anotheruser', '', 3.0]
+        ]
+        self.run_xls_export_test(expected_rows, export_options)
+
+    def test_xls_export_multiple_select_details(self):
+        export_options = {'lang': 'English', 'multiple_select': 'details'}
+        expected_rows = [
+            ['start', 'end', 'What kind of symmetry do you have?/Spherical', 'What kind of symmetry do you have?/Radial', 'What kind of symmetry do you have?/Bilateral', 'How many segments does your body have?', 'Do you have body fluids that occupy intracellular space?', 'Do you descend from an ancestral unicellular organism?', '_id', '_uuid', '_submission_time', '_validation_status', '_notes', '_status', '_submitted_by', '_tags', '_index'],
+            ['', '', '#symmetry', '', '', '#segments', '#fluids', '', '', '', '', '', '', '', '', '', ''],
+            ['2017-10-23T05:40:39.000-04:00', '2017-10-23T05:41:13.000-04:00', '1', '1', '1', '6', 'Yes, and some extracellular space', 'No', 61.0, '48583952-1892-4931-8d9c-869e7b49bafb', '2017-10-23T09:41:19', '', '[]', 'submitted_via_web', '', '', 1.0],
+            ['2017-10-23T05:41:14.000-04:00', '2017-10-23T05:41:32.000-04:00', '0', '1', '0', '3', 'Yes', 'No', 62.0, '317ba7b7-bea4-4a8c-8620-a483c3079c4b', '2017-10-23T09:41:38', '', '[]', 'submitted_via_web', '', '', 2.0],
+            ['2017-10-23T05:41:32.000-04:00', '2017-10-23T05:42:05.000-04:00', '0', '0', '1', '2', 'No / Unsure', 'Yes', 63.0, '3f15cdfe-3eab-4678-8352-7806febf158d', '2017-10-23T09:42:11', '', '[]', 'submitted_via_web', 'anotheruser', '', 3.0]
+        ]
+        self.run_xls_export_test(expected_rows, export_options)
+
+    def test_xls_export_filter_fields(self):
+        export_options = {'fields': '["start", "end", "Do_you_descend_from_unicellular_organism"]'}
+        expected_lines = [
+            [ "start", "end", "Do you descend from an ancestral unicellular organism?", "_index" ],
+            [ "2017-10-23T05:40:39.000-04:00", "2017-10-23T05:41:13.000-04:00", "No",  1.0  ],
+            [ "2017-10-23T05:41:14.000-04:00", "2017-10-23T05:41:32.000-04:00", "No",  2.0  ],
+            [ "2017-10-23T05:41:32.000-04:00", "2017-10-23T05:42:05.000-04:00", "Yes",  3.0  ],
+        ]
+        self.run_xls_export_test(expected_lines, export_options)
 
     def test_export_spss_labels(self):
         export_task = ExportTask()
@@ -480,7 +551,7 @@ class MockDataExports(TestCase):
             export_task.user = self.user
             export_task.data = task_data
             export_task.save()
-        created_export_tasks = ExportTask._filter_by_source_kludge(
+        created_export_tasks = ExportTask.filter_by_source(
             ExportTask.objects.filter(user=self.user),
             task_data['source']
         )
@@ -495,7 +566,7 @@ class MockDataExports(TestCase):
         self.assertFalse(result.storage.exists(result.name))
         self.assertListEqual( # assertSequenceEqual isn't working...
             list(export_tasks_to_keep.values_list('pk', flat=True)),
-            list(ExportTask._filter_by_source_kludge(
+            list(ExportTask.filter_by_source(
                 ExportTask.objects.filter(
                     user=self.user),
                 task_data['source']
@@ -509,7 +580,7 @@ class MockDataExports(TestCase):
         }
         self.assertEqual(
             0,
-            ExportTask._filter_by_source_kludge(
+            ExportTask.filter_by_source(
                 ExportTask.objects.filter(
                     user=self.user),
                 task_data['source']
@@ -526,7 +597,7 @@ class MockDataExports(TestCase):
             export_task.save()
         self.assertSequenceEqual(
             [ExportTask.CREATED, ExportTask.PROCESSING],
-            ExportTask._filter_by_source_kludge(
+            ExportTask.filter_by_source(
                 ExportTask.objects.filter(
                     user=self.user),
                 task_data['source']
@@ -541,7 +612,7 @@ class MockDataExports(TestCase):
         # Verify that the stuck exports have been marked
         self.assertSequenceEqual(
             [ExportTask.ERROR, ExportTask.ERROR, ExportTask.COMPLETE],
-            ExportTask._filter_by_source_kludge(
+            ExportTask.filter_by_source(
                 ExportTask.objects.filter(
                     user=self.user),
                 task_data['source']

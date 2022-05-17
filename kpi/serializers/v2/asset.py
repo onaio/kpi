@@ -1,6 +1,7 @@
 # coding: utf-8
 import json
 
+from django.utils.six import text_type
 from rest_framework import serializers
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework.reverse import reverse
@@ -134,7 +135,11 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
             try:
                 asset.update_translation_list(translations_list)
             except ValueError as err:
+<<<<<<< HEAD
                 raise serializers.ValidationError(str(err))
+=======
+                raise serializers.ValidationError(text_type(err))
+>>>>>>> Fixed XLS imports
             validated_data['content'] = asset_content
         try:
             return super().update(asset, validated_data)
@@ -297,6 +302,42 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         return [
             {
                 'url': reverse('api_v2:permission-detail',
+                               kwargs={'codename': codename},
+                               request=self.context.get('request')),
+                'label': asset.get_label_for_permission(codename),
+            }
+            for codename in asset.ASSIGNABLE_PERMISSIONS_BY_TYPE[asset.asset_type]]
+
+    def get_permissions(self, obj):
+        context = self.context
+        request = self.context.get('request')
+
+        queryset = ObjectPermissionHelper. \
+            get_user_permission_assignments_queryset(obj, request.user)
+        # Need to pass `asset` and `asset_uid` to context of
+        # AssetPermissionAssignmentSerializer serializer to avoid extra queries to DB
+        # within the serializer to retrieve the asset object.
+        context['asset'] = obj
+        context['asset_uid'] = obj.uid
+
+        return AssetPermissionAssignmentSerializer(queryset.all(),
+                                                   many=True, read_only=True,
+                                                   context=context).data
+
+    def get_assignable_permissions(self, asset):
+        return [
+            {
+                'url': reverse('permission-detail',
+                               kwargs={'codename': codename},
+                               request=self.context.get('request')),
+                'label': asset.get_label_for_permission(codename),
+            }
+        for codename in asset.assignable_permissions]
+
+    def get_assignable_permissions(self, asset):
+        return [
+            {
+                'url': reverse('permission-detail',
                                kwargs={'codename': codename},
                                request=self.context.get('request')),
                 'label': asset.get_label_for_permission(codename),

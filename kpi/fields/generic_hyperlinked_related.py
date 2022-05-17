@@ -1,13 +1,13 @@
 # coding: utf-8
-from urllib.parse import urlparse
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import (
-    Resolver404,
-    get_script_prefix,
-    resolve,
-)
+from django.core.urlresolvers import Resolver404
+from django.core.urlresolvers import get_script_prefix
+from django.core.urlresolvers import resolve
+from django.utils.six.moves.urllib.parse import urlparse
 from rest_framework import serializers
 
 from kpi.models.object_permission import ObjectPermission
@@ -20,13 +20,14 @@ class GenericHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
         # situation. We will override them dynamically.
         kwargs['view_name'] = '*'
         kwargs['queryset'] = ObjectPermission.objects.none()
-        super().__init__(**kwargs)
+        return super(GenericHyperlinkedRelatedField, self).__init__(**kwargs)
 
     def to_representation(self, value):
         # TODO Figure out why self.view_name is initialized twice in a row?
         self.view_name = '{}-detail'.format(
             ContentType.objects.get_for_model(value).model)
-        result = super().to_representation(value)
+        result = super(GenericHyperlinkedRelatedField, self).to_representation(
+            value)
         self.view_name = '*'
         return result
 

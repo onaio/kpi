@@ -1,8 +1,5 @@
 # coding: utf-8
 import datetime
-import json
-from hashlib import md5
-from itertools import chain
 
 from django.contrib.auth.decorators import login_required
 from django.template.response import TemplateResponse
@@ -24,16 +21,10 @@ from rest_framework.response import Response
 from kpi.models import AuthorizedApplication, OneTimeAuthenticationKey
 from kpi.models.authorized_application import ApplicationTokenAuthentication
 from kpi.serializers import AuthorizedApplicationUserSerializer
-from ona.authentication import JWTAuthentication
 
 
+@login_required
 def home(request):
-    cookie_jwt = request.COOKIES.get(settings.KPI_COOKIE_NAME)
-    if request.user.is_anonymous and cookie_jwt:
-        auth_class = JWTAuthentication()
-        user, token = auth_class.authenticate(request)
-        user.backend = settings.AUTHENTICATION_BACKENDS[0]
-        login(request, user)
     return TemplateResponse(request, "index.html")
 
 

@@ -6,6 +6,7 @@ from kpi.utils.two_database_configuration_checker import \
     TwoDatabaseConfigurationChecker
 
 
+
 class KpiConfig(AppConfig):
     name = 'kpi'
 

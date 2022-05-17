@@ -5,7 +5,11 @@ import re
 from lxml import etree
 
 from kpi.constants import INSTANCE_FORMAT_TYPE_XML
+<<<<<<< HEAD
 from kpi.utils.strings import to_str
+=======
+from kpi.utils.future import to_str
+>>>>>>> Fixed XLS imports
 from .hook_test_case import HookTestCase
 
 
@@ -16,6 +20,7 @@ class ParserTestCase(HookTestCase):
 
         ServiceDefinition = hook.get_service_definition()
         submissions = hook.asset.deployment.get_submissions(hook.asset.owner.id)
+
         uuid = submissions[0].get(hook.asset.deployment.INSTANCE_ID_FIELDNAME)
         service_definition = ServiceDefinition(hook, uuid)
         expected_data = {
@@ -35,6 +40,7 @@ class ParserTestCase(HookTestCase):
         self.asset_xml.deploy(backend='mock', active=True)
         self.asset_xml.save()
 
+
         hook = self._create_hook(subset_fields=['_id', 'subgroup1', 'q3'],
                                  format_type=INSTANCE_FORMAT_TYPE_XML)
 
@@ -47,6 +53,7 @@ class ParserTestCase(HookTestCase):
 
         service_definition = ServiceDefinition(hook, uuid)
         expected_etree = etree.fromstring(
+
             ('<{asset_uid}>'
              '   <group1>'
              '      <q3>¿Cómo está en el grupo uno la segunda vez?</q3>'

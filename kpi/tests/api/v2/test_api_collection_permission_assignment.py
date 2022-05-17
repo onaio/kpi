@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD:kpi/tests/api/v2/test_api_collection_permission_assignment.py
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+>>>>>>> Added __future__ imports to all files:kpi/tests/api/v2/test_api_collection_permission.py
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status

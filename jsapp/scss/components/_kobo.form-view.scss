@@ -23,7 +23,7 @@ $z-form-view-fullscreen: 101;
   width: 100%;
   height: calc(100% - 48px);
   overflow-y: auto;
-  background: $cool-whitegray;
+  background: $cool-whitesilver;
 
   &.form-view--fullscreen {
     position: fixed;
@@ -73,9 +73,9 @@ $z-form-view-fullscreen: 101;
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;
-    padding: 13px 30px;
+    padding: 13px 0;
     text-transform: uppercase;
-    margin-right: 10px;
+    margin: 0 30px;
     font-size: 15px;
     cursor: pointer;
     position: relative;
@@ -84,6 +84,7 @@ $z-form-view-fullscreen: 101;
     display: inline-block;
 
     &.active {
+      font-weight: 700;
       color: $black;
       border-bottom: 2px solid $cool-green;
     }
@@ -152,6 +153,7 @@ $z-form-view-fullscreen: 101;
     max-height: 0;
     overflow: hidden;
     transition: 0.2s max-height;
+    padding-bottom: 0;
   }
 
   &.historyExpanded .form-view__cell--history-label,
@@ -295,6 +297,10 @@ $z-form-view-fullscreen: 101;
       display: inline-block;
       width: calc(100% - 48px);
     }
+  }
+
+  &.form-view__cell--translation-modal-warning {
+    margin-bottom: 20px;
   }
 }
 

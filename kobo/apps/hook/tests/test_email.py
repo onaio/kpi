@@ -1,4 +1,5 @@
 # coding: utf-8
+<<<<<<< HEAD
 import responses
 from django.conf import settings
 from django.core import mail
@@ -7,6 +8,18 @@ from django.template.loader import get_template
 from django.utils import translation, dateparse
 from django_celery_beat.models import PeriodicTask
 from mock import patch
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+
+import responses
+from django.conf import settings
+from django.core import mail
+from django.template import Context
+from django.template.loader import get_template
+from django.utils import translation, dateparse
+from django_celery_beat.models import PeriodicTask
+>>>>>>> Added __future__ imports to all files
 
 from .hook_test_case import HookTestCase, MockSSRFProtect
 from ..tasks import failures_reports
@@ -21,8 +34,11 @@ class EmailTestCase(HookTestCase):
                                      task=beat_schedule.get("task"))
         periodic_task.save()
 
+<<<<<<< HEAD
     @patch('ssrf_protect.ssrf_protect.SSRFProtect._get_ip_address',
            new=MockSSRFProtect._get_ip_address)
+=======
+>>>>>>> Added __future__ imports to all files
     @responses.activate
     def test_notifications(self):
         self._create_periodic_task()
@@ -37,6 +53,7 @@ class EmailTestCase(HookTestCase):
             "assets": {
                 self.asset.uid: {
                     "name": self.asset.name,
+                    "hook_uid": self.hook.uid,
                     "max_length": len(self.hook.name),
                     "logs": [{
                         "hook_name": self.hook.name,

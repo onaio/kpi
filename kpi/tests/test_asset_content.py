@@ -1,11 +1,13 @@
-# coding: utf-8
-import inspect
-import json
-import string
 from collections import OrderedDict
 from copy import deepcopy
 from functools import reduce
 
+from kpi.models import Asset
+from kpi.utils.sluggify import sluggify_label
+
+from django.utils.six import string_types
+
+from formpack.utils.future import OrderedDict
 from kpi.models import Asset
 from kpi.utils.sluggify import sluggify_label
 

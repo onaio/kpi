@@ -5,6 +5,7 @@ from collections import defaultdict
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.test import TestCase
+from django.utils.six import text_type
 
 from kobo.apps.reports import report_data
 from kpi.constants import PERM_VIEW_SUBMISSIONS

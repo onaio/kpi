@@ -1,7 +1,6 @@
 # coding: utf-8
 from django.utils.deprecation import MiddlewareMixin
 
-
 class UsernameInResponseHeaderMiddleware(MiddlewareMixin):
     """
     Record the authenticated user (if any) in the `X-KoBoNaUt` HTTP header

@@ -17,10 +17,16 @@ class DataPagination(LimitOffsetPagination):
     max_limit = settings.SUBMISSION_LIST_LIMIT
 
 
-class Paginated(LimitOffsetPagination):
+class DataPagination(LimitOffsetPagination):
+    """
+    Pagination class for submissions.
+    """
+    default_limit = settings.SUBMISSION_LIST_LIMIT
+    offset_query_param = 'start'
+    max_limit = settings.SUBMISSION_LIST_LIMIT
 
-    """ Adds 'root' to the wrapping response object. """
-    root = SerializerMethodField('get_parent_url', read_only=True)
+
+class Paginated(LimitOffsetPagination):
 
     def get_parent_url(self, obj):
         return reverse_lazy('api-root', request=self.context.get('request'))

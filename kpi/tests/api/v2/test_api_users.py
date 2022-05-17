@@ -1,5 +1,12 @@
 # coding: utf-8
+<<<<<<< HEAD
 from django.urls import reverse
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+from django.core.urlresolvers import reverse
+>>>>>>> Added __future__ imports to all files
 from rest_framework import status
 
 from kpi.tests.base_test_case import BaseTestCase

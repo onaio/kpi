@@ -5,6 +5,8 @@ from django.core.management.base import BaseCommand
 
 from kpi.constants import PERM_VALIDATE_SUBMISSIONS
 from ...models import Asset
+from kpi.constants import PERM_VALIDATE_SUBMISSIONS
+from ...models import Asset
 
 
 class Command(BaseCommand):

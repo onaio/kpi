@@ -16,6 +16,7 @@ EPOCH_BEGINNING = datetime.datetime.utcfromtimestamp(0)
 markdownify = import_string(MARKDOWNX_MARKDOWNIFY_FUNCTION)
 
 
+@python_2_unicode_compatible
 class InAppMessage(models.Model):
     """
     A message, composed in the Django admin interface, displayed to regular
@@ -50,6 +51,7 @@ class InAppMessage(models.Model):
         return result
 
 
+@python_2_unicode_compatible
 class InAppMessageFile(models.Model):
     """
     A file uploaded by the django-markdownx editor. It doesn't have a foreign
@@ -69,6 +71,7 @@ class InAppMessageFile(models.Model):
         return self.content.name
 
 
+@python_2_unicode_compatible
 class InAppMessageUserInteractions(models.Model):
     message = models.ForeignKey(InAppMessage, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

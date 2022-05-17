@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD:kpi/tests/api/v2/test_api_asset_permission_assignment.py
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+>>>>>>> Added __future__ imports to all files:kpi/tests/api/v2/test_api_asset_permission.py
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -253,7 +259,9 @@ class ApiBulkAssetPermissionTestCase(BaseApiAssetPermissionTestCase):
         permission_list_response = self.client.get(self.asset_permissions_list_url,
                                                    format='json')
         self.assertEqual(permission_list_response.status_code, status.HTTP_200_OK)
+
         total = len(permission_list_response.data)
+
         # Add number of permissions added with 'view_asset'
         total += len(Asset.get_implied_perms(PERM_VIEW_ASSET)) + 1
         # Add number of permissions added with 'change_asset'
@@ -266,5 +274,6 @@ class ApiBulkAssetPermissionTestCase(BaseApiAssetPermissionTestCase):
         ])
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         self.assertEqual(len(response.data), total)
 

@@ -1,8 +1,11 @@
 # coding: utf-8
 from collections import OrderedDict
 
+from django.utils.module_loading import import_string
 from rest_framework import serializers
 from rest_framework.pagination import LimitOffsetPagination
+
+from formpack.utils.future import OrderedDict
 
 
 class PaginatedApiField(serializers.ReadOnlyField):
@@ -14,7 +17,6 @@ class PaginatedApiField(serializers.ReadOnlyField):
         The `source`, whether implied or explicit, must be a manager or
         queryset. Alternatively, pass a `source_processor` callable that
         transforms `source` into a usable queryset.
-
         :param serializer_class: The class (not instance) of the desired list
             serializer. Required.
         :param paginator_class: Optional; defaults to `LimitOffsetPagination`.
@@ -42,8 +44,11 @@ class PaginatedApiField(serializers.ReadOnlyField):
             queryset=queryset,
             request=self.context.get('request', None)
         )
-        serializer = self.serializer_class(
-            page, many=True, context=self.context)
+        if isinstance(self.serializer_class, str):
+            serializer_class = import_string(self.serializer_class)
+        else:
+            serializer_class = self.serializer_class
+        serializer = serializer_class(page, many=True, context=self.context)
         return OrderedDict([
             ('count', self.paginator.count),
             ('next', self.paginator.get_next_link()),

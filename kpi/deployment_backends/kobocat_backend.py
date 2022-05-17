@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from rest_framework import status, serializers
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.translation import ugettext_lazy as _
 
 from kpi.constants import INSTANCE_FORMAT_TYPE_JSON, INSTANCE_FORMAT_TYPE_XML
@@ -42,6 +43,27 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         # if only the owner has permissions, no need to go further
         if len(users_with_perms) == 1 and \
                 list(users_with_perms)[0].id == self.asset.owner_id:
+<<<<<<< HEAD
+            return
+
+        for user, perms in users_with_perms.items():
+            if user.id == self.asset.owner_id:
+                continue
+            assign_applicable_kc_permissions(self.asset, user, perms)
+
+    def bulk_assign_mapped_perms(self):
+        """
+        Bulk assign all `kc` permissions related to `kpi` permissions.
+        Useful to assign permissions retroactively upon deployment.
+        Beware: it only adds permissions, it does not remove or sync permissions.
+        """
+        users_with_perms = self.asset.get_users_with_perms(attach_perms=True)
+
+        # if only the owner has permissions, no need to go further
+        if len(users_with_perms) == 1 and \
+                users_with_perms.keys()[0].id == self.asset.owner_id:
+=======
+>>>>>>> Re-applied python3 rules after merge
             return
 
         for user, perms in users_with_perms.items():
@@ -226,7 +248,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             project = self.asset.settings.get('project')
             if project:
                 url = self.external_to_internal_url(
-                    u'{}/api/v1/projects/{}/forms'.format(server, project)
+                    '{}/api/v1/projects/{}/forms'.format(server, project)
                 )
         xls_io = self.asset.to_xls_io(
             versioned=True, append={
@@ -245,10 +267,10 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         #   to query a boolean than string.
         # Don't forget to run Management Command `populate_kc_xform_kpi_asset_uid`
         payload = {
-            u'kpi_asset_uid': self.asset.uid,
-            u'published_by_formbuilder': True,
-            u"downloadable": active,
-            u"has_kpi_hook": self.asset.has_active_hooks,
+            'kpi_asset_uid': self.asset.uid,
+            'published_by_formbuilder': True,
+            "downloadable": active,
+            "has_kpi_hook": self.asset.has_active_hooks,
         }
         files = {'xls_file': ('{}.xls'.format(id_string), xls_io)}
         json_response = self._kobocat_request(
@@ -486,7 +508,6 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             'csv_legacy': '/'.join((exports_base_url, 'csv/')),
             'zip_legacy': '/'.join((exports_base_url, 'zip/')),
             'kml_legacy': '/'.join((exports_base_url, 'kml/')),
-            'analyser_legacy': '/'.join((exports_base_url, 'analyser/')),
             # For GET requests that return files directly
             'xls': '/'.join((reports_base_url, 'export.xlsx')),
             'csv': '/'.join((reports_base_url, 'export.csv')),
@@ -545,9 +566,31 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         )
         return url
 
-    def get_submissions(self, requesting_user_id,
-                        format_type=INSTANCE_FORMAT_TYPE_JSON,
-                        instance_ids=[], **kwargs):
+    def get_submission(self, pk, format_type=INSTANCE_FORMAT_TYPE_JSON, **kwargs):
+        """
+        Returns submission if `pk` exists otherwise `None`
+
+        Args:
+            pk (int). Primary key. Must be a positive integer
+            format_type (str): INSTANCE_FORMAT_TYPE_JSON|INSTANCE_FORMAT_TYPE_XML
+            kwargs (dict): Filters to pass to MongoDB. See
+                https://docs.mongodb.com/manual/reference/operator/query/
+
+        Returns:
+            (dict|str|`None`): Depending of `format_type`, it can return:
+                - Mongo JSON representation as a dict
+                - Instance's XML as string
+                - `None` if doesn't exist
+        """
+
+        submissions = list(self.get_submissions(format_type, [int(pk)], **kwargs))
+        try:
+            return submissions[0]
+        except IndexError:
+            pass
+        return None
+
+    def get_submissions(self, format_type=INSTANCE_FORMAT_TYPE_JSON, instances_ids=[], **kwargs):
         """
         Retrieves submissions through Postgres or Mongo depending on `format_type`.
         It can be filtered on instances ids.
@@ -579,7 +622,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             raise BadFormatException(
                 "The format {} is not supported".format(format_type)
             )
-        return submissions_kobocat_request
+        return submissions
 
     def get_validation_status(self, submission_pk, params, user):
         url = self.get_submission_validation_status_url(submission_pk)
@@ -628,9 +671,6 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         """
         url = self.submission_list_url
         data = data.copy()  # Need to get a copy to update the dict
-
-        if method == 'DELETE':
-            data['reset'] = True
 
         # `PATCH` KC even if kpi receives `DELETE`
         kc_request = requests.Request(method='PATCH', url=url, json=data)
@@ -683,6 +723,13 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
                 'sort': _('This param is not supported in `XML` format')
             })
 
+        # FIXME. Use Mongo to sort data and ask PostgreSQL to follow the order.
+        # See. https://stackoverflow.com/a/867578
+        if 'sort' in kwargs:
+            raise serializers.ValidationError({
+                'sort': _('This param is not supported in `XML` format')
+            })
+
         # Because `kwargs`' values are for `Mongo`'s query engine
         # We still use MongoHelper to validate params.
         params = self.validate_submission_list_params(**kwargs)
@@ -711,6 +758,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
         if len(instance_ids) > 0 or use_mongo:
             queryset = queryset.filter(id__in=instance_ids)
 
+        # Python-only attribute used by `kpi.views.v2.data.DataViewSet.list()`
         self.current_submissions_count = queryset.count()
 
         # Force Sort by id (see fixme above)

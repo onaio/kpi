@@ -1,4 +1,5 @@
 # coding: utf-8
+import datetime
 import json
 import re
 from collections import OrderedDict
@@ -14,6 +15,7 @@ from kpi.constants import PERM_VIEW_ASSET, PERM_CHANGE_ASSET, PERM_SHARE_ASSET, 
 from kpi.models import Asset
 from kpi.models import Collection
 from kpi.models.object_permission import get_all_objects_for_user
+from formpack.utils.future import OrderedDict
 
 # move this into a fixture file?
 # note: this is not a very robust example of a cascading select
@@ -346,6 +348,18 @@ class AssetContentTests(AssetsTestCase):
             cell.value for cell in settings_sheet.col(settings_sheet.ncols - 1)
         ]
         self.assertEqual(xls_asdf_col, ['asdf', 'jkl'])
+
+    def test_to_xls_io_includes_version_number_and_date(self):
+        date_string = '2021-03-17 11:12:13'
+        self.asset.date_modified = datetime.datetime.fromisoformat(date_string)
+        xls_io = self.asset.to_xls_io(versioned=True)
+        workbook = xlrd.open_workbook(file_contents=xls_io.read())
+        settings_sheet = workbook.sheet_by_name('settings')
+        version_col = [cell.value for cell in settings_sheet.row(0)].index(
+            'version'
+        )
+        version_string = settings_sheet.col(version_col)[1].value
+        assert version_string == f'1 ({date_string})'
 
 
 class AssetSettingsTests(AssetsTestCase):

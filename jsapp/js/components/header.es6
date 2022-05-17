@@ -98,6 +98,24 @@ class MainHeader extends Reflux.Component {
     );
   }
   renderAccountNavMenu () {
+    let shouldDisplayUrls = false;
+    if (
+      stores.session &&
+      stores.session.environment &&
+      typeof stores.session.environment.terms_of_service_url === 'string' &&
+      typeof stores.session.environment.terms_of_service_url.length >= 1
+    ) {
+      shouldDisplayUrls = true;
+    }
+    if (
+      stores.session &&
+      stores.session.environment &&
+      typeof stores.session.environment.privacy_policy_url === 'string' &&
+      typeof stores.session.environment.privacy_policy_url.length >= 1
+    ) {
+      shouldDisplayUrls = true;
+    }
+
     let langs = [];
     if (stores.session.environment) {
       langs = stores.session.environment.interface_languages;
@@ -111,10 +129,6 @@ class MainHeader extends Reflux.Component {
 
       return (
         <bem.AccountBox>
-          {/*<bem.AccountBox__notifications className="is-edge">
-            <i className="fa fa-bell"></i>
-            <bem.AccountBox__notifications__count> 2 </bem.AccountBox__notifications__count>
-          </bem.AccountBox__notifications>*/}
           <ui.PopoverMenu type='account-menu'
                           triggerLabel={accountMenuLabel}
                           buttonType='text'>
@@ -133,14 +147,18 @@ class MainHeader extends Reflux.Component {
                     </button>
                   </bem.AccountBox__menuItem>
                 </bem.AccountBox__menuLI>
-                {stores.session && stores.session.environment &&
+                {shouldDisplayUrls &&
                   <bem.AccountBox__menuLI key='2' className='environment-links'>
-                    <a href={stores.session.environment.terms_of_service_url} target='_blank'>
-                      {t('Terms of Service')}
-                    </a>
-                    <a href={stores.session.environment.privacy_policy_url} target='_blank'>
-                      {t('Privacy Policy')}
-                    </a>
+                    {stores.session.environment.terms_of_service_url &&
+                      <a href={stores.session.environment.terms_of_service_url} target='_blank'>
+                        {t('Terms of Service')}
+                      </a>
+                    }
+                    {stores.session.environment.privacy_policy_url &&
+                      <a href={stores.session.environment.privacy_policy_url} target='_blank'>
+                        {t('Privacy Policy')}
+                      </a>
+                    }
                   </bem.AccountBox__menuLI>
                 }
                 <bem.AccountBox__menuLI m={'lang'} key='3'>
@@ -211,9 +229,9 @@ class MainHeader extends Reflux.Component {
   assetTitleChange (e) {
     var asset = this.state.asset;
     if (e.target.name == 'title')
-      asset.name = e.target.value;
+      asset.name = this.removeInvalidChars(e.target.value);
     else
-      asset.settings.description = e.target.value;
+      asset.settings.description = this.removeInvalidChars(e.target.value);
 
     this.setState({
       asset: asset
@@ -221,6 +239,14 @@ class MainHeader extends Reflux.Component {
 
     clearTimeout(typingTimer);
     typingTimer = setTimeout(this.updateAssetTitle.bind(this), 1500);
+  }
+  removeInvalidChars(str) {
+    /*
+    * Inspired by https://gist.github.com/john-doherty/b9195065884cdbfd2017a4756e6409cc
+    * Remove everything forbidden by XML 1.0 specifications, plus the unicode replacement character U+FFFD
+    */
+    var regex = /((?:[\0-\x08\x0B\f\x0E-\x1F\uFFFD\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))/g;
+    return str = String(str || '').replace(regex, '');
   }
   assetTitleKeyDown(evt) {
     if (evt.key === 'Enter') {
@@ -260,7 +286,7 @@ class MainHeader extends Reflux.Component {
                 <ListSearch searchContext={this.state.formFiltersContext} placeholderText={t('Search Projects')} />
               </div>
             }
-            { this.isLibrary() &&
+            { (this.isMyLibrary() || this.isPublicCollections()) &&
               <div className='mdl-layout__header-searchers'>
                 <ListSearch searchContext={this.state.libraryFiltersContext} placeholderText={t('Search Library')} />
               </div>

@@ -24,10 +24,11 @@ import {
 } from '../constants';
 import {
   t,
-  notify,
   formatTimeDate,
   renderCheckbox
 } from '../utils';
+import {getSurveyFlatPaths} from 'js/assetUtils';
+import {getRepeatGroupAnswers} from 'js/submissionUtils';
 
 const NOT_ASSIGNED = 'validation_status_not_assigned';
 
@@ -56,7 +57,6 @@ export class DataTable extends React.Component {
       selectedRows: {},
       selectAll: false,
       fetchState: false,
-      promptRefresh: false,
       submissionPager: false,
       overrideLabelsAndGroups: null
     };
@@ -176,14 +176,7 @@ export class DataTable extends React.Component {
       return Object.assign(result, obj);
     }, {}));
 
-    const surveyKeys = [];
-    this.props.asset.content.survey.forEach((row) => {
-      if (row.name) {
-        surveyKeys.push(row.name);
-      } else if (row.$autoname) {
-        surveyKeys.push(row.$autoname);
-      }
-    });
+    const surveyKeys = Object.values(getSurveyFlatPaths(this.props.asset.content.survey));
 
     // make sure the survey columns are displayed, even if current data's
     // submissions doesn't have them
@@ -332,8 +325,9 @@ export class DataTable extends React.Component {
         q = survey.find(o => o.name === key || o.$autoname == key);
       }
 
-      if (q && q.type === 'begin_repeat')
+      if (q && q.type === 'begin_repeat') {
         return false;
+      }
 
       // sets location of columns for questions not in current survey version
       var index = 'y_' + key;
@@ -403,38 +397,45 @@ export class DataTable extends React.Component {
         index: index,
         question: q,
         filterable: false,
-        Cell: row => {
-            if (showLabels && q && q.type && row.value) {
-              if (q.type === QUESTION_TYPES.get('image').id || q.type === QUESTION_TYPES.get('audio').id || q.type === QUESTION_TYPES.get('video').id) {
-                var mediaURL = this.getMediaDownloadLink(row.value);
-                return <a href={mediaURL} target="_blank">{row.value}</a>;
-              }
-              // show proper labels for choice questions
-              if (q.type == 'select_one') {
-                let choice = choices.find(o => o.list_name == q.select_from_list_name && (o.name === row.value || o.$autoname == row.value));
-                return choice && choice.label && choice.label[translationIndex] ? choice.label[translationIndex] : row.value;
-              }
-              if (q.type == 'select_multiple' && row.value) {
-                let values = row.value.split(' ');
-                var labels = [];
-                values.forEach(function(v) {
-                  let choice = choices.find(o => o.list_name == q.select_from_list_name && (o.name === v || o.$autoname == v));
-                  if (choice && choice.label && choice.label[translationIndex])
-                    labels.push(choice.label[translationIndex]);
-                });
-
-                return labels.join(', ');
-              }
-              if (q.type == 'start' || q.type == 'end' || q.type == '_submission_time') {
-                return formatTimeDate(row.value);
-              }
+        Cell: (row) => {
+          if (showLabels && q && q.type && row.value) {
+            if (q.type === QUESTION_TYPES.get('image').id || q.type === QUESTION_TYPES.get('audio').id || q.type === QUESTION_TYPES.get('video').id) {
+              var mediaURL = this.getMediaDownloadLink(row.value);
+              return <a href={mediaURL} target='_blank'>{row.value}</a>;
             }
-            if (typeof(row.value) == 'object' || row.value === undefined) {
-              return '';
-            } else {
-              return row.value;
+            // show proper labels for choice questions
+            if (q.type == 'select_one') {
+              let choice = choices.find(o => o.list_name == q.select_from_list_name && (o.name === row.value || o.$autoname == row.value));
+              return choice && choice.label && choice.label[translationIndex] ? choice.label[translationIndex] : row.value;
+            }
+            if (q.type == 'select_multiple' && row.value) {
+              let values = row.value.split(' ');
+              var labels = [];
+              values.forEach(function(v) {
+                let choice = choices.find(o => o.list_name == q.select_from_list_name && (o.name === v || o.$autoname == v));
+                if (choice && choice.label && choice.label[translationIndex])
+                  labels.push(choice.label[translationIndex]);
+              });
+
+              return labels.join(', ');
+            }
+            if (q.type == 'start' || q.type == 'end' || q.type == '_submission_time') {
+              return formatTimeDate(row.value);
             }
           }
+          if (typeof(row.value) == 'object' || row.value === undefined) {
+            const repeatGroupAnswers = getRepeatGroupAnswers(row.original, key);
+
+            if (repeatGroupAnswers) {
+              // display a list of answers from a repeat group question
+              return repeatGroupAnswers.join(', ');
+            } else {
+              return '';
+            }
+          } else {
+            return row.value;
+          }
+        }
       });
 
     });
@@ -485,7 +486,7 @@ export class DataTable extends React.Component {
             {choices.filter(c => c.list_name === col.question.select_from_list_name).map((item, n) => {
               let displayLabel = t('Unlabelled');
               if (item.label) {
-                displayLabel = item.label[0];
+                displayLabel = item.label[translationIndex];
               } else if (item.name) {
                 displayLabel = item.name;
               } else if (item.$autoname) {
@@ -729,14 +730,6 @@ export class DataTable extends React.Component {
     }
 
   }
-  refreshTable() {
-    this.fetchData(this.state.fetchState, this.state.fetchInstance);
-    this.setState({ promptRefresh: false });
-  }
-
-  clearPromptRefresh() {
-    this.setState({ promptRefresh: false });
-  }
   bulkUpdateChange(sid, isChecked) {
     let selectedRows = this.state.selectedRows;
 
@@ -801,9 +794,9 @@ export class DataTable extends React.Component {
       }
       selectedCount = this.state.resultsTotal;
     } else {
-      data.submissions_ids = Object.keys(this.state.selectedRows);
+      data.submission_ids = Object.keys(this.state.selectedRows);
       data['validation_status.uid'] = val;
-      selectedCount = data.submissions_ids.length;
+      selectedCount = data.submission_ids.length;
     }
 
     const dialog = alertify.dialog('confirm');
@@ -849,8 +842,8 @@ export class DataTable extends React.Component {
       }
       selectedCount = this.state.resultsTotal;
     } else {
-      data.submissions_ids = Object.keys(this.state.selectedRows);
-      selectedCount = data.submissions_ids.length;
+      data.submission_ids = Object.keys(this.state.selectedRows);
+      selectedCount = data.submission_ids.length;
     }
     let msg, onshow;
     msg = t('You are about to permanently delete ##count## data entries.').replace('##count##', selectedCount);
@@ -961,6 +954,28 @@ export class DataTable extends React.Component {
             }
           </ui.PopoverMenu>
         }
+        */
+
+        {Object.keys(selected).length > 0 &&
+          <ui.PopoverMenu type='bulkUpdate-menu' triggerLabel={selectedLabel} >
+            {VALIDATION_STATUSES_LIST.map((item, n) => {
+              return (
+                <bem.PopoverMenu__link
+                  onClick={this.onBulkUpdateStatus}
+                  data-value={item.value}
+                  key={n}
+                >
+                  {t('Set status: ##status##').replace('##status##', item.label)}
+                </bem.PopoverMenu__link>
+              );
+            })}
+            <bem.PopoverMenu__link
+              onClick={this.onBulkDelete}>
+              {t('Delete selected')}
+            </bem.PopoverMenu__link>
+            }
+          </ui.PopoverMenu>
+        }
       </bem.FormView__item>
     );
   }
@@ -1004,17 +1019,6 @@ export class DataTable extends React.Component {
     }
     return (
       <bem.FormView m={formViewModifiers}>
-        {this.state.promptRefresh &&
-          <bem.FormView__cell m='table-warning'>
-            <i className='k-icon-alert' />
-            {t('The data below may be out of date. ')}
-            <a className='select-all' onClick={this.refreshTable}>
-              {t('Refresh')}
-            </a>
-
-            <i className='k-icon-close' onClick={this.clearPromptRefresh} />
-          </bem.FormView__cell>
-        }
         <bem.FormView__group m={['table-header', this.state.loading ? 'table-loading' : 'table-loaded']}>
           {this.bulkSelectUI()}
           <bem.FormView__item m='table-buttons'>
@@ -1061,7 +1065,7 @@ export class DataTable extends React.Component {
               {t('Loading...')}
             </span>
           }
-          noDataText={t('Your filters returned no submissions.')} 
+          noDataText={t('Your filters returned no submissions.')}
           pageText={t('Page')}
           ofText={t('of')}
           rowsText={t('rows')}

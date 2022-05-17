@@ -174,7 +174,7 @@ export class FormLanding extends React.Component {
     );
     return (
       <bem.FormView__row className={this.state.historyExpanded ? 'historyExpanded' : 'historyHidden'}>
-        <bem.FormView__cell m={['columns', 'history-label']}>
+        <bem.FormView__cell m={['columns', 'label', 'first', 'history-label']}>
           <bem.FormView__cell m='label'>
             {t('Form history')}
           </bem.FormView__cell>
@@ -228,7 +228,7 @@ export class FormLanding extends React.Component {
           </bem.FormView__cell>
         }
       </bem.FormView__row>
-      );
+    );
   }
   renderCollectData () {
     var available_links = new Map([
@@ -242,7 +242,7 @@ export class FormLanding extends React.Component {
         }],
         ['single_url', {
           label: t('Online-Only (single submission)'),
-          desc: t('This allows a single submission, and can be paired with the "returnURL" parameter to redirect the user to a URL of your choice after the form has been submitted.')
+          desc: t('This allows a single submission, and can be paired with the "return_url" parameter to redirect the user to a URL of your choice after the form has been submitted.')
         }],
         ['single_once_url', {
           label: t('Online-only (once per respondent)'),

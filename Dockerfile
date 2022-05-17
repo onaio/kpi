@@ -40,6 +40,8 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+
 RUN apt -qq update && \
     apt -qq -y install \
         gdal-bin \
@@ -84,6 +86,7 @@ RUN pip-sync /srv/tmp/pip_dependencies.txt 1>/dev/null && \
 
 WORKDIR ${KPI_SRC_DIR}/
 RUN rm -rf ${KPI_NODE_PATH} && \
+    npm install -g check-dependencies && \
     npm install --quiet && \
     npm install -g check-dependencies && \
     npm cache clean --force

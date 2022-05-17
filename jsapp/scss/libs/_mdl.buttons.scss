@@ -1,3 +1,8 @@
+// TODO: cleanup these buttons
+// 1. stop @extend-ing them, as ut makes for much harder debugging in Dev Tools
+//    instead create few mixins and use those
+// 2. simplify the number of options
+
 // Inspired but simplified version of MDL buttons
 
 // The button component. Defaults to a flat button.
@@ -13,7 +18,7 @@
   padding: 0 24px;
   margin: 0;
   border: none;
-  border-radius: 2px;
+  border-radius: 10px;
   vertical-align: middle;
   background: transparent;
   position: relative;
@@ -60,19 +65,47 @@
       color: darken($cool-orange, 20%);
     }
   }
+
+  &.mdl-button--colored.mdl-button--gray {
+    color: $cool-darkgray;
+
+    &:hover {
+      color: $cool-charcoal;
+    }
+  }
 }
 
 input.mdl-button[type="submit"] {
   -webkit-appearance: none;
 }
 
+.mdl-button--icon-and-text {
+  i,
+  .k-icon {
+    vertical-align: top;
+    font-size: 24px;
+  }
+}
+
+.mdl-button--small {
+  height: 30px;
+  min-height: 30px;
+  line-height: 30px;
+  padding: 0 12px;
+}
+
+.mdl-button--fullwidth {
+  width: 100%;
+}
+
 // Raised buttons
 .mdl-button--raised {
-  background: $cool-blue;
-
   @include box-shadow;
 
+  background: $cool-blue;
+  border-radius: 10px;
   text-transform: uppercase;
+  font-weight: 600;
 
   &.mdl-button--colored {
     background: $cool-blue;
@@ -100,6 +133,16 @@ input.mdl-button[type="submit"] {
 
     &:hover {
       background-color: darken($cool-orange, 5%);
+      color: $white;
+    }
+  }
+
+  &.mdl-button--colored.mdl-button--gray {
+    background-color: $cool-darkgray;
+    color: $white;
+
+    &:hover {
+      background-color: $cool-charcoal;
       color: $white;
     }
   }

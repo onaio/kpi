@@ -4,7 +4,7 @@ from hashlib import md5
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import JSONField as JSONBField
 from django.db import (
     ProgrammingError,
     connections,
@@ -14,9 +14,9 @@ from django.db import (
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_digest.models import PartialDigest
-from jsonfield import JSONField
 
 from kpi.constants import SHADOW_MODEL_APP_LABEL
+from kpi.exceptions import BadContentTypeException
 from kpi.utils.strings import hashable_str
 
 
@@ -42,6 +42,9 @@ def update_autofield_sequence(model):
     connection = connections[router.db_for_write(model)]
     with connection.cursor() as cursor:
         cursor.execute(query)
+
+from kpi.constants import SHADOW_MODEL_APP_LABEL
+from kpi.utils.future import hashable_str
 
 
 class ReadOnlyModelError(ValueError):
@@ -235,6 +238,87 @@ class KobocatUser(ShadowModel):
         KobocatDigestPartial.sync(kc_auth_user)
 
 
+@python_2_unicode_compatible
+class KobocatContentType(ShadowModel):
+    """
+    Minimal representation of Django 1.8's
+    contrib.contenttypes.models.ContentType
+    """
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(_('python model class name'), max_length=100)
+
+    class Meta(ShadowModel.Meta):
+        db_table = 'django_content_type'
+        unique_together = (('app_label', 'model'),)
+
+    def __str__(self):
+        # Not as nice as the original, which returns a human-readable name
+        # complete with whitespace. That requires access to the Python model
+        # class, though
+        return self.model
+
+
+@python_2_unicode_compatible
+class KobocatPermission(ShadowModel):
+    """
+    Minimal representation of Django 1.8's contrib.auth.models.Permission
+    """
+    name = models.CharField(_('name'), max_length=255)
+    content_type = models.ForeignKey(KobocatContentType)
+    codename = models.CharField(_('codename'), max_length=100)
+
+    class Meta(ShadowModel.Meta):
+        db_table = 'auth_permission'
+        unique_together = (('content_type', 'codename'),)
+        ordering = ('content_type__app_label', 'content_type__model',
+                    'codename')
+
+    def __str__(self):
+        return "%s | %s | %s" % (
+            text_type(self.content_type.app_label),
+            text_type(self.content_type),
+            text_type(self.name))
+
+
+class KobocatUser(ShadowModel):
+
+    username = models.CharField(_("username"), max_length=30)
+    password = models.CharField(_("password"), max_length=128)
+    last_login = models.DateTimeField(_("last login"), blank=True, null=True)
+    is_superuser = models.BooleanField(_('superuser status'), default=False)
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=150, blank=True)
+    email = models.EmailField(_('email address'), blank=True)
+    is_staff = models.BooleanField(_('staff status'), default=False)
+    is_active = models.BooleanField(_('active'), default=True)
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
+    class Meta(ShadowModel.Meta):
+        db_table = "auth_user"
+
+    @classmethod
+    def sync(cls, auth_user):
+        # NB: `KobocatUserObjectPermission` (and probably other things) depend
+        # upon PKs being synchronized between KPI and KoBoCAT
+        try:
+            kc_auth_user = cls.objects.get(pk=auth_user.pk)
+            assert kc_auth_user.username == auth_user.username
+        except KobocatUser.DoesNotExist:
+            kc_auth_user = cls(pk=auth_user.pk, username=auth_user.username)
+
+        kc_auth_user.password = auth_user.password
+        kc_auth_user.last_login = auth_user.last_login
+        kc_auth_user.is_superuser = auth_user.is_superuser
+        kc_auth_user.first_name = auth_user.first_name
+        kc_auth_user.last_name = auth_user.last_name
+        kc_auth_user.email = auth_user.email
+        kc_auth_user.is_staff = auth_user.is_staff
+        kc_auth_user.is_active = auth_user.is_active
+        kc_auth_user.date_joined = auth_user.date_joined
+
+        kc_auth_user.save()
+
+
 class KobocatUserObjectPermission(ShadowModel):
     """
     For the _sole purpose_ of letting us manipulate KoBoCAT
@@ -387,6 +471,121 @@ class KobocatDigestPartial(ShadowModel):
                 confirmed=partial_digest.confirmed,
                 partial_digest=partial_digest.partial_digest,
             )
+
+
+class KobocatUserPermission(ShadowModel):
+    """ Needed to assign model-level KoBoCAT permissions """
+    user = models.ForeignKey('KobocatUser', db_column='user_id')
+    permission = models.ForeignKey('KobocatPermission', db_column='permission_id')
+
+    class Meta(ShadowModel.Meta):
+        db_table = 'auth_user_user_permissions'
+
+
+class KobocatUserProfile(ShadowModel):
+    """
+    From onadata/apps/main/models/user_profile.py
+    Not read-only because we need write access to `require_auth`
+    """
+    class Meta(ShadowModel.Meta):
+        db_table = 'main_userprofile'
+        verbose_name = 'user profile'
+        verbose_name_plural = 'user profiles'
+
+    # This field is required.
+    user = models.OneToOneField(KobocatUser, related_name='profile')
+
+    # Other fields here
+    name = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=255, blank=True)
+    country = models.CharField(max_length=2, blank=True)
+    organization = models.CharField(max_length=255, blank=True)
+    home_page = models.CharField(max_length=255, blank=True)
+    twitter = models.CharField(max_length=255, blank=True)
+    description = models.CharField(max_length=255, blank=True)
+    require_auth = models.BooleanField(
+        default=False,
+        verbose_name=_(
+            "Require authentication to see forms and submit data"
+        )
+    )
+    address = models.CharField(max_length=255, blank=True)
+    phonenumber = models.CharField(max_length=30, blank=True)
+    created_by = models.ForeignKey(User, null=True, blank=True)
+    num_of_submissions = models.IntegerField(default=0)
+    metadata = JSONField(default={}, blank=True)
+
+
+class KobocatToken(ShadowModel):
+
+    key = models.CharField(_("Key"), max_length=40, primary_key=True)
+    user = models.OneToOneField(KobocatUser,
+                                related_name='auth_token',
+                                on_delete=models.CASCADE, verbose_name=_("User"))
+    created = models.DateTimeField(_("Created"), auto_now_add=True)
+
+    class Meta(ShadowModel.Meta):
+        db_table = "authtoken_token"
+
+    @classmethod
+    def sync(cls, auth_token):
+        try:
+            # Token use a One-to-One relationship on User.
+            # Thus, we can retrieve tokens from users' id. 
+            kc_auth_token = cls.objects.get(user_id=auth_token.user_id)
+        except KobocatToken.DoesNotExist:
+            kc_auth_token = cls(pk=auth_token.pk, user_id=auth_token.user_id)
+
+        kc_auth_token.save()
+
+
+class KobocatDigestPartial(ShadowModel):
+
+    user = models.ForeignKey(KobocatUser, on_delete=models.CASCADE)
+    login = models.CharField(max_length=128, db_index=True)
+    partial_digest = models.CharField(max_length=100)
+    confirmed = models.BooleanField(default=True)
+
+    class Meta(ShadowModel.Meta):
+        db_table = "django_digest_partialdigest"
+
+    @classmethod
+    def sync(cls, digest_partial, validate_user=True):
+        """`
+        Sync `django_digest_partialdigest` table between `kpi` and `kc``
+
+        A race condition occurs when users are created.
+        `DigestPartial` post-signal is (often) triggered before `User`
+        post-signal.  Because of that, user doesn't exist in `kc` database
+        when `KobocatDigestPartial` is saved.
+
+        `validate_user` is useful to verify whether foreign key exists to avoid
+        getting an `IntegrityError` on save.
+
+        Args:
+            digest_partial (DigestPartial)
+            validate_user (bool)
+        """
+        try:
+            if validate_user:
+                # Race condition. `User` post signal can be triggered after
+                # `DigestPartial` post signal.
+                KobocatUser.objects.get(pk=digest_partial.user_id)
+
+            try:
+                kc_digest_partial = cls.objects.get(pk=digest_partial.pk)
+                assert kc_digest_partial.user_id == digest_partial.user_id
+            except KobocatDigestPartial.DoesNotExist:
+                kc_digest_partial = cls(pk=digest_partial.pk,
+                                        user_id=digest_partial.user_id)
+
+            kc_digest_partial.login = digest_partial.login
+            kc_digest_partial.partial_digest = digest_partial.partial_digest
+            kc_digest_partial.confirmed = kc_digest_partial.confirmed
+            kc_digest_partial.save()
+
+        except KobocatUser.DoesNotExist:
+            pass
 
 
 def safe_kc_read(func):

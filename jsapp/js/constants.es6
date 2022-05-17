@@ -21,9 +21,14 @@ export const ROOT_URL = (() => {
 export const ANON_USERNAME = 'AnonymousUser';
 
 /**
- * A hardcoded list of permissions codenames.
- * All of them are really defined on backend, but we need it here to be able to
- * build UI for handling them.
+ * BAD CODE™ A hardcoded list of permissions codenames.
+ *
+ * All of them are really defined on backend, and we get them through the
+ * permissions config endpoint, but as we need these names to reference them in
+ * the code to build the UI it's a necessary evil.
+ *
+ * NOTE: to know what these permissions permit see `kpi/permissions.py` file,
+ * where you have to match the classes with endpoints and their HTTP methods.
  */
 export const PERMISSIONS_CODENAMES = new Map();
 new Set([
@@ -50,13 +55,13 @@ export const HOOK_LOG_STATUSES = {
   FAILED: 0
 };
 
-export const KEY_CODES = new Map([
-  ['TAB', 9],
-  ['ENTER', 13],
-  ['ESC', 27],
-  ['SPACE', 32],
-  ['NBSP', 160], // non-breakable space
-]);
+export const KEY_CODES = Object.freeze({
+  TAB: 9,
+  ENTER: 13,
+  ESC: 27,
+  SPACE: 32,
+  NBSP: 160, // non-breakable space
+});
 
 export const MODAL_TYPES = {
   SHARING: 'sharing',
@@ -315,6 +320,14 @@ export const QUESTION_TYPES = new Map([
     }
   ],
   [
+    'hidden',
+    {
+      label: t('Hidden'),
+      faIcon: 'fa-eye-slash',
+      id: 'hidden'
+    }
+  ],
+  [
     'file',
     {
       label: t('File'),
@@ -345,6 +358,261 @@ new Set([
   'audit'
 ]).forEach((codename) => {META_QUESTION_TYPES.set(codename, codename);});
 
+export default {
+  ROOT_URL: ROOT_URL,
+  META_QUESTION_TYPES: META_QUESTION_TYPES,
+  ANON_USERNAME: ANON_USERNAME,
+  PERMISSIONS_CODENAMES: PERMISSIONS_CODENAMES,
+  COLLECTION_PERMISSIONS: COLLECTION_PERMISSIONS,
+  QUESTION_TYPES: QUESTION_TYPES,
+  AVAILABLE_FORM_STYLES: AVAILABLE_FORM_STYLES,
+  update_states: update_states,
+  VALIDATION_STATUSES: VALIDATION_STATUSES,
+  VALIDATION_STATUSES_LIST: VALIDATION_STATUSES_LIST,
+  PROJECT_SETTINGS_CONTEXTS: PROJECT_SETTINGS_CONTEXTS,
+  MODAL_TYPES: MODAL_TYPES,
+  ASSET_TYPES: ASSET_TYPES,
+  HOOK_LOG_STATUSES: HOOK_LOG_STATUSES,
+  NAME_MAX_LENGTH: 255
+};
+
+export const ASSET_KINDS = new Map();
+new Set([
+  'asset',
+  'collection'
+]).forEach((kind) => {ASSET_KINDS.set(kind, kind);});
+
+export const QUESTION_TYPES = new Map([
+  [
+    'select_one',
+    {
+      label: t('Select One'),
+      faIcon: 'fa-dot-circle-o',
+      id: 'select_one'
+    }
+  ],
+  [
+    'select_multiple',
+    {
+      label: t('Select Many'),
+      faIcon: 'fa-list-ul',
+      id: 'select_multiple'
+    }
+  ],
+  [
+    'text',
+    {
+      label: t('Text'),
+      faIcon: 'fa-lato-text',
+      id: 'text'
+    }
+  ],
+  [
+    'integer',
+    {
+      label: t('Number'),
+      faIcon: 'fa-lato-integer',
+      id: 'integer'
+    }
+  ],
+  [
+    'decimal',
+    {
+      label: t('Decimal'),
+      faIcon: 'fa-lato-decimal',
+      id: 'decimal'
+    }
+  ],
+  [
+    'date',
+    {
+      label: t('Date'),
+      faIcon: 'fa-calendar',
+      id: 'date'
+    }
+  ],
+  [
+    'time',
+    {
+      label: t('Time'),
+      faIcon: 'fa-clock-o',
+      id: 'time'
+    }
+  ],
+  [
+    'datetime',
+    {
+      label: t('Date & time'),
+      faIcon: 'fa-calendar clock-over',
+      id: 'datetime'
+    }
+  ],
+  [
+    'geopoint',
+    {
+      label: t('Point'),
+      faIcon: 'fa-map-marker',
+      id: 'geopoint'
+    }
+  ],
+  [
+    'image',
+    {
+      label: t('Photo'),
+      faIcon: 'fa-picture-o',
+      id: 'image'
+    }
+  ],
+  [
+    'audio',
+    {
+      label: t('Audio'),
+      faIcon: 'fa-volume-up',
+      id: 'audio'
+    }
+  ],
+  [
+    'video',
+    {
+      label: t('Video'),
+      faIcon: 'fa-video-camera',
+      id: 'video'
+    }
+  ],
+  [
+    'geotrace',
+    {
+      label: t('Line'),
+      faIcon: 'fa-share-alt',
+      id: 'geotrace'
+    }
+  ],
+  [
+    'note',
+    {
+      label: t('Note'),
+      faIcon: 'fa-bars',
+      id: 'note'
+    }
+  ],
+  [
+    'barcode',
+    {
+      label: t('Barcode / QR Code'),
+      faIcon: 'fa-qrcode',
+      id: 'barcode'
+    }
+  ],
+  [
+    'acknowledge',
+    {
+      label: t('Acknowledge'),
+      faIcon: 'fa-check-square-o',
+      id: 'acknowledge'
+    }
+  ],
+  [
+    'geoshape',
+    {
+      label: t('Area'),
+      faIcon: 'fa-square',
+      id: 'geoshape'
+    }
+  ],
+  [
+    'score',
+    {
+      label: t('Rating'),
+      faIcon: 'fa-server',
+      id: 'score'
+    }
+  ],
+  [
+    'kobomatrix',
+    {
+      label: t('Question Matrix'),
+      faIcon: 'fa-table',
+      id: 'kobomatrix'
+    }
+  ],
+  [
+    'rank',
+    {
+      label: t('Ranking'),
+      faIcon: 'fa-sort-amount-desc',
+      id: 'rank'
+    }
+  ],
+  [
+    'calculate',
+    {
+      label: t('Calculate'),
+      faIcon: 'fa-lato-calculate',
+      id: 'calculate'
+    }
+  ],
+  [
+    'file',
+    {
+      label: t('File'),
+      faIcon: 'fa-file',
+      id: 'file'
+    }
+  ],
+  [
+    'range',
+    {
+      label: t('Range'),
+      faIcon: 'fa-lato-range',
+      id: 'range'
+    }
+  ]
+]);
+
+export const META_QUESTION_TYPES = new Map();
+new Set([
+  'start',
+  'end',
+  'today',
+  'username',
+  'simserial',
+  'subscriberid',
+  'deviceid',
+  'phonenumber',
+  'audit'
+]).forEach((codename) => {META_QUESTION_TYPES.set(codename, codename);});
+
+export const GROUP_TYPES_BEGIN = new Map();
+new Set([
+  'begin_group',
+  'begin_score',
+  'begin_rank',
+  'begin_kobomatrix',
+  'begin_repeat',
+]).forEach((kind) => {GROUP_TYPES_BEGIN.set(kind, kind);});
+
+export const GROUP_TYPES_END = new Map();
+new Set([
+  'end_group',
+  'end_score',
+  'end_rank',
+  'end_kobomatrix',
+  'end_repeat',
+]).forEach((kind) => {GROUP_TYPES_END.set(kind, kind);});
+
+export const FORM_VERSION_NAME = '__version__';
+
+// a custom question type for score
+export const SCORE_ROW_TYPE = 'score__row';
+
+// a custom question type for rank
+export const RANK_LEVEL_TYPE = 'rank__level';
+
+export const MATRIX_PAIR_PROPS = {
+  inSurvey: 'kobo--matrix_list',
+  inChoices: 'list_name'
+};
+
 export const NAME_MAX_LENGTH = 255;
 
 const constants = {
@@ -364,6 +632,11 @@ const constants = {
   ASSET_KINDS,
   QUESTION_TYPES,
   META_QUESTION_TYPES,
+  GROUP_TYPES_BEGIN,
+  GROUP_TYPES_END,
+  FORM_VERSION_NAME,
+  SCORE_ROW_TYPE,
+  RANK_LEVEL_TYPE,
   NAME_MAX_LENGTH
 };
 

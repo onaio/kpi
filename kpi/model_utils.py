@@ -5,6 +5,7 @@ import re
 from collections import defaultdict
 
 from django.apps import apps
+from django.utils.six import text_type
 from taggit.models import Tag, TaggedItem
 
 '''
@@ -38,7 +39,8 @@ def _load_library_content(structure):
     for row in library_sheet:
         # preserve the additional sheets of imported library (but not the library)
         row_tags = []
-        for key, val in row.items():
+        row_copy = dict(row)
+        for key, val in row_copy.items():
             if str(val).lower() in ['false', '0', 'no', 'n', '', 'none']:
                 continue
             if re.search(TAG_RE, key):
@@ -46,7 +48,7 @@ def _load_library_content(structure):
                 row_tags.append(tag_name)
                 tag_name_to_pk[tag_name] = None # Will be filled in later
                 del row[key]
-        block_name = row.get('block', None)
+        block_name = row.pop('block', None)
         grouped[block_name].append((row, row_tags,))
 
     # Resolve tag names to PKs
@@ -108,6 +110,9 @@ def _load_library_content(structure):
                     content_object = sa
                 )
 
+    # To improve performance, we deferred this until the end using
+    # `update_parent_languages=False`
+    collection.update_languages()
     return collection
 
 

@@ -86,7 +86,9 @@ export var dataInterface;
       });
     },
     listCollections () {
-      return $.getJSON(`${ROOT_URL}/api/v2/collections/?all_public=true`);
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/assets/?q=asset_type:collection`
+      });
     },
     createAssetSnapshot (data) {
       return $ajax({
@@ -195,15 +197,6 @@ export var dataInterface;
         data: data,
       });
     },
-    cloneCollection ({uid}) {
-      return $ajax({
-        method: 'POST',
-        url: `${ROOT_URL}/api/v2/collections/`,
-        data: {
-          clone_from: uid
-        }
-      });
-    },
 
     /*
      * permissions
@@ -223,6 +216,14 @@ export var dataInterface;
       });
     },
 
+
+    getCollectionPermissions(uid) {
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/collections/${uid}/permission-assignments/`,
+        method: 'GET'
+      });
+    },
+
     getCollectionPermissions(uid) {
       return $ajax({
         url: `${ROOT_URL}/api/v2/collections/${uid}/permission-assignments/`,
@@ -237,6 +238,44 @@ export var dataInterface;
         data: JSON.stringify(perms),
         dataType: 'json',
         contentType: 'application/json'
+      });
+      return $.when.apply(undefined, $ajaxCalls);
+    },
+
+    bulkSetAssetPermissions(assetUid, perms) {
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/assets/${assetUid}/permissions/bulk/`,
+        method: 'POST',
+        data: JSON.stringify(perms),
+        dataType: 'json',
+        contentType: 'application/json'
+      });
+    },
+
+    assignAssetPermission(assetUid, perm) {
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/assets/${assetUid}/permission-assignments/`,
+        method: 'POST',
+        data: JSON.stringify(perm),
+        dataType: 'json',
+        contentType: 'application/json'
+      });
+    },
+
+    assignCollectionPermission(uid, perm) {
+      return $ajax({
+        url: `${ROOT_URL}/api/v2/collections/${uid}/permission-assignments/`,
+        method: 'POST',
+        data: JSON.stringify(perm),
+        dataType: 'json',
+        contentType: 'application/json'
+      });
+    },
+
+    removeAssetPermission(perm) {
+      return $ajax({
+        url: perm,
+        method: 'DELETE'
       });
     },
 
@@ -276,11 +315,6 @@ export var dataInterface;
         }
       });
     },
-    setCollectionDiscoverability (uid, discoverable) {
-      dataInterface.patchCollection(uid, {
-        discoverable_when_public: discoverable
-      });
-    },
     libraryDefaultSearch () {
       return $ajax({
         url: `${ROOT_URL}/api/v2/assets/`,
@@ -304,7 +338,7 @@ export var dataInterface;
     },
     subscribeCollection ({uid}) {
       return $ajax({
-        url: `${ROOT_URL}/collection_subscriptions/`,
+        url: `${ROOT_URL}/asset_subscriptions/`,
         data: {
           collection: `${ROOT_URL}/api/v2/collections/${uid}/`,
         },
@@ -313,7 +347,7 @@ export var dataInterface;
     },
     unsubscribeCollection ({uid}) {
       return $ajax({
-        url: `${ROOT_URL}/collection_subscriptions/`,
+        url: `${ROOT_URL}/asset_subscriptions/`,
         data: {
           collection__uid: uid
         },
@@ -329,7 +363,7 @@ export var dataInterface;
       return $.getJSON(`${ROOT_URL}/api/v2/assets/${id}/content/`);
     },
     getImportDetails ({uid}) {
-      return $.getJSON(`${ROOT_URL}/imports/${uid}/`);
+      return $.getJSON(`${ROOT_URL}/api/v2/imports/${uid}/`);
     },
     getAsset (params={}) {
       if (params.url) {
@@ -423,16 +457,11 @@ export var dataInterface;
         url: `${ROOT_URL}/tags/`,
         method: 'GET',
         data: assign({
-          limit: 9999,
+          // If this number is too big (e.g. 9999) it causes a deadly timeout
+          // whenever Form Builder displays the aside Library search
+          limit: 100,
         }, data),
       });
-    },
-    getCollection (params={}) {
-      if (params.url) {
-        return $.getJSON(params.url);
-      } else {
-        return $.getJSON(`${ROOT_URL}/api/v2/collections/${params.id}/`);
-      }
     },
     loadNextPageUrl(nextPageUrl){
       return $ajax({
@@ -471,7 +500,7 @@ export var dataInterface;
       });
       return $.ajax({
         method: 'POST',
-        url: `${ROOT_URL}/imports/`,
+        url: `${ROOT_URL}/api/v2/imports/`,
         data: formData,
         processData: false,
         contentType: false
@@ -491,10 +520,18 @@ export var dataInterface;
       if (fields.length)
         f = `&fields=${JSON.stringify(fields)}`;
 
-      return $ajax({
-        url: `${ROOT_URL}/api/v2/assets/${uid}/data/?${query}${s}${f}${filter}`,
-        method: 'GET'
-      });
+      if (fields.length > 3) {
+        const query_no_limit = `&start=${page}`;
+        return $ajax({
+          url: `${ROOT_URL}/api/v2/assets/${uid}/data/?${query_no_limit}${s}${f}${filter}`,
+          method: 'GET'
+        });
+      } else {
+        return $ajax({
+          url: `${ROOT_URL}/api/v2/assets/${uid}/data/?${query}${s}${f}${filter}`,
+          method: 'GET'
+        });
+      }
     },
     getSubmission(uid, sid) {
       return $ajax({

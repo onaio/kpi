@@ -77,6 +77,19 @@ class SharingForm extends React.Component {
 
     this.setState({
       permissions: parsedPerms,
+      nonOwnerPerms: nonOwnerPerms,
+      publicPerms: publicPerms
+    });
+  }
+
+  onGetCollectionPermissionsCompleted(response) {
+    const parsedPerms = permParser.parseBackendData(response.results, this.state.asset.owner);
+    let nonOwnerPerms = permParser.parseUserWithPermsList(parsedPerms).filter((perm) => {
+      return perm.user !== buildUserUrl(this.state.asset.owner);
+    });
+
+    this.setState({
+      permissions: parsedPerms,
       nonOwnerPerms: nonOwnerPerms
     });
   }
@@ -170,7 +183,6 @@ class SharingForm extends React.Component {
               {...perm}
             />;
           })}
-
           {!this.state.isAddUserEditorVisible &&
             <bem.Button
               m={['raised', 'colored']}
@@ -231,6 +243,7 @@ class SharingForm extends React.Component {
         }
 
         {/* copying permissions from other assets */}
+
         { kind !== 'collection' && this.state.allAssetsCount === 0 &&
           <React.Fragment>
             <bem.Modal__hr/>

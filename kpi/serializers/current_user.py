@@ -2,13 +2,13 @@
 import datetime
 import pytz
 
+import constance
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
-from django.db import transaction
 from django.conf import settings
+from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from kobo.static_lists import SECTORS, COUNTRIES, LANGUAGES
 from hub.models import ExtraUserDetail
 from kpi.deployment_backends.kc_access.utils import get_kc_profile_data
 from kpi.deployment_backends.kc_access.utils import set_kc_require_auth
@@ -22,7 +22,6 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     date_joined = serializers.SerializerMethodField()
     projects_url = serializers.SerializerMethodField()
     gravatar = serializers.SerializerMethodField()
-    languages = serializers.SerializerMethodField()
     extra_details = WritableJSONField(source='extra_details.data')
     current_password = serializers.CharField(write_only=True, required=False)
     new_password = serializers.CharField(write_only=True, required=False)
@@ -42,7 +41,6 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             'gravatar',
             'is_staff',
             'last_login',
-            'languages',
             'extra_details',
             'current_password',
             'new_password',
@@ -64,12 +62,11 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     def get_gravatar(self, obj):
         return gravatar_url(obj.email)
 
-    def get_languages(self, obj):
-        return settings.LANGUAGES
-
     def get_git_rev(self, obj):
         request = self.context.get('request', False)
-        if settings.EXPOSE_GIT_REV or (request and request.user.is_superuser):
+        if constance.config.EXPOSE_GIT_REV or (
+            request and request.user.is_superuser
+        ):
             return settings.GIT_REV
         else:
             return False
@@ -89,7 +86,33 @@ class CurrentUserSerializer(serializers.ModelSerializer):
 
         return rep
 
+    def validate(self, attrs):
+        if self.instance:
+
+            current_password = attrs.pop('current_password', False)
+            new_password = attrs.get('new_password', False)
+
+            if all((current_password, new_password)):
+                if not self.instance.check_password(current_password):
+                    raise serializers.ValidationError({
+                        'current_password': _('Incorrect current password.')
+                    })
+            elif any((current_password, new_password)):
+                not_empty_field_name = 'current_password' \
+                    if current_password else 'new_password'
+                empty_field_name = 'current_password' \
+                    if new_password else 'new_password'
+                raise serializers.ValidationError({
+                    empty_field_name: _('`current_password` and `new_password` '
+                                        'must both be sent together; '
+                                        f'`{not_empty_field_name}` cannot be '
+                                        'sent individually.')
+                })
+
+        return attrs
+
     def update(self, instance, validated_data):
+
         # "The `.update()` method does not support writable dotted-source
         # fields by default." --DRF
         extra_details = validated_data.pop('extra_details', False)
@@ -103,24 +126,14 @@ class CurrentUserSerializer(serializers.ModelSerializer):
                     instance.pk, extra_details['data']['require_auth'])
             extra_details_obj.data.update(extra_details['data'])
             extra_details_obj.save()
-        current_password = validated_data.pop('current_password', False)
-        new_password = validated_data.pop('new_password', False)
-        if all((current_password, new_password)):
-            with transaction.atomic():
-                if instance.check_password(current_password):
-                    instance.set_password(new_password)
-                    instance.save()
-                    request = self.context.get('request', False)
-                    if request:
-                        update_session_auth_hash(request, instance)
-                else:
-                    raise serializers.ValidationError({
-                        'current_password': 'Incorrect current password.'
-                    })
-        elif any((current_password, new_password)):
-            raise serializers.ValidationError(
-                'current_password and new_password must both be sent '
-                'together; one or the other cannot be sent individually.'
-            )
+
+        new_password = validated_data.get('new_password', False)
+        if new_password:
+            instance.set_password(new_password)
+            instance.save()
+            request = self.context.get('request', False)
+            if request:
+                update_session_auth_hash(request, instance)
+
         return super().update(
             instance, validated_data)

@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+
+>>>>>>> Added __future__ imports to all files
 from kobo.apps.hook.views.v2.hook import HookViewSet as HookViewSetV2
 from kobo.apps.hook.serializers.v1.hook import HookSerializer
 

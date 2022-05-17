@@ -28,7 +28,7 @@ import {
 } from 'js/constants';
 import { WEB_PAGE_TITLE } from '../../config.es6';
 
-const formViaUrlHelpLink = 'http://help.kobotoolbox.org/creating-forms/importing-an-xlsform-via-url';
+const VIA_URL_SUPPORT_URL = 'xls_url.html';
 
 /*
 This is used for multiple different purposes:
@@ -168,13 +168,13 @@ class ProjectSettings extends React.Component {
   }
 
   onNameChange(evt) {
-    this.setState({name: evt.target.value});
-    this.onAnyDataChange('name', evt.target.value);
+    this.setState({name: removeInvalidChars(evt.target.value)});
+    this.onAnyDataChange('name', removeInvalidChars(evt.target.value));
   }
 
   onDescriptionChange(evt) {
-    this.setState({description: evt.target.value});
-    this.onAnyDataChange('description', evt.target.value);
+    this.setState({description: removeInvalidChars(evt.target.value)});
+    this.onAnyDataChange('description', removeInvalidChars(evt.target.value));
   }
 
   onCountryChange(val) {
@@ -741,9 +741,13 @@ class ProjectSettings extends React.Component {
       <bem.FormModal__form className='project-settings project-settings--import-url'>
         <div className='intro'>
           {t('Enter a valid XLSForm URL in the field below.')}<br/>
-          <a href={formViaUrlHelpLink} target='_blank'>
-            {t('Having issues? See this help article.')}
-          </a>
+
+          { stores.serverEnvironment &&
+            stores.serverEnvironment.state.support_url &&
+            <a href={stores.serverEnvironment.state.support_url + VIA_URL_SUPPORT_URL} target='_blank'>
+              {t('Having issues? See this help article.')}
+            </a>
+          }
         </div>
 
         <bem.FormModal__item>

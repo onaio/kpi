@@ -7,7 +7,11 @@ from django.test import TestCase
 
 from formpack.utils.expand_content import SCHEMA_VERSION
 from kpi.exceptions import BadAssetTypeException
+<<<<<<< HEAD
 from kpi.utils.strings import hashable_str
+=======
+from kpi.utils.future import hashable_str
+>>>>>>> - Updated PIP dependencies to use latest Formpack commit for Python 3
 from ..models import Asset
 from ..models import AssetVersion
 

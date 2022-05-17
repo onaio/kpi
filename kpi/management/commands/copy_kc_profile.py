@@ -1,6 +1,7 @@
 # coding: utf-8
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.six import iteritems
 
 from hub.models import ExtraUserDetail
 from kpi.deployment_backends.kc_access.utils import get_kc_profile_data

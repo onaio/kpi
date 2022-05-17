@@ -15,6 +15,13 @@ from kpi.constants import (
     PERM_PARTIAL_SUBMISSIONS,
 )
 
+from kpi.constants import (
+    PERM_CHANGE_ASSET,
+    PERM_VIEW_ASSET,
+    PERM_VIEW_SUBMISSIONS,
+    PERM_PARTIAL_SUBMISSIONS,
+)
+
 from kpi.models import Asset
 from kpi.models import AssetFile
 from kpi.models import AssetVersion
@@ -63,8 +70,13 @@ class AssetsListApiTests(BaseAssetTestCase):
                          msg=list_response.data)
         expected_list_data = {
             field: detail_response.data[field]
-            for field in AssetListSerializer.Meta.fields
+            for field in AssetListSerializer.Meta.fields if field != 'children'
         }
+        # list endpoint only exposes children count.
+        expected_list_data['children'] = {
+            'count': detail_response.data['children']['count']
+        }
+
         list_result_detail = None
         for result in list_response.data['results']:
             if result['uid'] == expected_list_data['uid']:
@@ -113,7 +125,7 @@ class AssetsListApiTests(BaseAssetTestCase):
                     {
                         'name': 'zeppelin',
                         'type': 'select_one',
-                        'label': 'put on some zeppelin 🧀',
+                        'label': 'put on some zeppelin 🧀🧀🧀',
                         'select_from_list_name': 'choicelist',
                     }
                 ],
@@ -163,14 +175,11 @@ class AssetsListApiTests(BaseAssetTestCase):
         )
         self.assertListEqual(results, [template.uid, question.uid])
 
-        # TODO Uncomment the 2 lines below when
-        # https://github.com/kobotoolbox/kpi/issues/2635 is merged
-        # results = uids_from_search_results('🧀')
-        # self.assertListEqual(results, [template.uid])
+        results = uids_from_search_results('🧀🧀🧀')
+        self.assertListEqual(results, [template.uid])
 
         results = uids_from_search_results('pk:alrighty')
         self.assertListEqual(results, [])
-
 
 class AssetVersionApiTests(BaseTestCase):
     fixtures = ['test_data']
@@ -462,7 +471,6 @@ class AssetsDetailApiTests(BaseAssetTestCase):
         for index, assignable_perm in enumerate(assignable_permissions):
             self.assertEqual(assignable_perm['url'], expected_response[index]['url'])
             self.assertEqual(assignable_perm['label'], expected_response[index]['label'])
-
 
 class AssetsXmlExportApiTests(KpiTestCase):
 

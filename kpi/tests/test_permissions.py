@@ -1,6 +1,7 @@
 # coding: utf-8
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.utils.six import iteritems
 
 from kpi.constants import PERM_VIEW_ASSET, PERM_CHANGE_ASSET, PERM_ADD_SUBMISSIONS, \
     PERM_VIEW_SUBMISSIONS, PERM_CHANGE_SUBMISSIONS, PERM_VALIDATE_SUBMISSIONS, \
@@ -11,6 +12,11 @@ from kpi.exceptions import BadPermissionsException
 from ..models.asset import Asset
 from ..models.collection import Collection
 from ..models.object_permission import get_all_objects_for_user
+from kpi.constants import PERM_VIEW_ASSET, PERM_CHANGE_ASSET, PERM_ADD_SUBMISSIONS, \
+    PERM_VIEW_SUBMISSIONS, PERM_SUPERVISOR_VIEW_SUBMISSION, \
+    PERM_CHANGE_SUBMISSIONS, PERM_VALIDATE_SUBMISSIONS, PERM_SHARE_ASSET, \
+    PERM_DELETE_ASSET, PERM_SHARE_SUBMISSIONS, PERM_DELETE_SUBMISSIONS, \
+    PERM_VIEW_COLLECTION, PERM_CHANGE_COLLECTION
 
 
 class BasePermissionsTestCase(TestCase):
@@ -735,4 +741,4 @@ class PermissionsTestCase(BasePermissionsTestCase):
         asset.assign_perm(anonymous_user, PERM_VIEW_SUBMISSIONS)
         self.assertTrue(grantee.has_perm(PERM_VIEW_SUBMISSIONS, asset))
         self.assertTrue(list(asset.get_perms(grantee)),
-                        list(asset.get_perms(AnonymousUser())))
+                        list(asset.get_perms(anonymous_user)))

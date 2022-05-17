@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+
+>>>>>>> Added __future__ imports to all files
 import json
 import os
 import re
@@ -6,7 +12,10 @@ from abc import ABCMeta, abstractmethod
 
 import constance
 import requests
+<<<<<<< HEAD
 from ssrf_protect.ssrf_protect import SSRFProtect, SSRFProtectException
+=======
+>>>>>>> Added __future__ imports to all files
 
 from kpi.utils.log import logging
 from .hook import Hook
@@ -101,11 +110,11 @@ class ServiceDefinitionInterface(object):
                 ssrf_protect_options = {}
                 if constance.config.SSRF_ALLOWED_IP_ADDRESS.strip():
                     ssrf_protect_options['allowed_ip_addresses'] = constance.\
-                        config.SSRF_ALLOWED_IP_ADDRESS.strip().split('\n')
+                        config.SSRF_ALLOWED_IP_ADDRESS.strip().split('\r\n')
 
                 if constance.config.SSRF_DENIED_IP_ADDRESS.strip():
                     ssrf_protect_options['denied_ip_addresses'] = constance.\
-                        config.SSRF_DENIED_IP_ADDRESS.strip().split('\n')
+                        config.SSRF_DENIED_IP_ADDRESS.strip().split('\r\n')
 
                 SSRFProtect.validate(self._hook.endpoint,
                                      options=ssrf_protect_options)

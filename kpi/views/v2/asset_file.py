@@ -1,4 +1,3 @@
-# coding: utf-8
 from private_storage.views import PrivateStorageDetailView
 from rest_framework import exceptions
 from rest_framework.decorators import action

@@ -73,18 +73,17 @@
     "webpack-bundle-tracker": "0.4.3",
     "webpack-cli": "^3.1.1",
     "webpack-dev-server": "^3.9.0",
+    "webpack-extract-translation-keys-plugin": "^5.0.2",
     "zxcvbn": "^4.4.2"
   },
   "scripts": {
-    "build": "webpack --config webpack/prod.config.js --colors",
-    "build-production": "npm run build && echo 'WARNING: npm run build-production DEPRECATED! PLEASE USE npm run build INSTEAD'",
+    "build": "webpack --config webpack/prod.config.js",
     "watch": "webpack-dev-server --config webpack/dev.server.js",
-    "test": "webpack --config webpack/test.config.js --colors && mocha-chrome test/tests.html",
+    "test": "webpack --config webpack/test.config.js && mocha-chrome test/tests.html",
     "lint": "eslint --ext .es6 \"jsapp/js/**/*\"",
     "show-icons": "opn jsapp/fonts/k-icons.html",
     "generate-icons": "node ./scripts/generate_icons.js",
-    "copy-fonts": "python ./scripts/copy_fonts.py && npm run generate-icons",
-    "localdev": "rm -rf node_modules && rm -rf jsapp/fonts && npm i && npm run copy-fonts"
+    "copy-fonts": "python ./scripts/copy_fonts.py && npm run generate-icons"
   },
   "repository": "https://github.com/kobotoolbox/kpi.git",
   "author": "alex.dorey@kobotoolbox.org, esmail.fadae@kobotoolbox.org, john.milner@kobotoolbox.org",

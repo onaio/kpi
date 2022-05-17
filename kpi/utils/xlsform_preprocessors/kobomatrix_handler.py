@@ -2,6 +2,7 @@
 import re
 from functools import reduce
 
+from django.utils.six import string_types
 from .base_handlers import GroupHandler
 
 

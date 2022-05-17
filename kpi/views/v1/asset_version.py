@@ -1,3 +1,4 @@
+
 # coding: utf-8
 from kpi.serializers import AssetVersionListSerializer, AssetVersionSerializer
 from kpi.views.v2.asset_version import \
@@ -7,7 +8,6 @@ from kpi.views.v2.asset_version import \
 class AssetVersionViewSet(AssetVersionViewSetV2):
     """
     ## This document is for a deprecated version of kpi's API.
-
     **Please upgrade to latest release `/api/v2/assets/{uid}/versions`**
     """
 
@@ -15,4 +15,4 @@ class AssetVersionViewSet(AssetVersionViewSetV2):
         if self.action == 'list':
             return AssetVersionListSerializer
         else:
-            return AssetVersionSerializer
+            return

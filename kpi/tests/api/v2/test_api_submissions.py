@@ -1,4 +1,11 @@
 # coding: utf-8
+<<<<<<< HEAD
+import json
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+>>>>>>> Added __future__ imports to all files
+
 import json
 
 from django.conf import settings
@@ -220,6 +227,20 @@ class SubmissionApiTests(BaseSubmissionTestCase):
         response = self.client.get(self.submission_url, {"format": "json"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.asset.remove_perm(anonymous_user, PERM_VIEW_SUBMISSIONS)
+
+    def test_list_submissions_authenticated_asset_publicly_shared(self):
+        # https://github.com/kobotoolbox/kpi/issues/2698
+        self._log_in_as_another_user()
+
+        # give the poor schmuck their own asset; needed to expose flaw in
+        # `ObjectPermissionMixin.__get_object_permissions()`
+        Asset.objects.create(name='i own it', owner=self.anotheruser)
+
+        anonymous_user = get_anonymous_user()
+        self.asset.assign_perm(anonymous_user, 'view_submissions')
+        response = self.client.get(self.submission_url, {"format": "json"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.asset.remove_perm(anonymous_user, 'view_submissions')
 
     def test_retrieve_submission_owner(self):
         submission = self.submissions[0]
@@ -574,4 +595,4 @@ class SubmissionGeoJsonApiTests(BaseTestCase):
             "name": "Two points and one text",
             "type": "FeatureCollection"
         }
-        self.assertDictEqual(expected_output, json.loads(response.content))
+        assert expected_output == json.loads(response.content)

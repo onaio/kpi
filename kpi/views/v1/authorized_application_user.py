@@ -1,7 +1,7 @@
+
 # coding: utf-8
 from django.contrib.auth.models import User
 from rest_framework import viewsets, mixins, exceptions
-
 from kpi.models import AuthorizedApplication
 from kpi.models.authorized_application import ApplicationTokenAuthentication
 from kpi.serializers import CreateUserSerializer

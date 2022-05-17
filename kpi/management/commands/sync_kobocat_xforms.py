@@ -127,7 +127,7 @@ def _kc_forms_api_request(token, xform_pk, xlsform=False):
         settings.KOBOCAT_INTERNAL_URL, xform_pk)
     if xlsform:
         url += '/form.xls'
-    headers = {u'Authorization': 'Token ' + token.key}
+    headers = {'Authorization': 'Token ' + token.key}
     return requests.get(url, headers=headers)
 
 

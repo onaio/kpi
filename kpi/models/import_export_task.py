@@ -18,6 +18,11 @@ from rest_framework.authtoken.models import Token
 from django.core.files.base import ContentFile
 from django.urls import Resolver404, resolve
 from django.db import models, transaction
+<<<<<<< HEAD
+=======
+from django.utils.six import text_type
+from django.utils.six.moves.urllib.parse import urlparse
+>>>>>>> Fixed XLS imports
 from jsonfield import JSONField
 from private_storage.fields import PrivateFileField
 from pyxform import xls2json_backends
@@ -30,7 +35,11 @@ from kobo.apps.reports.report_data import build_formpack
 
 from kpi.constants import PERM_VIEW_SUBMISSIONS, PERM_PARTIAL_SUBMISSIONS
 from kpi.utils.log import logging
+<<<<<<< HEAD
 from kpi.utils.strings import to_str
+=======
+from kpi.utils.future import to_str
+>>>>>>> Fixed XLS imports
 from ..fields import KpiUidField
 from ..model_utils import create_assets, _load_library_content, \
     remove_string_prefix
@@ -120,7 +129,11 @@ class ImportExportTask(models.Model):
             self.status = self.COMPLETE
         except Exception as err:
             msgs['error_type'] = type(err).__name__
+<<<<<<< HEAD
             msgs['error'] = str(err)
+=======
+            msgs['error'] = text_type(err)
+>>>>>>> Fixed XLS imports
             self.status = self.ERROR
             logging.error(
                 'Failed to run %s: %s' % (self._meta.model_name, repr(err)),
@@ -229,6 +242,9 @@ class ImportTask(ImportExportTask):
             }
 
             if item.get_type() == 'collection':
+                # FIXME: seems to allow importing nested collections, even
+                # though uploading from a file does not (`_parse_b64_upload()`
+                # raises `NotImplementedError`)
                 item._orm = create_assets(item.get_type(), extra_args)
             elif item.get_type() == 'asset':
                 kontent = xls2json_backends.xls_to_dict(item.readable)
@@ -433,8 +449,12 @@ class ExportTask(ImportExportTask):
 
     COPY_FIELDS = (
         '_id',
-        '_uuid',
+        '_notes',
+        '_status',
         '_submission_time',
+        '_submitted_by',
+        '_tags',
+        '_uuid',
         ValidationStatusCopyField,
     )
 
@@ -513,8 +533,10 @@ class ExportTask(ImportExportTask):
             'hierarchy_in_labels', ''
         ).lower() == 'true'
         group_sep = self.data.get('group_sep', '/')
+        multiple_select = self.data.get('multiple_select', 'both')
         translations = pack.available_translations
         lang = self.data.get('lang', None) or next(iter(translations), None)
+        fields = json.loads(self.data.get('fields', '[]'))
         try:
             # If applicable, substitute the constants that formpack expects for
             # friendlier language strings used by the API
@@ -526,11 +548,13 @@ class ExportTask(ImportExportTask):
         return {
             'versions': pack.versions.keys(),
             'group_sep': group_sep,
+            'multiple_select': multiple_select,
             'lang': lang,
             'hierarchy_in_labels': hierarchy_in_labels,
             'copy_fields': self.COPY_FIELDS,
             'force_index': True,
             'tag_cols_for_header': tag_cols_for_header,
+            'filter_fields': fields,
         }
 
     def _record_last_submission_time(self, submission_stream):
@@ -613,6 +637,7 @@ class ExportTask(ImportExportTask):
         # https://code.djangoproject.com/ticket/13809
         self.result.close()
         self.result.file.close()
+
         with self.result.storage.open(self.result.name, 'wb') as output_file:
             if export_type == 'csv':
                 for line in export.to_csv(submission_stream):
@@ -711,9 +736,12 @@ class ExportTask(ImportExportTask):
             settings.MAXIMUM_EXPORTS_PER_USER_PER_FORM:
         ]
         for export in excess_exports:
-            # The `result` file must be deleted manually
-            export.result.delete()
             export.delete()
+
+    def delete(self, *args, **kwargs):
+        # removing exported file from storage
+        self.result.delete(save=False)
+        super().delete(*args, **kwargs)
 
 
 def _b64_xls_to_dict(base64_encoded_upload):

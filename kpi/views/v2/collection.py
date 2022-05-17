@@ -2,6 +2,7 @@
 from django.forms import model_to_dict
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.six import iteritems
 from rest_framework import viewsets, status, exceptions
 from rest_framework.response import Response
 

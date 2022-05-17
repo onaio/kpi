@@ -1,5 +1,12 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+>>>>>>> Added __future__ imports to all files
 import base64
+import json
 
 import responses
 import unittest
@@ -10,8 +17,13 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from kpi.models import Asset
+from kpi.models import Collection
 from kpi.tests.base_test_case import BaseTestCase
+<<<<<<< HEAD
 from kpi.utils.strings import to_str
+=======
+from kpi.utils.future import to_str
+>>>>>>> Fixed XLS imports
 
 
 class AssetImportTaskTest(BaseTestCase):
@@ -64,7 +76,6 @@ class AssetImportTaskTest(BaseTestCase):
         }
         self._post_import_task_and_compare_created_asset_to_source(task_data,
                                                                    self.asset)
-
     def test_import_asset_base64_xls(self):
         encoded_xls = base64.b64encode(self.asset.to_xls_io().read())
         task_data = {
@@ -74,6 +85,39 @@ class AssetImportTaskTest(BaseTestCase):
         self._post_import_task_and_compare_created_asset_to_source(task_data,
                                                                    self.asset)
 
+    def test_import_asset_library(self):
+       library_xls = open('../../../fixtures/basic-text-library.xlsx', 'rb').read()
+       encoded_xls = base64.b64encode(library_xls)
+       task_data = {
+           'base64Encoded': f'base64:{to_str(encoded_xls)}',
+           'name': 'I was imported to the library via base64-encoded XLS!',
+       }
+
+       # Setting up the requests
+       post_url = reverse('importtask-list')
+       response = self.client.post(post_url, task_data)
+
+       # Check for corect responses
+       self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+       detail_response = self.client.get(response.data['url'])
+       self.assertEqual(detail_response.status_code, status.HTTP_200_OK)
+       self.assertEqual(detail_response.data['status'], 'complete') # Error is from issue #2262
+       created_details = detail_response.data['messages']['created'][0]
+       self.assertEqual(created_details['kind'], 'collection')
+
+       # Check for correct collection asset content
+       created_collection = Collection.objects.get(uid=created_details['uid'])
+       # TODO: XLSForms downloaded from KoBo contain extra assets for `start`, `end` and `calculate`
+       for e in created_collection.assets.all():
+           if e.content['survey'][0]['name'] == 'basic':
+               created_asset = Asset()
+               created_asset.content = e.content
+       self.assertEqual(created_collection.name, task_data['name'])
+       # Make equivilent Asset to check against collection children
+       library_asset = Asset()
+       library_asset.content = {'survey': [{'name': 'basic', 'type': 'text', 'label': ['basic'], 'required': False}]}
+       self._assert_assets_contents_equal(created_asset, library_asset)
+
     def test_import_asset_xls(self):
         xls_io = self.asset.to_xls_io()
         task_data = {
@@ -82,7 +126,6 @@ class AssetImportTaskTest(BaseTestCase):
         }
         self._post_import_task_and_compare_created_asset_to_source(task_data,
                                                                    self.asset)
-
     def test_import_non_xls_url(self):
         """
         Make sure the import fails with a meaningful error
@@ -100,7 +143,7 @@ class AssetImportTaskTest(BaseTestCase):
         self.assertEqual(detail_response.data['status'], 'error')
         self.assertTrue(
             detail_response.data['messages']['error'].startswith(
-                'Error reading .xls file: Unsupported format'
+                'Unsupported format, or corrupt file'
             )
         )
 

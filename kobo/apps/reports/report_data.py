@@ -2,10 +2,12 @@
 from collections import OrderedDict
 from copy import deepcopy
 
+from django.utils.six import iteritems
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from formpack import FormPack
+from formpack.utils.future import OrderedDict
 from kpi.utils.log import logging
 
 

@@ -8,6 +8,8 @@ from kpi.serializers import ObjectPermissionSerializer
 from kpi.views.no_update_model import NoUpdateModelViewSet
 from kpi.utils.object_permission_helper import ObjectPermissionHelper
 
+from .no_update_model import NoUpdateModelViewSet
+
 
 class ObjectPermissionViewSet(NoUpdateModelViewSet):
     queryset = ObjectPermission.objects.all()

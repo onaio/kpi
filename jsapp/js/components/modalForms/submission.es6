@@ -10,6 +10,7 @@ import {actions} from 'js/actions';
 import mixins from 'js/mixins';
 import {bem} from 'js/bem';
 import {t, notify, launchPrinting} from 'js/utils';
+import {getSubmissionDisplayData} from 'js/submissionUtils';
 import {stores} from 'js/stores';
 import ui from 'js/ui';
 import icons from '../../../xlform/src/view.icons';
@@ -17,6 +18,7 @@ import {
   VALIDATION_STATUSES_LIST,
   MODAL_TYPES,
 } from 'js/constants';
+import SubmissionDataTable from 'js/components/submissionDataTable';
 
 const DETAIL_NOT_FOUND = '{\"detail\":\"Not found.\"}';
 
@@ -78,10 +80,12 @@ class Submission extends React.Component {
       if (this.props.ids && sid) {
         const c = this.props.ids.findIndex(k => k==sid);
         let tableInfo = this.props.tableInfo || false;
-        if (this.props.ids[c - 1])
+        if (this.props.ids[c - 1]) {
           prev = this.props.ids[c - 1];
-        if (this.props.ids[c + 1])
+        }
+        if (this.props.ids[c + 1]) {
           next = this.props.ids[c + 1];
+        }
 
         // table submissions pagination
         if (tableInfo) {
@@ -90,8 +94,9 @@ class Submission extends React.Component {
             next = -2;
           }
 
-          if (tableInfo.currentPage > 0 && prev == -1)
+          if (tableInfo.currentPage > 0 && prev == -1) {
             prev = -2;
+          }
         }
       }
 
@@ -195,9 +200,8 @@ class Submission extends React.Component {
     });
   }
 
-  switchSubmission(evt) {
+  switchSubmission(sid) {
     this.setState({ loading: true});
-    const sid = evt.target.getAttribute('data-sid');
     stores.pageState.showModal({
       type: MODAL_TYPES.SUBMISSION,
       sid: sid,
@@ -279,9 +283,9 @@ class Submission extends React.Component {
       case 'begin_repeat': {
         const list = submissionValue.map((r) => {
           const stringified = JSON.stringify(r);
-          return <li key={stringified}>{stringified}</li>
+          return (<li key={stringified}>{stringified}</li>);
         });
-        return <ul>{list}</ul>
+        return (<ul>{list}</ul>);
       }
       default: {
         return submissionValue;
@@ -398,6 +402,7 @@ class Submission extends React.Component {
       );
     });
   }
+
   render () {
     if (this.state.loading) {
       return (
@@ -424,6 +429,13 @@ class Submission extends React.Component {
 
     const s = this.state.submission;
     let translationOptions = this.state.translationOptions;
+
+    const displayData = getSubmissionDisplayData(
+      this.props.asset.content.survey,
+      this.props.asset.content.choices,
+      this.state.translationIndex,
+      this.state.submission
+    );
 
     return (
       <bem.FormModal>
@@ -476,36 +488,41 @@ class Submission extends React.Component {
         }
         <bem.FormModal__group>
           <div className='submission-pager'>
+            {/* don't display previous button if `previous` is -1 */}
             {this.state.previous > -1 &&
-              <a onClick={this.switchSubmission}
-                    className='mdl-button mdl-button--colored'
-                    data-sid={this.state.previous}>
+              <a
+                onClick={this.switchSubmission.bind(this, this.state.previous)}
+                className='mdl-button mdl-button--colored'
+              >
+                <i className='k-icon-prev' />
+                {t('Previous')}
+              </a>
+            }
+            {this.state.previous === -2 &&
+              <a
+                onClick={this.prevTablePage}
+                className='mdl-button mdl-button--colored'
+              >
                 <i className='k-icon-prev' />
                 {t('Previous')}
               </a>
             }
 
-            {this.state.previous == -2 &&
-              <a onClick={this.prevTablePage}
-                    className='mdl-button mdl-button--colored'>
-                <i className='k-icon-prev' />
-                {t('Previous')}
-              </a>
-            }
-
-
+            {/* don't display next button if `next` is -1 */}
             {this.state.next > -1 &&
-              <a onClick={this.switchSubmission}
-                    className='mdl-button mdl-button--colored'
-                    data-sid={this.state.next}>
+              <a
+                onClick={this.switchSubmission.bind(this, this.state.next)}
+                className='mdl-button mdl-button--colored'
+              >
                 {t('Next')}
                 <i className='k-icon-next' />
               </a>
             }
-
-            {this.state.next == -2 &&
-              <a onClick={this.nextTablePage}
-                    className='mdl-button mdl-button--colored'>
+            {this.state.next === -2 &&
+              <a
+                onClick={this.nextTablePage}
+                className='mdl-button mdl-button--colored'
+              >
                 {t('Next')}
                 <i className='k-icon-next' />
               </a>
@@ -586,6 +603,12 @@ class Submission extends React.Component {
 
           </tbody>
         </table>
+
+        <SubmissionDataTable
+          displayData={displayData}
+          choices={this.props.asset.content.choices}
+          translationIndex={this.state.translationIndex}
+        />
       </bem.FormModal>
     );
   }

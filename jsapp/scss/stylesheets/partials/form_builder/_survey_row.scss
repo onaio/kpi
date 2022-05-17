@@ -28,6 +28,11 @@
       display: block;
     }
   }
+
+  // for displaying after row was added
+  .btn--addrow-force-show {
+    display: block !important;
+  }
 }
 
 // duplicated inside .btn--addrow, where
@@ -254,9 +259,9 @@ tr .scorecell__radio:hover {
 .rank_items__add {
   list-style-type: none;
 
-  button {
+  .btn {
     display: block;
-    width: 35%;
+    width: 100%;
     line-height: 10px;
   }
 }

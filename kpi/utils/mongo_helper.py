@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+>>>>>>> - Updated PIP dependencies to use latest Formpack commit for Python 3
 import re
 
 from bson import ObjectId
@@ -8,7 +14,11 @@ from django.utils.translation import ugettext as _
 from django.utils.six import string_types
 
 from kpi.constants import NESTED_MONGO_RESERVED_ATTRIBUTES
+<<<<<<< HEAD
 from kpi.utils.strings import base64_encodestring
+=======
+from kpi.utils.future import base64_encodestring
+>>>>>>> - Updated PIP dependencies to use latest Formpack commit for Python 3
 
 
 class MongoHelper:
@@ -81,7 +91,7 @@ class MongoHelper:
     @classmethod
     def get_instances(
             cls, mongo_userform_id, hide_deleted=True, start=None, limit=None,
-            sort=None, fields=None, query=None, instances_ids=None,
+            sort=None, fields=None, query=None, instance_ids=None,
             permission_filters=None
     ):
         cursor, total_count = cls._get_cursor_and_count(
@@ -283,6 +293,49 @@ class MongoHelper:
     def _get_cursor_and_count(cls, mongo_userform_id, hide_deleted=True,
                               fields=None, query=None, instance_ids=None,
                               permission_filters=None):
+
+        if len(instances_ids) > 0:
+            query.update({
+                '_id': {'$in': instances_ids}
+            })
+
+        query.update({cls.USERFORM_ID: mongo_userform_id})
+
+        # Narrow down query
+        if permission_filters is not None:
+            permission_filters_query = {'$or': []}
+            for permission_filter in permission_filters:
+                permission_filters_query['$or'].append(permission_filter)
+
+            query = {'$and': [query, permission_filters_query]}
+
+        if hide_deleted:
+            # display only active elements
+            deleted_at_query = {
+                '$or': [{'_deleted_at': {'$exists': False}},
+                        {'_deleted_at': None}]}
+            # join existing query with deleted_at_query on an $and
+            query = {'$and': [query, deleted_at_query]}
+
+        query = cls.to_safe_dict(query, reading=True)
+
+        if len(fields) > 0:
+            # Retrieve only specified fields from Mongo. Remove
+            # `cls.USERFORM_ID` from those fields in case users try to add it.
+            if cls.USERFORM_ID in fields:
+                fields.remove(cls.USERFORM_ID)
+            fields_to_select = dict(
+                [(cls.encode(field), 1) for field in fields])
+        else:
+            # Retrieve all fields except `cls.USERFORM_ID`
+            fields_to_select = {cls.USERFORM_ID: 0}
+
+        cursor = settings.MONGO_DB.instances.find(query, fields_to_select)
+        return cursor, cursor.count()
+
+    @classmethod
+    def _get_cursor(cls, mongo_userform_id, hide_deleted=True, fields=None,
+                   query=None, instances_ids=None, permission_filters=None):
         # check if query contains an _id and if its a valid ObjectID
         if '_uuid' in query:
             if ObjectId.is_valid(query.get('_uuid')):
@@ -326,7 +379,11 @@ class MongoHelper:
             # Retrieve all fields except `cls.USERFORM_ID`
             fields_to_select = {cls.USERFORM_ID: 0}
 
-        cursor = settings.MONGO_DB.instances.find(query, fields_to_select)
+        cursor = settings.MONGO_DB.instances.find(
+            query,
+            fields_to_select,
+            max_time_ms=settings.MONGO_DB_MAX_TIME_MS
+        )
         return cursor, cursor.count()
 
     @classmethod

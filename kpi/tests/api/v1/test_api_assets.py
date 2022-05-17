@@ -255,7 +255,6 @@ class AssetExportTaskTest(BaseTestCase):
             'q1': '¿Qué tal?'
         }
         self.asset.deployment.mock_submissions([submission])
-        settings.CELERY_TASK_ALWAYS_EAGER = True
 
     def test_owner_can_create_export(self):
         post_url = reverse('exporttask-list')
@@ -313,6 +312,23 @@ class AssetExportTaskTest(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Get the result file
         result_response = self.client.get(detail_response.data['result'])
+        self.assertEqual(result_response.status_code, status.HTTP_200_OK)
+
+    def test_owner_with_token_auth_can_access_export(self):
+        detail_response = self.test_owner_can_create_export()
+        self.client.logout()
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token {}'.format(
+                Token.objects.get_or_create(user=self.user)[0].key
+            )
+        )
+        response = self.client.get(detail_response.data['url'])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Get the result file
+        if self.result_stored_locally(detail_response):
+            result_response = self.client.get(detail_response.data['result'])
+        else:
+            result_response = requests.get(detail_response.data['result'])
         self.assertEqual(result_response.status_code, status.HTTP_200_OK)
 
 

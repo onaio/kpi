@@ -27,8 +27,8 @@ dj-static
 dj-database-url
 django-braces
 django-constance[database]
-django-cors-headers
-django-debug-toolbar
+django-cors-headers<3 # 3.0.0 dropped support for Python2 support
+django-debug-toolbar<2 # Last Python2 support: 1.11
 django-extensions
 django-oauth-toolkit
 django-registration-redux

@@ -8,6 +8,7 @@ from django.urls import (
 from django.utils.encoding import uri_to_iri
 
 
+
 def absolute_resolve(url):
     """
     An extension of Django's `resolve()` that handles absolute URLs *or*

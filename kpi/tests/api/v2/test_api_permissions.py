@@ -1,11 +1,17 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (unicode_literals, print_function,
+                        absolute_import, division)
+
+>>>>>>> Added __future__ imports to all files
 from django.contrib.auth.models import User, Permission
 from django.urls import reverse
 from rest_framework import status
 
 from kpi.constants import PERM_VIEW_ASSET, PERM_CHANGE_ASSET, \
     PERM_SHARE_ASSET
-from kpi.models.object_permission import get_anonymous_user
+from kpi.models.object_permission import get_anonymous_user, ObjectPermission
 from kpi.tests.kpi_test_case import KpiTestCase
 from kpi.urls.router_api_v2 import URL_NAMESPACE as ROUTER_URL_NAMESPACE
 
@@ -245,6 +251,116 @@ class ApiPermissionsTestCase(KpiTestCase):
         url = reverse(self._get_endpoint('asset-detail'), kwargs={'uid': self.admin_asset.uid})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_shared_asset_remove_own_permissions_allowed(self):
+        """
+        Ensuring that a non-owner who has been shared an asset is able to remove
+        themselves from that asset if they want.
+        """
+        self.client.login(
+            username=self.someuser.username,
+            password=self.someuser_password,
+        )
+        new_asset = self.create_asset(
+            name='a new asset',
+            owner=self.someuser,
+        )
+        perm = new_asset.assign_perm(self.anotheruser, 'view_asset')
+        kwargs = {
+            'parent_lookup_asset': new_asset.uid,
+            'uid': perm.uid,
+        }
+        url = reverse(
+            'api_v2:asset-permission-assignment-detail', kwargs=kwargs
+        )
+        self.client.logout()
+        self.client.login(
+            username=self.anotheruser.username,
+            password=self.anotheruser_password,
+        )
+        assert self.anotheruser.has_perm(PERM_VIEW_ASSET, new_asset)
+
+        # `anotheruser` attempting to remove themselves from the asset
+        res = self.client.delete(url)
+        assert res.status_code == status.HTTP_204_NO_CONTENT
+        assert not self.anotheruser.has_perm(PERM_VIEW_ASSET, new_asset)
+        assert len(new_asset.get_perms(self.anotheruser)) == 0
+
+    def test_shared_asset_non_owner_remove_owners_permissions_not_allowed(self):
+        """
+        Ensuring that a non-owner who has been shared an asset is not able to
+        remove permissions from the owner of that asset
+        """
+        self.client.login(
+            username=self.someuser.username,
+            password=self.someuser_password,
+        )
+        new_asset = self.create_asset(
+            name='a new asset',
+            owner=self.someuser,
+        )
+        # Getting existing permission for the owner of the asset
+        perm = ObjectPermission.objects.filter(asset=new_asset).get(
+            user=self.someuser, permission__codename=PERM_VIEW_ASSET
+        )
+        new_asset.assign_perm(self.anotheruser, PERM_VIEW_ASSET)
+        kwargs = {
+            'parent_lookup_asset': new_asset.uid,
+            'uid': perm.uid,
+        }
+        url = reverse(
+            'api_v2:asset-permission-assignment-detail', kwargs=kwargs
+        )
+        self.client.logout()
+        self.client.login(
+            username=self.anotheruser.username,
+            password=self.anotheruser_password,
+        )
+        assert self.someuser.has_perm(PERM_VIEW_ASSET, new_asset)
+
+        # `anotheruser` attempting to remove `someuser` from the asset
+        res = self.client.delete(url)
+        assert res.status_code == status.HTTP_403_FORBIDDEN
+        assert self.someuser.has_perm(PERM_VIEW_ASSET, new_asset)
+
+    def test_shared_asset_non_owner_remove_another_non_owners_permissions_not_allowed(self):
+        """
+        Ensuring that a non-owner who has an asset shared with them cannot
+        remove permissions from another non-owner with that same asset shared
+        with them.
+        """
+        yetanotheruser = User.objects.create(
+            username='yetanotheruser',
+        )
+        self.client.login(
+            username=self.someuser.username,
+            password=self.someuser_password,
+        )
+        new_asset = self.create_asset(
+            name='a new asset',
+            owner=self.someuser,
+            owner_password=self.someuser_password,
+        )
+        new_asset.assign_perm(self.anotheruser, PERM_VIEW_ASSET)
+        perm = new_asset.assign_perm(yetanotheruser, PERM_VIEW_ASSET)
+        kwargs = {
+            'parent_lookup_asset': new_asset.uid,
+            'uid': perm.uid,
+        }
+        url = reverse(
+            'api_v2:asset-permission-assignment-detail', kwargs=kwargs
+        )
+        self.client.logout()
+        self.client.login(
+            username=self.anotheruser.username,
+            password=self.anotheruser_password,
+        )
+        assert yetanotheruser.has_perm(PERM_VIEW_ASSET, new_asset)
+
+        # `anotheruser` attempting to remove `yetanotheruser` from the asset
+        res = self.client.delete(url)
+        assert res.status_code == status.HTTP_404_NOT_FOUND
+        assert yetanotheruser.has_perm(PERM_VIEW_ASSET, new_asset)
 
     def test_copy_permissions_between_assets(self):
         # Give "someuser" edit permissions on an asset owned by "admin"

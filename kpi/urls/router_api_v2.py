@@ -13,7 +13,6 @@ from kpi.views.v2.asset_version import AssetVersionViewSet
 from kpi.views.v2.collection import CollectionViewSet
 from kpi.views.v2.collection_permission_assignment import CollectionPermissionAssignmentViewSet
 from kpi.views.v2.data import DataViewSet
-
 from kpi.views.v2.permission import PermissionViewSet
 from kpi.views.v2.user import UserViewSet
 

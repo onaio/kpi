@@ -19,13 +19,7 @@ import {WEB_PAGE_TITLE} from '../config';
 class SearchCollectionList extends Reflux.Component {
   constructor(props) {
     super(props);
-    var selectedCategories = {
-      'Draft': true,
-      'Deployed': true,
-      'Archived': true
-    };
     this.state = {
-      selectedCategories: selectedCategories,
       ownedCollections: [],
       fixedHeadings: '',
       fixedHeadingsWidth: 'auto'
@@ -33,19 +27,19 @@ class SearchCollectionList extends Reflux.Component {
     this.store = stores.selectedAsset;
     autoBind(this);
   }
-  componentDidMount () {
+  componentDidMount() {
     this.listenTo(this.searchStore, this.searchChanged);
     this.queryCollections();
   }
-  searchChanged (searchStoreState) {
+  searchChanged(searchStoreState) {
     this.setState(searchStoreState);
     if (searchStoreState.searchState === 'done') {
       this.queryCollections();
     }
   }
-  queryCollections () {
+  queryCollections() {
     if (this.props.searchContext.store.filterTags !== 'asset_type:survey') {
-      dataInterface.listCollections().then((collections)=>{
+      dataInterface.listCollections().then((collections) => {
         this.setState({
           ownedCollections: collections.results.filter((value) => {
             if (value.access_type === 'shared') {
@@ -65,8 +59,8 @@ class SearchCollectionList extends Reflux.Component {
       });
     }
   }
-  handleScroll (event) {
-    if (this.props.searchContext.store.filterTags == 'asset_type:survey') {
+  handleScroll(event) {
+    if (this.props.searchContext.store.filterTags === 'asset_type:survey') {
       let offset = $(event.target).children('.asset-list').offset().top;
       this.setState({
         fixedHeadings: offset < -105 ? 'fixed-headings' : '',
@@ -75,7 +69,7 @@ class SearchCollectionList extends Reflux.Component {
     }
   }
 
-  renderAssetRow (resource) {
+  renderAssetRow(resource) {
     var currentUsername = stores.session.currentAccount && stores.session.currentAccount.username;
     var isSelected = stores.selectedAsset.uid === resource.uid;
     var ownedCollections = this.state.ownedCollections;
@@ -104,7 +98,7 @@ class SearchCollectionList extends Reflux.Component {
       />
     );
   }
-  renderHeadings () {
+  renderHeadings() {
     return [
       (
         <bem.List__heading key='1'>
@@ -137,7 +131,7 @@ class SearchCollectionList extends Reflux.Component {
         </bem.AssetListSorts>
       )];
   }
-  renderGroupedHeadings () {
+  renderGroupedHeadings() {
     return (
         <bem.AssetListSorts className='mdl-grid' style={{width: this.state.fixedHeadingsWidth}}>
           <bem.AssetListSorts__item m={'name'} className='mdl-cell mdl-cell--5-col mdl-cell--4-col-tablet mdl-cell--2-col-phone'>
@@ -158,10 +152,11 @@ class SearchCollectionList extends Reflux.Component {
         </bem.AssetListSorts>
       );
   }
-  renderGroupedResults () {
+  renderGroupedResults() {
     var searchResultsBucket = 'defaultQueryCategorizedResultsLists';
-    if (this.state.searchResultsDisplayed)
+    if (this.state.searchResultsDisplayed) {
       searchResultsBucket = 'searchResultsCategorizedResultsLists';
+    }
 
     var results = ['Deployed', 'Draft', 'Archived'].map(
       (category, i) => {
@@ -172,7 +167,8 @@ class SearchCollectionList extends Reflux.Component {
           <bem.List__subheading key={i}>
             {t(category)}
           </bem.List__subheading>,
-          <bem.AssetItems m={i+1} key={i+2}>
+
+          <bem.AssetItems m={i + 1} key={i + 2}>
             {this.renderGroupedHeadings()}
             {
               (() => {
@@ -192,11 +188,11 @@ class SearchCollectionList extends Reflux.Component {
       results];
   }
 
-  render () {
+  render() {
     var s = this.state;
     var docTitle = '';
     let display;
-    if (this.props.searchContext.store.filterTags == 'asset_type:survey') {
+    if (this.props.searchContext.store.filterTags === 'asset_type:survey') {
       display = 'grouped';
       docTitle = t('Projects');
     } else {
@@ -215,15 +211,15 @@ class SearchCollectionList extends Reflux.Component {
         >
           <bem.List m={display} onScroll={this.handleScroll}>
             {
-              (()=>{
-                if (display == 'regular') {
+              (() => {
+                if (display === 'regular') {
                   return this.renderHeadings();
                 }
               })()
             }
             <bem.AssetList m={this.state.fixedHeadings}>
             {
-              (()=>{
+              (() => {
                 if (s.searchResultsDisplayed) {
                   if (s.searchState === 'loading') {
                     return (
@@ -243,7 +239,7 @@ class SearchCollectionList extends Reflux.Component {
                           </bem.Loading__inner>
                         </bem.Loading>
                       );
-                    } else if (display == 'grouped') {
+                    } else if (display === 'grouped') {
                       return this.renderGroupedResults();
                     } else {
                       return s.searchResultsList.map(this.renderAssetRow);
@@ -261,7 +257,7 @@ class SearchCollectionList extends Reflux.Component {
                     );
                   } else if (s.defaultQueryState === 'done') {
                     if (s.defaultQueryCount < 1) {
-                      if (s.defaultQueryFor.assetType == 'asset_type:survey') {
+                      if (s.defaultQueryFor.assetType === 'asset_type:survey') {
                         return (
                           <bem.Loading>
                             <bem.Loading__inner>
@@ -283,7 +279,7 @@ class SearchCollectionList extends Reflux.Component {
                       }
                     }
 
-                    if (display == 'grouped') {
+                    if (display === 'grouped') {
                       return this.renderGroupedResults();
                     } else {
                       return s.defaultQueryResultsList.map(this.renderAssetRow);
@@ -304,7 +300,7 @@ class SearchCollectionList extends Reflux.Component {
       </DocumentTitle>
       );
   }
-};
+}
 
 SearchCollectionList.defaultProps = {
   assetRowClass: AssetRow,

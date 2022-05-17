@@ -1,4 +1,10 @@
 # coding: utf-8
+<<<<<<< HEAD
+=======
+from __future__ import (division, print_function, absolute_import,
+                        unicode_literals)
+
+>>>>>>> Added __future__ imports to all files
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import status, viewsets, serializers
@@ -47,6 +53,7 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         :param request:
         :return:
         """
+
         try:
             instance_id = positive_int(
                 request.data.get('instance_id'), strict=True)
@@ -55,6 +62,12 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
                 {'instance_id': _('A positive integer is required.')})
 
         # Check if instance really belongs to Asset.
+            raise serializers.ValidationError(
+                {'instance_id': _('A positive integer is required.')})
+
+
+        # Check if instance really belongs to Asset.
+
         try:
             instance = self.asset.deployment.get_submission(instance_id,
                                                             request.user.id)
@@ -71,6 +84,7 @@ class HookSignalViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
             response_status_code = status.HTTP_202_ACCEPTED
             response = {
                 "detail": _(
+
                     "We got and saved your data, but may not have "
                     "fully processed it. You should not try to resubmit.")
             }

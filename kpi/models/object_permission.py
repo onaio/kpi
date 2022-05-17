@@ -3,7 +3,6 @@ import copy
 import re
 from collections import defaultdict
 
-
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser, Permission
@@ -12,6 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db import models, transaction
 from django.shortcuts import _get_queryset
+from django.utils.six import string_types
 from django_request_cache import cache_for_request
 
 from kpi.constants import PREFIX_PARTIAL_PERMS
@@ -226,6 +226,7 @@ class ObjectPermissionManager(models.Manager):
             super().get_or_create, content_object, **kwargs)
 
 
+@python_2_unicode_compatible
 class ObjectPermission(models.Model):
     """ An application of an auth.Permission instance to a specific
     content_object. Call ObjectPermission.objects.get_for_object() or
@@ -271,7 +272,12 @@ class ObjectPermission(models.Model):
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
 
-    def __unicode__(self):
+    @void_cache_for_request(keys=('__get_all_object_permissions',
+                                  '__get_all_user_permissions',))
+    def delete(self, *args, **kwargs):
+        super(self, ObjectPermission).delete(*args, **kwargs)
+
+    def __str__(self):
         for required_field in ('user', 'permission'):
             if not hasattr(self, required_field):
                 return 'incomplete ObjectPermission'
@@ -1126,6 +1132,12 @@ class ObjectPermissionMixin:
             all_object_permissions = self.__get_all_user_permissions(
                 content_type_id=object_content_type_id,
                 user_id=user_id)
+            if not all_object_permissions:
+                # Try AnonymousUser's permissions in case user does not have any.
+                all_object_permissions = self.__get_all_user_permissions(
+                    content_type_id=object_content_type_id,
+                    user_id=settings.ANONYMOUS_USER_ID)
+
             perms = build_dict(user_id, all_object_permissions.get(self.pk))
 
             if not perms:

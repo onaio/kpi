@@ -55,8 +55,11 @@ if os.environ.get('SESSION_COOKIE_DOMAIN'):
 # Limit sessions to 1 week (the default is 2 weeks)
 SESSION_COOKIE_AGE = 604800
 
+# Limit sessions to 1 week (the default is 2 weeks)
+SESSION_COOKIE_AGE = 604800
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = (os.environ.get('DJANGO_DEBUG', 'True') == 'True')
+DEBUG = (os.environ.get('DJANGO_DEBUG', 'False') == 'True')
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(' ')
 
@@ -172,10 +175,13 @@ CONSTANCE_CONFIG = {
         '',
         'Blacklisted IP addresses to bypass SSRF protection\nOne per line',
     ),
+    'EXPOSE_GIT_REV': (
+        False,
+        'Display information about the running commit to non-superusers',
+    ),
 }
 # Tell django-constance to use a database model instead of Redis
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
-
 
 # Warn developers to use `pytest` instead of `./manage.py test`
 class DoNotUseRunner:
@@ -186,7 +192,9 @@ class DoNotUseRunner:
 TEST_RUNNER = __name__ + '.DoNotUseRunner'
 
 # used in kpi.models.sitewide_messages
-MARKITUP_FILTER = ('markdown.markdown', {'safe_mode': False})
+# markdown does not support imports as unicode.
+# see `python2.7/dist-packages/markitup/fields.py:L14`
+MARKITUP_FILTER = (n(b'markdown.markdown'), {n(b'safe_mode'): False})
 
 # The backend that handles user authentication must match KoBoCAT's when
 # sharing sessions. ModelBackend does not interfere with object-level
@@ -209,6 +217,7 @@ ANONYMOUS_USER_ID = -1
 ALLOWED_ANONYMOUS_PERMISSIONS = (
     'kpi.view_collection',
     'kpi.view_asset',
+    'kpi.discover_asset',
     'kpi.view_submissions',
 )
 
@@ -280,6 +289,13 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/' + os.environ.get('KPI_MEDIA_URL', 'media').strip('/') + '/'
 
+# `PUBLIC_MEDIA_PATH` sets the `upload_to` attribute of explicitly-public
+# `FileField`s, e.g. in `ConfigurationFile`. The corresponding location on the
+# file system (usually `MEDIA_ROOT + PUBLIC_MEDIA_PATH`) should be exposed to
+# everyone via NGINX. For more information, see
+# https://docs.djangoproject.com/en/2.2/ref/models/fields/#django.db.models.FileField.upload_to
+PUBLIC_MEDIA_PATH = '__public/'
+
 # Following the uWSGI mountpoint convention, this should have a leading slash
 # but no trailing slash
 KPI_PREFIX = os.environ.get('KPI_PREFIX', 'False')
@@ -299,6 +315,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'jsapp'),
     os.path.join(BASE_DIR, 'static'),
     ('mocha', os.path.join(BASE_DIR, 'node_modules', 'mocha'),),
+    ('chai', os.path.join(BASE_DIR, 'node_modules', 'chai'),),
 )
 
 if os.path.exists(os.path.join(BASE_DIR, 'dkobo', 'jsapp')):
@@ -348,7 +365,7 @@ TEMPLATES = [
                 'kpi.context_processors.sitewide_messages',
                 'kpi.context_processors.config',
             ],
-            'debug': os.environ.get('TEMPLATE_DEBUG', 'True') == 'True',
+            'debug': os.environ.get('TEMPLATE_DEBUG', 'False') == 'True',
         },
     },
 ]
@@ -646,9 +663,6 @@ for git_rev_key, git_command in (
         GIT_REV[git_rev_key] = False
 if GIT_REV['branch'] == 'HEAD':
     GIT_REV['branch'] = False
-# Only superusers will be able to see this information unless
-# EXPOSE_GIT_REV=TRUE is set in the environment
-EXPOSE_GIT_REV = os.environ.get('EXPOSE_GIT_REV', '').upper() == 'TRUE'
 
 
 '''
@@ -663,9 +677,6 @@ KOBOCAT_DEFAULT_PERMISSION_CONTENT_TYPES = [
     # Each tuple must be (app_label, model_name)
     ('main', 'userprofile'),
     ('logger', 'xform'),
-    ('api', 'project'),
-    ('api', 'team'),
-    ('api', 'organizationprofile'),
     ('logger', 'note'),
 ]
 
@@ -696,6 +707,8 @@ else:
 MONGO_CONNECTION = MongoClient(
     MONGO_CONNECTION_URL, j=True, tz_aware=True, connect=False)
 MONGO_DB = MONGO_CONNECTION[MONGO_DATABASE['NAME']]
+
+MONGO_DB_MAX_TIME_MS = CELERY_TASK_TIME_LIMIT * 60 * 1000
 
 SESSION_ENGINE = "redis_sessions.session"
 SESSION_REDIS = RedisHelper.config(default="redis://redis_cache:6380/2")

@@ -5,6 +5,7 @@ from hashlib import md5
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils.six import iteritems
 
 from ...models import Asset, AssetVersion
 

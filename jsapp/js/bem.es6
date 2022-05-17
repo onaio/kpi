@@ -9,6 +9,8 @@ export const bem = BEM.init();
 
 bem.Button = BEM('mdl-button', '<button>');
 
+bem.Button = BEM('mdl-button', '<button>');
+
 bem.PageWrapper = BEM('page-wrapper');
 bem.PageWrapper__content = bem.PageWrapper.__('content');
 
@@ -92,6 +94,12 @@ bem.LibList__tag = bem.LibList.__('tag', '<span>');
 bem.LibList__label = bem.LibList.__('label');
 bem.LibList__dragbox = bem.LibList.__('dragbox');
 bem.LibList__qtype = bem.LibList.__('qtype');
+
+bem.SubmissionDataTable = bem('submission-data-table');
+bem.SubmissionDataTable__row = bem.SubmissionDataTable.__('row');
+bem.SubmissionDataTable__column = bem.SubmissionDataTable.__('column');
+bem.SubmissionDataTable__XMLName = bem.SubmissionDataTable.__('xml-name');
+bem.SubmissionDataTable__value = bem.SubmissionDataTable.__('value');
 
 bem.CollectionsWrapper = bem('collections-wrapper');
 
@@ -220,8 +228,6 @@ bem.Header = BEM('header');
 bem.Header__logo = bem.Header.__('logo', '<span>');
 
 bem.AccountBox = BEM('account-box');
-bem.AccountBox__notifications = bem.AccountBox.__('notifications');
-bem.AccountBox__notifications__count = bem.AccountBox.__('notifications__count', '<span>');
 bem.AccountBox__name = bem.AccountBox.__('name', '<div>');
 bem.AccountBox__initials = bem.AccountBox.__('initials', '<span>');
 bem.AccountBox__menu = bem.AccountBox.__('menu', '<ul>');
@@ -291,6 +297,10 @@ bem.PasswordStrength__bar = bem.PasswordStrength.__('bar');
 bem.PasswordStrength__indicator = bem.PasswordStrength.__('indicator');
 bem.PasswordStrength__messages = bem.PasswordStrength.__('messages', '<ul>');
 bem.PasswordStrength__message = bem.PasswordStrength.__('message', '<li>');
+
+bem.Breadcrumbs = BEM('breadcrumbs');
+bem.Breadcrumbs__crumb = bem.Breadcrumbs.__('crumb', '<a>');
+bem.Breadcrumbs__divider = bem.Breadcrumbs.__('divider', '<i>');
 
 bem.PrintOnly = BEM('print-only');
 

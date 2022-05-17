@@ -78,10 +78,16 @@ class UserCollectionPermissionsEditor extends React.Component {
   }
 
   componentDidMount() {
+
     this.listenTo(actions.permissions.assignCollectionPermission.completed, this.onChangeCollectionPermissionCompleted);
     this.listenTo(actions.permissions.assignCollectionPermission.failed, this.onChangeCollectionPermissionFailed);
     this.listenTo(actions.permissions.removeCollectionPermission.completed, this.onChangeCollectionPermissionCompleted);
     this.listenTo(actions.permissions.removeCollectionPermission.failed, this.onChangeCollectionPermissionFailed);
+    this.listenTo(stores.userExists, this.onUserExistsStoreChange);
+  }
+
+  onChangeCollectionPermissionCompleted() {
+
     this.listenTo(stores.userExists, this.onUserExistsStoreChange);
   }
 

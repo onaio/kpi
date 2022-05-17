@@ -99,7 +99,7 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
     * `uid` - is the unique identifier of a specific asset
     * `id` - is the unique identifier of a specific submission
 
-    **It is not allowed to create submissions with `kpi`'s API as this is handled by `kobocat`'s `/submissions` endpoint**
+    **It is not allowed to create submissions with `kpi`'s API as this is handled by `kobocat`'s `/submission` endpoint**
 
     Retrieves a specific submission
     <pre class="prettyprint">
@@ -137,7 +137,7 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
 
     Update current submission
 
-    _It is not possible to update a submission directly with `kpi`'s API as this is handled by `kobocat`'s `/submissions` endpoint. 
+    _It is not possible to update a submission directly with `kpi`'s API as this is handled by `kobocat`'s `/submission` endpoint.
     Instead, it returns the URL where the instance can be opened in Enketo for editing in the UI._
 
     <pre class="prettyprint">
@@ -193,9 +193,31 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
     > **Payload**
     >
     >        {
-    >           "submissions_ids": [{integer}],
+    >           "submission_ids": [{integer}],
     >           "validation_status.uid": <validation_status>
     >        }
+
+
+    ### Bulk updating of submissions
+
+    <pre class="prettyprint">
+    <b>PATCH</b> /api/v2/assets/<code>{uid}</code>/data/bulk_update_submissions/
+    </pre>
+
+    > Example
+    >
+    >       curl -X PATCH https://[kpi]/api/v2/assets/aSAvYreNzVEkrWg5Gdcvg/data/bulk_update_submissions/
+
+    > **Payload**
+    >
+    >        {
+    >           "submission_ids": [{integer}],
+    >           <field_to_update_1>: <value_1>,
+    >           <field_to_update_2>: <value_2>,
+    >           <field_to_update_n>: <value_n>
+    >        }
+
+    where `<field_to_update_n>` is a string and should be an existing XML field value of the submissions.
 
 
     ### CURRENT ENDPOINT
@@ -215,7 +237,7 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         Returns the deployment for the asset specified by the request
         """
         if not self.asset.has_deployment:
-            raise serializers.ValidationError(
+            raise ValidationError(
                 _('The specified asset has not been deployed'))
         return self.asset.deployment
 
@@ -271,7 +293,6 @@ class DataViewSet(AssetNestedObjectViewsetMixin, NestedViewSetMixin,
         page = self.paginate_queryset(dummy_submissions_list)
         if page is not None:
             return self.get_paginated_response(submissions)
-
         return Response(list(submissions))
 
     def retrieve(self, request, pk, *args, **kwargs):

@@ -88,12 +88,6 @@ actions.search = Reflux.createActions({
       'completed',
       'failed'
     ]
-  },
-  collections: {
-    children: [
-      'completed',
-      'failed'
-    ]
   }
 });
 
@@ -710,22 +704,9 @@ actions.auth.getApiToken.failed.listen(() => {
 });
 
 actions.resources.loadAsset.listen(function(params){
-  var dispatchMethodName;
-  if (params.url) {
-    dispatchMethodName = params.url.indexOf('collections') === -1 ?
-        'getAsset' : 'getCollection';
-  } else if (params.id) {
-    dispatchMethodName = {
-      c: 'getCollection',
-      a: 'getAsset'
-    }[params.id[0]];
-  }
-
-  if (dispatchMethodName) {
-    dataInterface[dispatchMethodName](params)
-      .done(actions.resources.loadAsset.completed)
-      .fail(actions.resources.loadAsset.failed);
-  }
+  dataInterface.getAsset(params)
+    .done(actions.resources.loadAsset.completed)
+    .fail(actions.resources.loadAsset.failed);
 });
 
 actions.resources.loadAssetContent.listen(function(params){

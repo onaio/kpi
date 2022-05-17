@@ -215,6 +215,21 @@ mixins.dmix = {
       return this.props.uid;
     }
   },
+  // TODO
+  // Fix `componentWillUpdate` and `componentDidMount` asset loading flow.
+  // Ideally we should build a single overaching component that would
+  // handle loading of the asset in all necessary cases in a way that all
+  // interested parties could use without duplication or confusion and with
+  // indication when the loading starts and when ends.
+  componentWillUpdate(newProps) {
+    if (
+      this.props.params?.uid !== newProps.params?.uid
+    ) {
+      // This case is used by other components (header.es6 is one such component)
+      // in a not clear way to gain a data on new asset.
+      actions.resources.loadAsset({id: newProps.params.uid});
+    }
+  },
   componentDidMount () {
     this.listenTo(stores.asset, this.dmixAssetStoreChange);
 
@@ -583,8 +598,13 @@ mixins.clickAssets = {
         let asset = stores.selectedAsset.asset;
         mixins.dmix.deployAsset(asset);
       },
-      archive: function(uid, callback) {
-        let asset = stores.selectedAsset.asset || stores.allAssets.byUid[uid];
+      archive: function(assetOrUid, callback) {
+        let asset;
+        if (typeof assetOrUid === 'object') {
+          asset = assetOrUid;
+        } else {
+          asset = stores.selectedAsset.asset || stores.allAssets.byUid[assetOrUid];
+        }
         let dialog = alertify.dialog('confirm');
         let opts = {
           title: t('Archive Project'),

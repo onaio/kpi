@@ -31,6 +31,7 @@ class AssetPermissionAssignmentSerializer(serializers.ModelSerializer):
         style={'base_template': 'input.html'}  # Render as a simple text box
     )
     partial_permissions = serializers.SerializerMethodField()
+    label = serializers.SerializerMethodField()
 
     class Meta:
         model = ObjectPermission
@@ -55,6 +56,20 @@ class AssetPermissionAssignmentSerializer(serializers.ModelSerializer):
         return asset.assign_perm(user, permission.codename,
                                  partial_perms=partial_permissions)
 
+    def get_label(self, object_permission):
+        # `self.object_permission.label` calls `self.object_permission.asset`
+        # internally. Thus, costs an extra query each time the object is
+        # serialized. `asset` is already loaded and attached to context,
+        # let's use it!
+        try:
+            asset = self.context['asset']
+        except KeyError:
+            return object_permission.label
+        else:
+            return asset.get_label_for_permission(
+                object_permission.permission.codename
+            )
+
     def get_partial_permissions(self, object_permission):
         codename = object_permission.permission.codename
         if codename.startswith(PREFIX_PARTIAL_PERMS):
@@ -67,14 +82,15 @@ class AssetPermissionAssignmentSerializer(serializers.ModelSerializer):
             if not partial_perms:
                 return None
 
-            hyperlinked_partial_perms = []
-            for perm_codename, filters in partial_perms.items():
-                url = self.__get_permission_hyperlink(perm_codename)
-                hyperlinked_partial_perms.append({
-                    'url': url,
-                    'filters': filters
-                })
-            return hyperlinked_partial_perms
+            if partial_perms:
+                hyperlinked_partial_perms = []
+                for perm_codename, filters in partial_perms.items():
+                    url = self.__get_permission_hyperlink(perm_codename)
+                    hyperlinked_partial_perms.append({
+                        'url': url,
+                        'filters': filters
+                    })
+                return hyperlinked_partial_perms
         return None
 
     def get_url(self, object_permission):
