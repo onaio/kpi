@@ -250,7 +250,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             u"downloadable": active,
             u"has_kpi_hook": self.asset.has_active_hooks,
         }
-        files = {'xls_file': ('{}.xls'.format(id_string), xls_io)}
+        files = {'xls_file': ('{}.xlsx'.format(id_string), xls_io)}
         json_response = self._kobocat_request(
             'POST', url, data=payload, files=files)
         self.store_data({
@@ -283,7 +283,7 @@ class KobocatDeploymentBackend(BaseDeploymentBackend):
             "title": self.asset.name,
             "has_kpi_hook": self.asset.has_active_hooks
         }
-        files = {'xls_file': ('{}.xls'.format(id_string), xls_io)}
+        files = {'xls_file': ('{}.xlsx'.format(id_string), xls_io)}
         try:
             json_response = self._kobocat_request(
                 'PATCH', url, data=payload, files=files)
