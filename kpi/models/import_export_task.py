@@ -1,6 +1,7 @@
 # coding: utf-8
 import base64
 import datetime
+import json
 import dateutil.parser
 import posixpath
 import re
@@ -17,6 +18,7 @@ except ImportError:
 import constance
 import requests
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField as JSONBField
 from django.core.files.base import ContentFile
 from django.db import models, transaction
@@ -26,6 +28,7 @@ from openpyxl.utils.exceptions import InvalidFileException
 from private_storage.fields import PrivateFileField
 from pyxform.xls2json_backends import xls_to_dict, xlsx_to_dict
 from rest_framework import exceptions
+from rest_framework.authtoken.models import Token
 from werkzeug.http import parse_options_header
 
 import formpack
@@ -202,7 +205,11 @@ class ImportTask(ImportExportTask):
             # TODO: merge with `url` handling above; currently kept separate
             # because `_load_assets_from_url()` uses complex logic to deal with
             # multiple XLS files in a directory structure within a ZIP archive
-            response = requests.get(self.data['single_xls_url'])
+            username = self.user.username
+            token = User.objects.using("kobocat").select_related("auth_token").get(username=username).auth_token.key
+            headers = {"Authorization": f"Token {token}"}
+            response = requests.get(
+                self.data['single_xls_url'], headers=headers)
             response.raise_for_status()
             encoded_xls = to_str(base64.b64encode(response.content))
 
@@ -304,6 +311,16 @@ class ImportTask(ImportExportTask):
             orm_obj.parent = parent_item
             orm_obj.save()
 
+    def _retrieve_form_payload(self, form_id):
+        url = f"{settings.KOBOCAT_INTERNAL_URL}/api/v1/forms/{form_id}"
+        username = self.user.username
+        token = User.objects.using("kobocat").select_related("auth_token").get(
+            username=username).auth_token
+
+        response = requests.get(url, headers={"Authorization": f"Token {token}"})
+        if response.status_code == 200:
+            return response.json()
+
     def _parse_b64_upload(self, base64_encoded_upload, messages, **kwargs):
         filename = kwargs.get('filename', False)
         desired_type = kwargs.get('desired_type')
@@ -316,8 +333,17 @@ class ImportTask(ImportExportTask):
         survey_dict = _b64_xls_to_dict(base64_encoded_upload)
         survey_dict_keys = survey_dict.keys()
 
+        form_payload = None
+
         destination = kwargs.get('destination', False)
         has_necessary_perm = kwargs.get('has_necessary_perm', False)
+        if destination and hasattr(destination, "settings"):
+            form_id = destination.settings.get('form_id')
+            if form_id:
+                form_payload = self._retrieve_form_payload(form_id)
+                if form_payload:
+                    form_payload['has_id_string_changed'] = False
+
 
         if destination and not has_necessary_perm:
             # redundant check
@@ -377,6 +403,16 @@ class ImportTask(ImportExportTask):
                         base64_encoded_upload, survey_dict
                     )
                 asset.content = survey_dict
+                if form_payload:
+                    id_string = form_payload.get('id_string')
+                    identifier = f"{settings.KOBOCAT_URL}/{asset.owner.username}/forms/{id_string}"
+                    asset._deployment_data.update({
+                        'backend': 'kobocat',
+                        'identifier': identifier,
+                        'active': form_payload['downloadable'],
+                        'backend_response': form_payload,
+                        'version': asset.version_id
+                    })
                 asset.save()
                 msg_key = 'updated'
 

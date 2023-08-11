@@ -23,6 +23,8 @@ import dataShareActions from './actions/dataShareActions';
 import {
   notify,
   replaceSupportEmail,
+  checkIfCookieExists,
+  redirectForOnaDataAuth,
 } from 'utils';
 
 // Configure Reflux
@@ -201,36 +203,68 @@ actions.resources.listTags.completed.listen(function(results){
 });
 
 actions.resources.updateAsset.listen(function(uid, values, params={}) {
-  dataInterface.patchAsset(uid, values)
-    .done((asset) => {
-      actions.resources.updateAsset.completed(asset);
-      if (typeof params.onComplete === 'function') {
-        params.onComplete(asset, uid, values);
+  if (checkIfCookieExists("__kpi_formbuilder")) {
+    redirectForOnaDataAuth()
+  } else {
+    return new Promise((resolve, reject) => {
+      dataInterface.patchAsset(uid, values)
+        .done((asset) => {
+          actions.resources.updateAsset.completed(asset);
+          resolve(asset);
+        })
+        .fail((resp) => {
+          if (resp.status === 500) {
+            reject(resp);
+          } else {
+            alertify.error(resp.responseJSON[0]);
+            reject(resp);
+          }
+        });
+    }).then((asset) => {
+      if (asset.asset_type === "survey") {
+        dataInterface.deployAsset(asset, asset.has_deployment)
+          .done((data) => {
+            if (asset.has_deployment) {
+              notify(t('Successfully updated published form.'));
+            } else {
+              notify(t('Successfully published form.'));
+            }
+          })
+          .fail((resp) => {
+            if (resp.status === 500) {
+              alertify.error(t('Internal Server Error: Kindly ensure the form has atleast one question'));
+            } else {
+              alertify.error(resp.responseText);
+            }
+          });
+      } else {
+        notify(t('Successfully updated asset.'));
       }
-      notify(t('successfully updated'));
+
+      return asset
     })
-    .fail(function(resp){
-      actions.resources.updateAsset.failed(resp);
-      if (params.onFailed) {
-        params.onFailed(resp);
-      }
-    });
+  }
 });
 
 actions.resources.deployAsset.listen(function(asset, redeployment, params={}){
-  dataInterface.deployAsset(asset, redeployment)
-    .done((data) => {
-      actions.resources.deployAsset.completed(data.asset);
-      if (typeof params.onDone === 'function') {
-        params.onDone(data, redeployment);
-      }
-    })
-    .fail((data) => {
-      actions.resources.deployAsset.failed(data, redeployment);
-      if (typeof params.onFail === 'function') {
-        params.onFail(data,  redeployment);
-      }
-    });
+  var asset_type = asset.asset_type;
+  if (asset_type === "survey") {
+    dataInterface.deployAsset(asset, redeployment)
+      .done((data) => {
+        actions.resources.deployAsset.completed(data.asset);
+        if (typeof params.onDone === 'function') {
+          params.onDone(data, redeployment);
+        }
+      })
+      .fail((data) => {
+        actions.resources.deployAsset.failed(data, redeployment);
+        if (typeof params.onFail === 'function') {
+          params.onFail(data,  redeployment);
+        }
+      });
+  } else {
+    notify(t('Asset of type ${asset_type} deployment is disabled'));
+  }
 });
 
 actions.resources.deployAsset.failed.listen(function(data, redeployment){
