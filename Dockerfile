@@ -32,13 +32,12 @@ ENV KPI_LOGS_DIR=/srv/logs \
     UWSGI_GROUP=kobo \
     SERVICES_DIR=/etc/service \
     CELERY_PID_DIR=/var/run/celery \
-    NODE_MAJOR=16 \
+    NODE_VERSION=16.15.0 \
     INIT_PATH=/srv/init
 
 ##########################################
 # Create build directories               #
 ##########################################
-
 RUN mkdir -p "${NGINX_STATIC_DIR}" && \
     mkdir -p "${KPI_SRC_DIR}" && \
     mkdir -p "${KPI_NODE_PATH}" && \
@@ -50,20 +49,25 @@ RUN mkdir -p "${NGINX_STATIC_DIR}" && \
     mkdir -p ${SERVICES_DIR}/celery_beat && \
     mkdir -p "${INIT_PATH}"
 
+RUN apt -qq update -y && \
+    apt install -y curl
+
+ENV NVM_DIR=/usr/local/nvm
+RUN mkdir -p $NVM_DIR
+RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
+ENV PATH="${NVM_DIR}/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+RUN echo $PATH
+RUN node --version
+RUN npm --version
 ##########################################
 # Install `apt` packages.                #
 ##########################################
 
 RUN apt -qq update -y && \
-    apt -qq -y install curl && \
     apt -qq install -y ca-certificates && \
-    apt -qq install -y gnupg && \
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key |\
-    gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" |\
-    tee /etc/apt/sources.list.d/nodesource.list && \
-    apt-get update && \
-    apt-get install nodejs -y && \
     apt -qq -y install --no-install-recommends \
     npm \
     ffmpeg \
@@ -195,12 +199,6 @@ RUN apt remove -y vim-tiny\
     git \
     git-man \
     gnupg \
-    gnupg-l10n \
-    gnupg-utils \
-    gpg \
-    gpg-agent \
-    gpgconf \
-    gpgsm \
     libaom3 \
     libavutil57 \
     libc-ares2 \
