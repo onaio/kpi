@@ -23,8 +23,8 @@ celery[redis]
 dict2xml
 dj-static
 django-braces
-django-celery-beat
-django-constance[database]
+django-celery-beat==2.3.0
+django-constance[database]==2.9.1
 django-cors-headers
 django-csp
 django-debug-toolbar
