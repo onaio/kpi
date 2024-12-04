@@ -16,7 +16,7 @@ begins==0.9               # via formpack
 billiard==3.6.1.0         # via -r dependencies/pip/requirements.in, celery
 boto3==1.10.15            # via -r dependencies/pip/requirements.in, django-amazon-ses
 botocore==1.13.15         # via boto3, s3transfer
-celery[redis]==4.3.0      # via -r dependencies/pip/requirements.in
+celery[redis]==4.4.7      # via -r dependencies/pip/requirements.in
 certifi==2019.9.11        # via requests
 cffi==1.13.2              # via cryptography
 chardet==3.0.4            # via requests
