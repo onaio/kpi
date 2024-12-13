@@ -155,7 +155,7 @@ django-markdownx==3.0.1
     # via -r dependencies/pip/requirements.in
 django-markitup==4.0.0
     # via -r dependencies/pip/requirements.in
-django-mptt==0.13.4
+django-mptt==0.14.0
     # via -r dependencies/pip/requirements.in
 django-oauth-toolkit==1.7.1
     # via -r dependencies/pip/requirements.in

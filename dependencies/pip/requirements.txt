@@ -135,8 +135,8 @@ django-loginas==0.3.11
 django-markdownx==4.0.7
     # via -r dependencies/pip/requirements.in
 django-markitup==4.1.0
-    # via -r dependencies/pip/requirements.in
-django-mptt==0.16.0
+t    # via -r dependencies/pip/requirements.in
+django-mptt==0.14.0
     # via -r dependencies/pip/requirements.in
 django-oauth-toolkit==2.3.0
     # via -r dependencies/pip/requirements.in
