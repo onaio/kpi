@@ -5,11 +5,11 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python -m venv "$VIRTUAL_ENV"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install --quiet pip==24.0 setuptools==70.0.0 && \
-    pip install --quiet pip-tools
+  pip install --quiet pip-tools
 COPY ./dependencies/pip/external_services.txt "/tmp/pip_dependencies.txt"
 RUN pip-sync "/tmp/pip_dependencies.txt" 1>/dev/null
 
-FROM python:3.10.14-slim-bookworm
+FROM python:3.10.17-slim-bookworm
 
 RUN apt -y update && apt -y upgrade
 
@@ -20,37 +20,37 @@ ENV LC_ALL=en_US.UTF-8
 ENV VIRTUAL_ENV=/opt/venv
 
 ENV KPI_LOGS_DIR=/srv/logs \
-    DJANGO_SETTINGS_MODULE=kobo.settings.prod \
-    # The mountpoint of a volume shared with the `nginx` container. Static files will
-    #   be copied there.
-    NGINX_STATIC_DIR=/srv/static \
-    KPI_SRC_DIR=/srv/src/kpi \
-    KPI_MEDIA_DIR=/srv/src/kpi/media \
-    KPI_NODE_PATH=/srv/src/kpi/node_modules \
-    TMP_DIR=/srv/tmp \
-    UWSGI_USER=kobo \
-    UWSGI_GROUP=kobo \
-    SERVICES_DIR=/etc/service \
-    CELERY_PID_DIR=/var/run/celery \
-    NODE_VERSION=16.15.0 \
-    INIT_PATH=/srv/init
+  DJANGO_SETTINGS_MODULE=kobo.settings.prod \
+  # The mountpoint of a volume shared with the `nginx` container. Static files will
+  #   be copied there.
+  NGINX_STATIC_DIR=/srv/static \
+  KPI_SRC_DIR=/srv/src/kpi \
+  KPI_MEDIA_DIR=/srv/src/kpi/media \
+  KPI_NODE_PATH=/srv/src/kpi/node_modules \
+  TMP_DIR=/srv/tmp \
+  UWSGI_USER=kobo \
+  UWSGI_GROUP=kobo \
+  SERVICES_DIR=/etc/service \
+  CELERY_PID_DIR=/var/run/celery \
+  NODE_VERSION=16.15.0 \
+  INIT_PATH=/srv/init
 
 ##########################################
 # Create build directories               #
 ##########################################
 RUN mkdir -p "${NGINX_STATIC_DIR}" && \
-    mkdir -p "${KPI_SRC_DIR}" && \
-    mkdir -p "${KPI_NODE_PATH}" && \
-    mkdir -p "${TMP_DIR}" && \
-    mkdir -p ${CELERY_PID_DIR} && \
-    mkdir -p ${SERVICES_DIR}/uwsgi && \
-    mkdir -p ${SERVICES_DIR}/celery && \
-    mkdir -p ${SERVICES_DIR}/celery_low_priority && \
-    mkdir -p ${SERVICES_DIR}/celery_beat && \
-    mkdir -p "${INIT_PATH}"
+  mkdir -p "${KPI_SRC_DIR}" && \
+  mkdir -p "${KPI_NODE_PATH}" && \
+  mkdir -p "${TMP_DIR}" && \
+  mkdir -p ${CELERY_PID_DIR} && \
+  mkdir -p ${SERVICES_DIR}/uwsgi && \
+  mkdir -p ${SERVICES_DIR}/celery && \
+  mkdir -p ${SERVICES_DIR}/celery_low_priority && \
+  mkdir -p ${SERVICES_DIR}/celery_beat && \
+  mkdir -p "${INIT_PATH}"
 
 RUN apt -qq update -y && \
-    apt install -y curl
+  apt install -y curl
 
 ENV NVM_DIR=/usr/local/nvm
 RUN mkdir -p $NVM_DIR
@@ -67,31 +67,31 @@ RUN npm --version
 ##########################################
 
 RUN apt -qq update -y && \
-    apt -qq install -y ca-certificates && \
-    apt -qq -y install --no-install-recommends \
-    npm \
-    ffmpeg \
-    gdal-bin \
-    gettext \
-    git \
-    gosu \
-    less \
-    libproj-dev \
-    locales \
-    postgresql-client \
-    rsync \
-    runit-init \
-    vim-tiny \
-    wait-for-it && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  apt -qq install -y ca-certificates && \
+  apt -qq -y install --no-install-recommends \
+  npm \
+  ffmpeg \
+  gdal-bin \
+  gettext \
+  git \
+  gosu \
+  less \
+  libproj-dev \
+  locales \
+  postgresql-client \
+  rsync \
+  runit-init \
+  vim-tiny \
+  wait-for-it && \
+  apt clean && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ###########################
 # Install locales         #
 ###########################
 
 RUN echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && \
-    locale-gen && dpkg-reconfigure locales -f noninteractive
+  locale-gen && dpkg-reconfigure locales -f noninteractive
 
 #################################
 # Create local user UWSGI_USER` #
@@ -118,11 +118,11 @@ COPY --from=build-python "$VIRTUAL_ENV" "$VIRTUAL_ENV"
 WORKDIR ${KPI_SRC_DIR}/
 
 RUN rm -rf ${KPI_NODE_PATH} && \
-    npm install -g npm@8.11.0 && \
-    npm config set legacy-peer-deps true && \
-    npm install -g check-dependencies && \
-    npm install --quiet && \
-    npm cache clean --force
+  npm install -g npm@8.11.0 && \
+  npm config set legacy-peer-deps true && \
+  npm install -g check-dependencies && \
+  npm install --quiet && \
+  npm cache clean --force
 
 ENV PATH $PATH:${KPI_NODE_PATH}/.bin
 
@@ -131,8 +131,8 @@ ENV PATH $PATH:${KPI_NODE_PATH}/.bin
 ######################
 
 RUN rm -rf "${KPI_SRC_DIR}/jsapp/fonts" && \
-    rm -rf "${KPI_SRC_DIR}/jsapp/compiled" && \
-    npm run copy-fonts && npm run build
+  rm -rf "${KPI_SRC_DIR}/jsapp/compiled" && \
+  npm run copy-fonts && npm run build
 
 ###########################
 # Organize static assets. #
@@ -145,8 +145,8 @@ RUN python manage.py collectstatic --noinput
 #####################################
 
 RUN git submodule init && \
-    git submodule update --remote && \
-    python manage.py compilemessages
+  git submodule update --remote && \
+  python manage.py compilemessages
 
 ##########################################
 # Persist the log and email directories. #
@@ -160,8 +160,8 @@ RUN mkdir -p "${KPI_LOGS_DIR}/" "${KPI_SRC_DIR}/emails"
 
 # Using `/etc/profile.d/` as a repository for non-hard-coded environment variable overrides.
 RUN echo "export PATH=${PATH}" >> /etc/profile && \
-    echo 'source /etc/profile' >> /root/.bashrc && \
-    echo 'source /etc/profile' >> /home/${UWSGI_USER}/.bashrc
+  echo 'source /etc/profile' >> /root/.bashrc && \
+  echo 'source /etc/profile' >> /home/${UWSGI_USER}/.bashrc
 
 
 # Remove getty* services to avoid errors of absent tty at sv start-up
@@ -169,17 +169,17 @@ RUN rm -rf /etc/runit/runsvdir/default/getty-tty*
 
 # Create symlinks for runsv services
 RUN ln -s "${KPI_SRC_DIR}/docker/run_uwsgi.bash" "${SERVICES_DIR}/uwsgi/run" && \
-    ln -s "${KPI_SRC_DIR}/docker/run_celery.bash" "${SERVICES_DIR}/celery/run" && \
-    ln -s "${KPI_SRC_DIR}/docker/run_celery_low_priority.bash" "${SERVICES_DIR}/celery_low_priority/run" && \
-    ln -s "${KPI_SRC_DIR}/docker/run_celery_beat.bash" "${SERVICES_DIR}/celery_beat/run"
+  ln -s "${KPI_SRC_DIR}/docker/run_celery.bash" "${SERVICES_DIR}/celery/run" && \
+  ln -s "${KPI_SRC_DIR}/docker/run_celery_low_priority.bash" "${SERVICES_DIR}/celery_low_priority/run" && \
+  ln -s "${KPI_SRC_DIR}/docker/run_celery_beat.bash" "${SERVICES_DIR}/celery_beat/run"
 
 
 # Add/Restore `UWSGI_USER`'s permissions
 RUN chown -R ":${UWSGI_GROUP}" ${CELERY_PID_DIR} && \
-    chmod g+w ${CELERY_PID_DIR} && \
-    chown -R "${UWSGI_USER}:${UWSGI_GROUP}" ${KPI_SRC_DIR}/emails/ && \
-    chown -R "${UWSGI_USER}:${UWSGI_GROUP}" ${KPI_LOGS_DIR} && \
-    chown -R "${UWSGI_USER}:${UWSGI_GROUP}" ${TMP_DIR}
+  chmod g+w ${CELERY_PID_DIR} && \
+  chown -R "${UWSGI_USER}:${UWSGI_GROUP}" ${KPI_SRC_DIR}/emails/ && \
+  chown -R "${UWSGI_USER}:${UWSGI_GROUP}" ${KPI_LOGS_DIR} && \
+  chown -R "${UWSGI_USER}:${UWSGI_GROUP}" ${TMP_DIR}
 
 ################################
 # Clean up vulnerable packages.#
@@ -188,56 +188,56 @@ RUN npm run copy-fonts && npm run build && python manage.py collectstatic --noin
 RUN npm prune --production
 RUN pip install pyyaml
 RUN apt remove -y vim-tiny\
-    vim-common\
-    perl\
-    openssl\
-    linux-libc-dev\
-    libwebpdemux2\
-    libxerces-c3.2\
-    libnode-dev\
-    curl \
-    git \
-    git-man \
-    gnupg \
-    libaom3 \
-    libavutil57 \
-    libc-ares2 \
-    libc-dev-bin \
-    libc-l10n \
-    libc6-dev \
-    libcaca0 \
-    libcairo-gobject2 \
-    libcairo2 \
-    libcurl3-gnutls \
-    libcurl4 \
-    libdav1d6 \
-    libde265-0 \
-    libgfortran5 \
-    libgif7 \
-    libglib2.0-0 \
-    libgomp1 \
-    libgssapi-krb5-2 \
-    libjbig-dev \
-    libk5crypto3 \
-    libkrb5-3 \
-    libkrb5support0 \
-    libldap-2.5-0 \
-    libldap-common \
-    libllvm15 \
-    libmbedcrypto7 \
-    libnss3 \
-    libopenjp2-7 \
-    libperl5.36 \
-    libpixman-1-0 \
-    libquadmath0 \
-    librabbitmq4 \
-    libsndfile1 \
-    libjxl0.7 \
-    libtiff6
+  vim-common\
+  perl\
+  openssl\
+  linux-libc-dev\
+  libwebpdemux2\
+  libxerces-c3.2\
+  libnode-dev\
+  curl \
+  git \
+  git-man \
+  gnupg \
+  libaom3 \
+  libavutil57 \
+  libc-ares2 \
+  libc-dev-bin \
+  libc-l10n \
+  libc6-dev \
+  libcaca0 \
+  libcairo-gobject2 \
+  libcairo2 \
+  libcurl3-gnutls \
+  libcurl4 \
+  libdav1d6 \
+  libde265-0 \
+  libgfortran5 \
+  libgif7 \
+  libglib2.0-0 \
+  libgomp1 \
+  libgssapi-krb5-2 \
+  libjbig-dev \
+  libk5crypto3 \
+  libkrb5-3 \
+  libkrb5support0 \
+  libldap-2.5-0 \
+  libldap-common \
+  libllvm15 \
+  libmbedcrypto7 \
+  libnss3 \
+  libopenjp2-7 \
+  libperl5.36 \
+  libpixman-1-0 \
+  libquadmath0 \
+  librabbitmq4 \
+  libsndfile1 \
+  libjxl0.7 \
+  libtiff6
 
 RUN apt update -y  && \
-    apt -y install libpq-dev && \
-    apt -y install build-essential libgdal-dev
+  apt -y install libpq-dev && \
+  apt -y install build-essential libgdal-dev
 
 EXPOSE 8000
 
