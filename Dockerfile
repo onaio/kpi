@@ -9,7 +9,7 @@ RUN pip install --quiet pip==24.0 setuptools==70.0.0 && \
 COPY ./dependencies/pip/external_services.txt "/tmp/pip_dependencies.txt"
 RUN pip-sync "/tmp/pip_dependencies.txt" 1>/dev/null
 
-FROM python:3.10.17-slim-bookworm
+FROM python:3.10.18-slim-bookworm
 
 RUN apt -y update && apt -y upgrade
 
