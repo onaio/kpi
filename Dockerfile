@@ -40,18 +40,23 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 
+# Point Buster repos to archive.debian.org instead of deb.debian.org/security.debian.org
+RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
+    sed -i 's|http://security.debian.org/debian-security|http://archive.debian.org/debian-security|g' /etc/apt/sources.list
+
+
 RUN apt -qq update && \
     apt -qq -y install \
-        gdal-bin \
-        libproj-dev \
-        gettext \
-        postgresql-client \
-        locales \
-        runit-init \
-        rsync \
-        vim && \
+    gdal-bin \
+    libproj-dev \
+    gettext \
+    postgresql-client \
+    locales \
+    runit-init \
+    rsync \
+    vim && \
     apt clean && \
-        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ###########################
 # Install locales         #
@@ -72,10 +77,14 @@ COPY . "${KPI_SRC_DIR}"
 
 RUN virtualenv "$VIRTUAL_ENV"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-RUN pip install  --quiet --upgrade pip && \
-    pip install  --quiet pip-tools
+
+# Pin pip to last version that works with celery==4.3.0's broken metadata
+RUN python -m pip install "pip==24.0"
+
 COPY ./dependencies/pip/external_services.txt /srv/tmp/pip_dependencies.txt
-RUN pip-sync /srv/tmp/pip_dependencies.txt 1>/dev/null && \
+
+# In a fresh venv inside Docker, pip install is enough
+RUN python -m pip install -r /srv/tmp/pip_dependencies.txt && \
     rm -rf ~/.cache/pip
 
 ###########################
