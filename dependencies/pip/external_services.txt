@@ -76,6 +76,7 @@ psycopg2==2.8.4           # via -r dependencies/pip/requirements.in
 pyasn1==0.4.7             # via -r dependencies/pip/requirements.in, ndg-httpsclient
 pycparser==2.19           # via cffi
 pygments==2.4.2           # via -r dependencies/pip/requirements.in
+PyJWT==2.9.0              # via -r dependencies/pip/requirements.in
 pymongo==3.9.0            # via -r dependencies/pip/requirements.in
 pyopenssl==19.0.0         # via -r dependencies/pip/requirements.in, ndg-httpsclient
 pyquery==1.4.1            # via formpack
@@ -84,6 +85,7 @@ python-crontab==2.4.0     # via django-celery-beat
 python-dateutil==2.8.0    # via -r dependencies/pip/requirements.in, botocore, python-crontab
 pytz==2019.3              # via -r dependencies/pip/requirements.in, celery, django, django-timezone-field
 pyxform==0.15.1           # via -r dependencies/pip/requirements.in, formpack
+pyyaml==5.3.1             # via -r dependencies/pip/requirements.in
 raven==6.10.0             # via -r dependencies/pip/external_services.in
 redis==3.3.11             # via celery, django-redis-sessions
 requests==2.22.0          # via -r dependencies/pip/requirements.in, django-oauth-toolkit, responses

@@ -55,10 +55,12 @@ lxml
 oauthlib
 #py-gfm # Incompatible with markdown 3.x
 psycopg2
+PyJWT==2.9.0
 pymongo
 python-dateutil
 pytz
 pyxform
+pyyaml==5.3.1
 requests
 responses
 shortuuid
