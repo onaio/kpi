@@ -48,6 +48,7 @@ RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /
 RUN apt -qq update && \
     apt -qq -y install \
     gdal-bin \
+    libgdal-dev \
     libproj-dev \
     gettext \
     postgresql-client \
@@ -77,14 +78,11 @@ COPY . "${KPI_SRC_DIR}"
 
 RUN virtualenv "$VIRTUAL_ENV"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
 # Pin pip to last version that works with celery==4.3.0's broken metadata
-RUN python -m pip install "pip==24.0"
-
+RUN python -m pip install "pip==24.0" && \
+    pip install "pip-tools==7.4.1"
 COPY ./dependencies/pip/external_services.txt /srv/tmp/pip_dependencies.txt
-
-# In a fresh venv inside Docker, pip install is enough
-RUN python -m pip install -r /srv/tmp/pip_dependencies.txt && \
+RUN pip-sync /srv/tmp/pip_dependencies.txt && \
     rm -rf ~/.cache/pip
 
 ###########################
