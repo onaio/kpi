@@ -9,6 +9,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
+import json
+
 from kpi.authentication import DigestAuthentication, EnketoSessionAuthentication
 from kpi.exceptions import SubmissionIntegrityError
 from kpi.filters import RelatedAssetPermissionsFilter
@@ -136,8 +138,12 @@ class AssetSnapshotViewSet(OpenRosaViewSetMixin, NoUpdateModelViewSet):
     def preview(self, request, *args, **kwargs):
         # **Not** part of the OpenRosa API
         snapshot = self.get_object()
-        if snapshot.details.get('status') == 'success':
-            # data = {
+        try:
+            snapshot_status = json.loads(snapshot.details).get('status')
+        except:
+            snapshot_status = snapshot.details.get('status')
+        if  snapshot_status == 'success':
+        # data = {
             #     'server_url': reverse(viewname='assetsnapshot-detail',
             #                           kwargs={'uid': snapshot.uid},
             #                           request=request
